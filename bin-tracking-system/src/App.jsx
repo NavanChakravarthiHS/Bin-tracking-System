@@ -1,43 +1,31 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Sidebar from './components/Layout/Sidebar';
 import Navbar from './components/Layout/Navbar';
 import DashboardPage from './pages/DashboardPage';
 import MapPage from './pages/MapPage';
 import AlertsPage from './pages/AlertsPage';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(() => {
-    // Check if user has a saved preference
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
-  });
-
-  useEffect(() => {
-    // Apply dark mode class to html element
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    // Save preference
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
-
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-  };
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg transition-colors duration-300">
-        <Navbar darkMode={darkMode} toggleTheme={toggleTheme} />
-        <main>
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/map" element={<MapPage />} />
-            <Route path="/alerts" element={<AlertsPage />} />
-          </Routes>
-        </main>
+      <div className="flex bg-eco-bg min-h-screen">
+        {/* Sidebar */}
+        <Sidebar />
+        
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          <Navbar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+          <main className="flex-1 p-6 overflow-auto">
+            <Routes>
+              <Route path="/" element={<DashboardPage searchTerm={searchTerm} />} />
+              <Route path="/map" element={<MapPage searchTerm={searchTerm} />} />
+              <Route path="/alerts" element={<AlertsPage />} />
+            </Routes>
+          </main>
+        </div>
       </div>
     </Router>
   );

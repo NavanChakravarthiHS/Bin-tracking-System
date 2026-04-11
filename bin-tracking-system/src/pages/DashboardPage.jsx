@@ -1,27 +1,97 @@
+import { useState, useEffect } from 'react';
+import { Trash2, CheckCircle, AlertTriangle, AlertOctagon, Filter } from 'lucide-react';
 import Dashboard from '../components/Dashboard/Dashboard';
-import SearchBar from '../components/Common/SearchBar';
 import FilterBar from '../components/Common/FilterBar';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import { useBins } from '../hooks/useBins';
 
-const DashboardPage = () => {
-  const { bins, loading, searchTerm, setSearchTerm, activeFilter, setActiveFilter } = useBins();
+const DashboardPage = ({ searchTerm }) => {
+  const { bins, loading, activeFilter, setActiveFilter } = useBins(searchTerm);
+  const { allBins } = useBins();
+
+  // Calculate stats
+  const stats = {
+    total: allBins.length,
+    normal: allBins.filter(b => b.status === 'Normal').length,
+    warning: allBins.filter(b => b.status === 'Warning').length,
+    full: allBins.filter(b => b.status === 'Full').length,
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-          Dashboard
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Monitor all waste bins and their current status
-        </p>
+    <div className="space-y-6 animate-fade-in">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Total Bins */}
+        <div className="summary-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-primary-700 mb-1">Total Bins</p>
+              <p className="text-4xl font-bold text-heading">{stats.total}</p>
+            </div>
+            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
+              <Trash2 size={28} className="text-white" />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-primary-200">
+            <p className="text-sm text-body font-medium">All monitored bins</p>
+          </div>
+        </div>
+
+        {/* Normal Bins */}
+        <div className="summary-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-green-700 mb-1">Normal</p>
+              <p className="text-4xl font-bold text-green-800">{stats.normal}</p>
+            </div>
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+              <CheckCircle size={28} className="text-white" />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-green-200">
+            <p className="text-sm text-green-700 font-medium">Operating normally</p>
+          </div>
+        </div>
+
+        {/* Warning Bins */}
+        <div className="summary-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-yellow-700 mb-1">Warning</p>
+              <p className="text-4xl font-bold text-yellow-800">{stats.warning}</p>
+            </div>
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
+              <AlertTriangle size={28} className="text-white" />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-yellow-200">
+            <p className="text-sm text-yellow-700 font-medium">Needs attention soon</p>
+          </div>
+        </div>
+
+        {/* Full Bins */}
+        <div className="summary-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-red-700 mb-1">Full</p>
+              <p className="text-4xl font-bold text-red-800">{stats.full}</p>
+            </div>
+            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+              <AlertOctagon size={28} className="text-white" />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-red-200">
+            <p className="text-sm text-red-700 font-medium">Requires immediate pickup</p>
+          </div>
+        </div>
       </div>
 
-      {/* Search and Filter */}
-      <div className="mb-8 space-y-4 md:space-y-0 md:flex md:items-center md:justify-between">
-        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+      {/* Filter Bar */}
+      <div className="eco-card p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <Filter size={18} className="text-primary-600" />
+          <h3 className="text-sm font-semibold text-primary-800">Filter Bins</h3>
+        </div>
         <FilterBar activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       </div>
 
@@ -29,32 +99,7 @@ const DashboardPage = () => {
       {loading ? (
         <LoadingSpinner size="large" />
       ) : (
-        <>
-          {/* Stats Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-              <p className="text-sm text-green-600 dark:text-green-400 font-medium">Normal</p>
-              <p className="text-2xl font-bold text-green-700 dark:text-green-300">
-                {bins.filter((b) => b.status === 'Normal').length}
-              </p>
-            </div>
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-              <p className="text-sm text-yellow-600 dark:text-yellow-400 font-medium">Warning</p>
-              <p className="text-2xl font-bold text-yellow-700 dark:text-yellow-300">
-                {bins.filter((b) => b.status === 'Warning').length}
-              </p>
-            </div>
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium">Full</p>
-              <p className="text-2xl font-bold text-red-700 dark:text-red-300">
-                {bins.filter((b) => b.status === 'Full').length}
-              </p>
-            </div>
-          </div>
-
-          {/* Dashboard Grid */}
-          <Dashboard bins={bins} />
-        </>
+        <Dashboard bins={bins} />
       )}
     </div>
   );

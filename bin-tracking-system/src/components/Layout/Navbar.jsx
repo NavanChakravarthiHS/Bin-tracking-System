@@ -1,99 +1,77 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Trash2, LayoutDashboard, Map, AlertTriangle, Menu, X } from 'lucide-react';
-import ThemeToggle from '../Theme/ThemeToggle';
+import { Search, Bell, User, Menu, X } from 'lucide-react';
 
-const Navbar = ({ darkMode, toggleTheme }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-
-  const navItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/map', icon: Map, label: 'Map' },
-    { path: '/alerts', icon: AlertTriangle, label: 'Alerts' }
-  ];
-
-  const isActive = (path) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
-  };
+const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white dark:bg-dark-card border-b border-gray-200 dark:border-dark-border shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-              <Trash2 size={24} className="text-white" />
-            </div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Smart Bin Tracker
-            </h1>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                    isActive(item.path)
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Icon size={18} />
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Theme Toggle & Mobile Menu */}
-          <div className="flex items-center gap-3">
-            <ThemeToggle darkMode={darkMode} toggleTheme={toggleTheme} />
-            
-            {/* Mobile menu button */}
+    <header className="navbar sticky top-0 z-40">
+      <div className="px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Left: Title & Mobile Menu */}
+          <div className="flex items-center gap-4">
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 hover:bg-primary-50 rounded-lg transition-colors"
             >
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
+            <div>
+              <h2 className="text-2xl font-bold text-primary-800">{title}</h2>
+              <p className="text-sm text-primary-600">Monitor and manage waste bins</p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 dark:border-dark-border animate-fade-in">
-          <div className="px-4 py-3 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                    isActive(item.path)
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <Icon size={20} />
-                  <span className="font-medium">{item.label}</span>
-                </Link>
-              );
-            })}
+          {/* Center: Search Bar */}
+          <div className="hidden md:flex flex-1 max-w-xl mx-8">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search bins by ID or location..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+                className="input-field w-full pl-10 pr-4"
+              />
+            </div>
+          </div>
+
+          {/* Right: Notifications & Profile */}
+          <div className="flex items-center gap-3">
+            <button className="relative p-2 hover:bg-primary-50 rounded-lg transition-colors">
+              <Bell size={20} className="text-primary-700" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            
+            <div className="flex items-center gap-3 pl-3 border-l border-primary-200">
+              <div className="hidden md:block text-right">
+                <p className="text-sm font-medium text-primary-800">Admin User</p>
+                <p className="text-xs text-primary-600">System Administrator</p>
+              </div>
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center shadow-md">
+                <User size={20} className="text-white" />
+              </div>
+            </div>
           </div>
         </div>
-      )}
-    </nav>
+
+        {/* Mobile Search */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-4 animate-fade-in">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search bins..."
+                value={searchTerm}
+                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+                className="input-field w-full pl-10 pr-4"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
   );
 };
 

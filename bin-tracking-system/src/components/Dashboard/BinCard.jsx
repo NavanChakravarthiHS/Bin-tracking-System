@@ -3,59 +3,59 @@ import StatusBadge from '../Common/StatusBadge';
 
 const BinCard = ({ bin, index }) => {
   const getProgressColor = (fillLevel) => {
-    if (fillLevel >= 90) return 'bg-red-500';
-    if (fillLevel >= 70) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (fillLevel >= 90) return 'progress-fill-full';
+    if (fillLevel >= 70) return 'progress-fill-warning';
+    return 'progress-fill-normal';
   };
 
   const getProgressBg = (fillLevel) => {
-    if (fillLevel >= 90) return 'bg-red-100 dark:bg-red-900';
-    if (fillLevel >= 70) return 'bg-yellow-100 dark:bg-yellow-900';
-    return 'bg-green-100 dark:bg-green-900';
+    if (fillLevel >= 90) return 'bg-red-100';
+    if (fillLevel >= 70) return 'bg-yellow-100';
+    return 'bg-green-100';
   };
 
   return (
     <div
-      className="card p-6 animate-fade-in hover:scale-105 cursor-pointer"
+      className="eco-card p-6 animate-slide-up cursor-pointer"
       style={{ animationDelay: `${index * 50}ms` }}
     >
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          <h3 className="text-lg font-bold text-heading">
             {bin.id}
           </h3>
-          <div className="flex items-center gap-1 mt-1 text-gray-600 dark:text-gray-400 text-sm">
-            <MapPin size={14} />
-            <span>{bin.location}</span>
+          <div className="flex items-center gap-1.5 mt-2 text-body text-sm">
+            <MapPin size={14} className="text-primary-500" />
+            <span className="font-medium">{bin.location}</span>
           </div>
         </div>
         <StatusBadge status={bin.status} />
       </div>
 
       {/* Fill Level */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-semibold text-subheading">
             Fill Level
           </span>
-          <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          <span className="text-2xl font-bold text-heading">
             {bin.fillLevel}%
           </span>
         </div>
         
         {/* Progress Bar */}
-        <div className={`w-full h-3 ${getProgressBg(bin.fillLevel)} rounded-full overflow-hidden`}>
+        <div className={`w-full h-2.5 ${getProgressBg(bin.fillLevel)} rounded-full overflow-hidden`}>
           <div
-            className={`h-full ${getProgressColor(bin.fillLevel)} transition-all duration-500 rounded-full`}
+            className={`h-full ${getProgressColor(bin.fillLevel)}`}
             style={{ width: `${bin.fillLevel}%` }}
           ></div>
         </div>
       </div>
 
       {/* Coordinates */}
-      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-dark-border">
-        <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+      <div className="mt-4 pt-4 border-t border-primary-100">
+        <div className="text-xs text-muted space-y-1 font-medium">
           <div>Lat: {bin.latitude.toFixed(4)}</div>
           <div>Lng: {bin.longitude.toFixed(4)}</div>
         </div>

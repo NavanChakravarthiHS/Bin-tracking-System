@@ -75,50 +75,45 @@ A modern, responsive React.js frontend application for tracking smart waste bins
 
 ```
 bin-tracking-system/
-├── public/                     # Static assets
-├── src/
-│   ├── components/
-│   │   ├── Layout/
-│   │   │   └── Navbar.jsx     # Navigation bar
-│   │   ├── Dashboard/
-│   │   │   ├── Dashboard.jsx  # Dashboard grid
-│   │   │   └── BinCard.jsx    # Individual bin card
-│   │   ├── Map/
-│   │   │   └── MapView.jsx    # Google Maps integration
-│   │   ├── Alerts/
-│   │   │   └── Alerts.jsx     # Alert notifications
-│   │   ├── Common/
-│   │   │   ├── SearchBar.jsx  # Search input
-│   │   │   ├── FilterBar.jsx  # Filter buttons
-│   │   │   ├── LoadingSpinner.jsx
-│   │   │   └── StatusBadge.jsx
-│   │   └── Theme/
-│   │       └── ThemeToggle.jsx # Dark mode toggle
-│   ├── data/
-│   │   └── mockData.js        # Mock bin data
-│   ├── hooks/
-│   │   └── useBins.js         # Custom hook for bin management
-│   ├── pages/
-│   │   ├── DashboardPage.jsx  # Dashboard page
-│   │   ├── MapPage.jsx        # Map page
-│   │   └── AlertsPage.jsx     # Alerts page
-│   ├── utils/
-│   │   └── helpers.js         # Utility functions
-│   ├── App.jsx                # Main app component
-│   ├── main.jsx               # Entry point
-│   └── index.css              # Global styles
-├── .env                        # Environment variables
-├── .env.example                # Environment template
-├── .gitignore                  # Git ignore rules
-├── vercel.json                 # Vercel deployment configuration
-├── package.json
-├── tailwind.config.js
-├── postcss.config.js
-├── vite.config.js
-├── deploy.ps1                  # Windows deployment script
-├── deploy.sh                   # Linux/Mac deployment script
-├── VERCEL_DEPLOYMENT.md        # Detailed Vercel deployment guide
-└── README.md
+├── 📁 src/                      # Application source code
+│   ├── 📁 components/           # React components
+│   │   ├── 📁 Layout/          # Layout components (Navbar)
+│   │   ├── 📁 Dashboard/       # Dashboard components
+│   │   ├── 📁 Map/             # Map components
+│   │   ├── 📁 Alerts/          # Alert components
+│   │   ├── 📁 Common/          # Shared components
+│   │   └── 📁 Theme/           # Theme components
+│   ├── 📁 data/                # Mock data
+│   ├── 📁 hooks/               # Custom React hooks
+│   ├── 📁 pages/               # Page components
+│   ├── 📁 utils/               # Utility functions
+│   ├── 📄 App.jsx              # Main app component
+│   ├── 📄 main.jsx             # Entry point
+│   └── 📄 index.css            # Global styles
+├── 📁 public/                   # Static assets
+├── 📁 dist/                     # Production build output
+├── 📁 docs/                     # Documentation
+│   ├── 📄 INDEX.md             # Documentation index
+│   ├── 📄 QUICKSTART.md        # Quick start guide
+│   ├── 📄 DEPLOY_NOW.md        # Quick deployment guide
+│   ├── 📄 VERCEL_DEPLOYMENT.md # Full deployment guide
+│   └── 📄 DEPLOYMENT_CHECKLIST.md # Deployment checklist
+├── 📁 scripts/                  # Deployment scripts
+│   ├── 📄 README.md            # Scripts documentation
+│   ├── 📄 deploy.ps1           # Windows deployment script
+│   └── 📄 deploy.sh            # Linux/Mac deployment script
+├── 📁 config/                   # Configuration files
+│   ├── 📄 README.md            # Config documentation
+│   └── 📄 vercel.json          # Vercel deployment config
+├── 📄 .env                      # Environment variables (local)
+├── 📄 .env.example              # Environment variables template
+├── 📄 .gitignore                # Git ignore rules
+├── 📄 package.json              # Project dependencies
+├── 📄 vite.config.js            # Vite configuration
+├── 📄 tailwind.config.js        # Tailwind CSS configuration
+├── 📄 postcss.config.js         # PostCSS configuration
+├── 📄 eslint.config.js          # ESLint configuration
+└── 📄 README.md                 # This file
 ```
 
 ## Usage
@@ -209,12 +204,12 @@ npm run preview
 
 ### Quick Deploy (Windows):
 ```powershell
-.\deploy.ps1
+.\scripts\deploy.ps1
 ```
 
 ### Quick Deploy (Linux/Mac):
 ```bash
-./deploy.sh
+./scripts/deploy.sh
 ```
 
 ### Manual Deploy:
