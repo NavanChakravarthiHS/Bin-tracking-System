@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Bell, User, Menu, X } from 'lucide-react';
+import { Search, Bell, UserCog, Menu, X } from 'lucide-react';
 
 const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -38,18 +38,18 @@ const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
 
           {/* Right: Notifications & Profile */}
           <div className="flex items-center gap-3">
-            <button className="relative p-2 hover:bg-primary-50 rounded-lg transition-colors">
-              <Bell size={20} className="text-primary-700" />
+            <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <Bell size={20} className="text-gray-700" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             
-            <div className="flex items-center gap-3 pl-3 border-l border-primary-200">
+            <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-primary-800">Admin User</p>
-                <p className="text-xs text-primary-600">System Administrator</p>
+                <p className="text-sm font-semibold text-heading">Admin User</p>
+                <p className="text-xs text-gray-600">System Administrator</p>
               </div>
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center shadow-md">
-                <User size={20} className="text-white" />
+              <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg border-2 border-blue-400">
+                <UserCog size={22} className="text-white" strokeWidth={2.5} />
               </div>
             </div>
           </div>
