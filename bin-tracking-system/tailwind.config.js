@@ -4,61 +4,78 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Eco-friendly green theme
+        // Modern neutral palette (SaaS style)
+        neutral: {
+          50: '#f8fafc',   // Page background
+          100: '#f1f5f9',  // Subtle backgrounds
+          200: '#e2e8f0',  // Borders
+          300: '#cbd5e1',  // Dividers
+          400: '#94a3b8',  // Muted text
+          500: '#64748b',  // Secondary text
+          600: '#475569',  // Body text
+          700: '#334155',  // Primary text
+          800: '#1e293b',  // Headings
+          900: '#0f172a',  // Dark text
+        },
+        // Primary action color - Deep Green
         primary: {
           50: '#f0fdf4',
           100: '#dcfce7',
           200: '#bbf7d0',
           300: '#86efac',
           400: '#4ade80',
-          500: '#16a34a', // Primary green
-          600: '#15803d', // Secondary green
-          700: '#166534',
-          800: '#14532d',
-          900: '#052e16',
+          500: '#22c55e',
+          600: '#16a34a', // Primary brand color
+          700: '#15803d', // Hover state
+          800: '#166534',
+          900: '#14532d',
         },
-        // Status colors
+        // Status colors - Vibrant and clear
         status: {
-          normal: '#16a34a',
-          warning: '#eab308',
-          full: '#dc2626',
+          normal: '#22c55e',    // Vibrant green
+          warning: '#f59e0b',   // Amber/Yellow
+          full: '#ef4444',      // Clear red
         },
-        // Background colors
-        eco: {
-          bg: '#f0fdf4',
-          card: '#ffffff',
-          border: '#dcfce7',
+        // Sidebar colors
+        sidebar: {
+          bg: '#f8fafc',        // Slightly off-white
+          border: '#e2e8f0',    // Light border
+          hover: '#f1f5f9',     // Hover state
+          active: '#16a34a',    // Active item
+        },
+        // Card backgrounds
+        card: {
+          bg: '#ffffff',        // White cards
+          border: '#e2e8f0',    // Subtle borders
         }
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'slide-in': 'slideIn 0.3s ease-out',
+        'fade-in': 'fadeIn 0.3s ease-out',
         'slide-up': 'slideUp 0.4s ease-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'bounce-slow': 'bounce 2s infinite',
+        'scale-in': 'scaleIn 0.2s ease-out',
       },
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
-        slideIn: {
-          '0%': { transform: 'translateX(-100%)' },
-          '100%': { transform: 'translateX(0)' },
-        },
         slideUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        scaleIn: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'card': '0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.04)',
-        'card-hover': '0 0 0 1px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.08)',
+        'soft': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)',
+        'medium': '0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
+        'large': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05)',
+        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
       },
       borderRadius: {
         'xl': '1rem',

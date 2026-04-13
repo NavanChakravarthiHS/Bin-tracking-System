@@ -30,14 +30,14 @@ const MapView = ({ bins }) => {
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center h-96 bg-gray-100 dark:bg-dark-card rounded-lg">
-        <p className="text-gray-600 dark:text-gray-400">Loading map...</p>
+      <div className="flex items-center justify-center h-96 bg-white rounded-lg shadow-soft border border-gray-200">
+        <p className="text-gray-600 font-medium">Loading map...</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg overflow-hidden shadow-lg border border-gray-200 dark:border-dark-border">
+    <div className="rounded-lg overflow-hidden shadow-lg border border-gray-200">
       <GoogleMap
         center={mapCenter}
         zoom={12}

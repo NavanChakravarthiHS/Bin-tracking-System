@@ -11,7 +11,7 @@ function App() {
 
   return (
     <Router>
-      <div className="flex bg-eco-bg min-h-screen">
+      <div className="flex bg-gray-50 min-h-screen">
         {/* Sidebar */}
         <Sidebar />
         

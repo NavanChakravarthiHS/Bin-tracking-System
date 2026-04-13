@@ -22,66 +22,66 @@ const DashboardPage = ({ searchTerm }) => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Bins */}
-        <div className="summary-card">
+        <div className="stat-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-primary-700 mb-1">Total Bins</p>
-              <p className="text-4xl font-bold text-heading">{stats.total}</p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Total Bins</p>
+              <p className="text-3xl font-bold text-heading">{stats.total}</p>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Trash2 size={28} className="text-white" />
+            <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-lg">
+              <Trash2 size={24} className="text-white" />
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-primary-200">
-            <p className="text-sm text-body font-medium">All monitored bins</p>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-600">All monitored bins</p>
           </div>
         </div>
 
         {/* Normal Bins */}
-        <div className="summary-card">
+        <div className="stat-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-green-700 mb-1">Normal</p>
-              <p className="text-4xl font-bold text-green-800">{stats.normal}</p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Normal</p>
+              <p className="text-3xl font-bold text-green-700">{stats.normal}</p>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
-              <CheckCircle size={28} className="text-white" />
+            <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center shadow-lg">
+              <CheckCircle size={24} className="text-white" />
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-green-200">
-            <p className="text-sm text-green-700 font-medium">Operating normally</p>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-600">Operating normally</p>
           </div>
         </div>
 
         {/* Warning Bins */}
-        <div className="summary-card">
+        <div className="stat-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-yellow-700 mb-1">Warning</p>
-              <p className="text-4xl font-bold text-yellow-800">{stats.warning}</p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Warning</p>
+              <p className="text-3xl font-bold text-amber-700">{stats.warning}</p>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center shadow-lg">
-              <AlertTriangle size={28} className="text-white" />
+            <div className="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center shadow-lg">
+              <AlertTriangle size={24} className="text-white" />
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-yellow-200">
-            <p className="text-sm text-yellow-700 font-medium">Needs attention soon</p>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-600">Needs attention soon</p>
           </div>
         </div>
 
         {/* Full Bins */}
-        <div className="summary-card">
+        <div className="stat-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-red-700 mb-1">Full</p>
-              <p className="text-4xl font-bold text-red-800">{stats.full}</p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Full</p>
+              <p className="text-3xl font-bold text-red-700">{stats.full}</p>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-              <AlertOctagon size={28} className="text-white" />
+            <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center shadow-lg">
+              <AlertOctagon size={24} className="text-white" />
             </div>
           </div>
-          <div className="mt-4 pt-4 border-t border-red-200">
-            <p className="text-sm text-red-700 font-medium">Requires immediate pickup</p>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-600">Requires immediate pickup</p>
           </div>
         </div>
       </div>

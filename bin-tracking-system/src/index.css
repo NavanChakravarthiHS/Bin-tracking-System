@@ -1,201 +1,213 @@
 @import "tailwindcss";
 
-/* Base styles - Eco-friendly green theme */
+/* Base styles - High contrast, accessible design */
 * {
-  border-color: #dcfce7;
+  border-color: #e5e7eb;
 }
 
 body {
-  background-color: #f0fdf4;
-  color: #14532d;
-  transition: color 300ms, background-color 300ms;
+  background-color: #f9fafb;  /* Clean light gray background */
+  color: #374151;  /* Dark gray body text - high contrast */
+  transition: color 200ms, background-color 200ms;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Eco-friendly card component */
-.eco-card {
-  background-color: white;
-  border-radius: 1rem;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 300ms ease;
-  border: 1px solid #dcfce7;
-}
-
-.eco-card:hover {
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-
-/* Summary card - Enhanced visibility */
-.summary-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-  border-radius: 1rem;
-  border: 2px solid #bbf7d0;
-  padding: 1.5rem;
-  transition: all 300ms ease;
-}
-
-.summary-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(22, 163, 74, 0.2);
-  border-color: #86efac;
-}
-
-/* Primary button */
-.btn-primary {
-  padding: 0.625rem 1.25rem;
-  background-color: #16a34a;
-  color: white;
+/* Modern card component - White with clear borders */
+.modern-card {
+  background-color: #ffffff;
   border-radius: 0.75rem;
-  transition: all 200ms;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+  transition: all 200ms ease;
+  border: 1px solid #e5e7eb;
+}
+
+.modern-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: #d1d5db;
+}
+
+/* Summary stat card - Clear and readable */
+.stat-card {
+  background: #ffffff;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  transition: all 200ms ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
+}
+
+/* Primary button - Green with white text (high contrast) */
+.btn-primary {
+  padding: 0.625rem 1.5rem;
+  background-color: #16a34a;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
   font-weight: 600;
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-primary:hover {
   background-color: #15803d;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.3), 0 2px 4px -2px rgba(22, 163, 74, 0.2);
 }
 
-/* Secondary button */
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary button - White with dark text */
 .btn-secondary {
-  padding: 0.625rem 1.25rem;
-  background-color: white;
-  color: #166534;
-  border-radius: 0.75rem;
-  transition: all 200ms;
+  padding: 0.625rem 1.5rem;
+  background-color: #ffffff;
+  color: #111827;
+  border-radius: 0.5rem;
+  transition: all 150ms ease;
   font-weight: 600;
-  border: 2px solid #86efac;
+  border: 1px solid #e5e7eb;
   cursor: pointer;
   font-size: 0.875rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .btn-secondary:hover {
-  background-color: #f0fdf4;
-  border-color: #16a34a;
-  color: #15803d;
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  color: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Active filter button - High contrast */
+/* Active filter button */
 .btn-active {
   background-color: #16a34a !important;
-  color: white !important;
+  color: #ffffff !important;
   border-color: #16a34a !important;
-  font-weight: 600;
+  box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.3) !important;
 }
 
-/* Status badges - Enhanced visibility */
+/* Status badges - High contrast */
 .status-normal {
-  background-color: #dcfce7;
-  color: #14532d;
-  border: 2px solid #86efac;
+  background-color: #22c55e;
+  color: #ffffff;
+  border: 1px solid #16a34a;
   font-weight: 600;
 }
 
 .status-warning {
-  background-color: #fef9c3;
-  color: #713f12;
-  border: 2px solid #facc15;
+  background-color: #f59e0b;
+  color: #000000;
+  border: 1px solid #d97706;
   font-weight: 600;
 }
 
 .status-full {
-  background-color: #fee2e2;
-  color: #7f1d1d;
-  border: 2px solid #f87171;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: 1px solid #dc2626;
   font-weight: 600;
 }
 
 /* Progress bars */
 .progress-bg {
-  background-color: #dcfce7;
+  background-color: #e5e7eb;
   border-radius: 9999px;
-  height: 0.625rem;
+  height: 0.5rem;
   overflow: hidden;
 }
 
 .progress-fill-normal {
-  background: linear-gradient(90deg, #4ade80 0%, #16a34a 100%);
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
   height: 100%;
   border-radius: 9999px;
-  transition: width 500ms ease;
+  transition: width 400ms ease;
 }
 
 .progress-fill-warning {
-  background: linear-gradient(90deg, #facc15 0%, #ca8a04 100%);
+  background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
   height: 100%;
   border-radius: 9999px;
-  transition: width 500ms ease;
+  transition: width 400ms ease;
 }
 
 .progress-fill-full {
-  background: linear-gradient(90deg, #f87171 0%, #dc2626 100%);
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%);
   height: 100%;
   border-radius: 9999px;
-  transition: width 500ms ease;
+  transition: width 400ms ease;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #f0fdf4;
+  background-color: #f9fafb;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #86efac;
+  background-color: #d1d5db;
   border-radius: 9999px;
-  border: 2px solid #f0fdf4;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #4ade80;
+  background-color: #9ca3af;
 }
 
-/* Sidebar styles */
+/* Sidebar styles - Dark slate background */
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  border-radius: 0.75rem;
-  color: #166534;
-  transition: all 200ms;
-  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: #f9fafb;  /* Light text on dark background */
+  transition: all 150ms ease;
+  font-weight: 500;
   font-size: 0.9375rem;
 }
 
 .sidebar-link:hover {
-  background-color: #dcfce7;
-  color: #14532d;
+  background-color: #374151;
+  color: #ffffff;
 }
 
 .sidebar-link.active {
   background-color: #16a34a;
-  color: white;
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgba(22, 163, 74, 0.3);
+  font-weight: 600;
 }
 
-/* Navbar styles */
+/* Navbar styles - White with dark text */
 .navbar {
-  background-color: white;
-  border-bottom: 2px solid #dcfce7;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
 }
 
-/* Input fields */
+/* Input fields - White with dark text */
 .input-field {
   padding: 0.625rem 1rem;
-  border: 2px solid #bbf7d0;
-  border-radius: 0.75rem;
-  background-color: white;
-  color: #14532d;
-  transition: all 200ms;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  color: #111827;  /* Almost black text */
+  transition: all 150ms ease;
   font-size: 0.9375rem;
 }
 
@@ -206,26 +218,26 @@ body {
 }
 
 .input-field::placeholder {
-  color: #86efac;
+  color: #9ca3af;  /* Visible light gray placeholder */
 }
 
-/* Text visibility utilities */
+/* Text utilities - High contrast for readability */
 .text-heading {
-  color: #14532d;
+  color: #111827;  /* Almost black - maximum contrast */
   font-weight: 700;
 }
 
 .text-subheading {
-  color: #166534;
+  color: #1f2937;  /* Very dark gray */
   font-weight: 600;
 }
 
 .text-body {
-  color: #15803d;
+  color: #374151;  /* Dark gray - good contrast */
   font-weight: 500;
 }
 
 .text-muted {
-  color: #16a34a;
-  font-weight: 500;
+  color: #6b7280;  /* Medium gray - still readable */
+  font-weight: 400;
 }
