@@ -28,8 +28,8 @@ const DashboardPage = ({ searchTerm }) => {
               <p className="text-sm font-medium text-gray-600 mb-2">Total Bins</p>
               <p className="text-3xl font-bold text-heading">{stats.total}</p>
             </div>
-            <div className="w-14 h-14 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-lg">
-              <Trash2 size={24} className="text-white" />
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-xl">
+              <Trash2 size={32} className="text-white" strokeWidth={2.5} />
             </div>
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200">
