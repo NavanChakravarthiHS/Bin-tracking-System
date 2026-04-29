@@ -5,12 +5,13 @@ import Navbar from './components/Layout/Navbar';
 import DashboardPage from './pages/DashboardPage';
 import MapPage from './pages/MapPage';
 import AlertsPage from './pages/AlertsPage';
+import RequireAdmin from './components/Auth/RequireAdmin';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <Router>
+    <Router basename="/app.html">
       <div className="flex bg-gray-50 min-h-screen">
         {/* Sidebar */}
         <Sidebar />
@@ -20,9 +21,11 @@ function App() {
           <Navbar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
           <main className="flex-1 p-6 overflow-auto">
             <Routes>
-              <Route path="/" element={<DashboardPage searchTerm={searchTerm} />} />
-              <Route path="/map" element={<MapPage searchTerm={searchTerm} />} />
-              <Route path="/alerts" element={<AlertsPage />} />
+              <Route element={<RequireAdmin />}>
+                <Route path="/" element={<DashboardPage searchTerm={searchTerm} />} />
+                <Route path="/map" element={<MapPage searchTerm={searchTerm} />} />
+                <Route path="/alerts" element={<AlertsPage />} />
+              </Route>
             </Routes>
           </main>
         </div>

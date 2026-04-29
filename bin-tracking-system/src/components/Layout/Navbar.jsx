@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import { Search, Bell, UserCog, Menu, X } from 'lucide-react';
+import { Search, Bell, UserCog, Menu, X, LogOut } from 'lucide-react';
+import { clearToken, goToLogin } from '../../auth/adminAuth';
 
 const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const handleLogout = () => {
+    clearToken();
+    goToLogin();
+  };
 
   return (
     <header className="navbar sticky top-0 z-40">
@@ -51,6 +57,15 @@ const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
               <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg border-2 border-blue-400">
                 <UserCog size={22} className="text-white" strokeWidth={2.5} />
               </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm font-semibold text-gray-800"
+                title="Logout"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
             </div>
           </div>
         </div>

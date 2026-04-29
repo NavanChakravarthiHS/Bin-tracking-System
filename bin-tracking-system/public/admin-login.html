@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoTrack | Admin Login</title>
+    <link rel="stylesheet" href="/admin-login.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="card" aria-label="Admin Login">
+        <header class="card__header">
+          <div class="brand">
+            <div class="brand__mark" aria-hidden="true"></div>
+            <div class="brand__text">
+              <h1>Admin Login</h1>
+              <p>EcoTrack Smart Waste Bin Tracking</p>
+            </div>
+          </div>
+        </header>
+
+        <div id="alert" class="alert" role="alert" aria-live="polite" hidden></div>
+
+        <form id="loginForm" class="form" novalidate>
+          <label class="field">
+            <span class="field__label">Mobile Number</span>
+            <input
+              id="mobile"
+              name="mobile"
+              type="tel"
+              inputmode="numeric"
+              autocomplete="username"
+              placeholder="10-digit mobile number"
+              maxlength="10"
+              required
+            />
+            <span id="mobileError" class="field__error" aria-live="polite"></span>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Password</span>
+            <div class="password">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Enter password"
+                required
+              />
+              <button id="togglePassword" type="button" class="password__toggle" aria-label="Show password">
+                Show
+              </button>
+            </div>
+            <span id="passwordError" class="field__error" aria-live="polite"></span>
+          </label>
+
+          <button id="loginBtn" class="btn" type="submit">Login</button>
+
+          <p class="hint">Restricted to System Administrator only.</p>
+        </form>
+      </section>
+    </main>
+
+    <script src="/admin-login.js"></script>
+  </body>
+</html>
+

@@ -4,10 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Waste Bin Tracking System</title>
+    <title>EcoTrack | Landing</title>
+    <meta http-equiv="refresh" content="0; url=/landing.html" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <noscript>
+      <p>
+        JavaScript is required. Open <a href="/landing.html">/landing.html</a>.
+      </p>
+    </noscript>
+    <script>
+      // Ensure root opens the static landing page (not React dashboard)
+      window.location.replace("/landing.html");
+    </script>
   </body>
 </html>
