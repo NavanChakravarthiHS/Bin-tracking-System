@@ -75,3 +75,19 @@ collectorRouter.get("/me", requireCollectorAuth, async (req, res) => {
   }
   return res.json({ collector });
 });
+
+// POST /collector/update-status (protected route)
+collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) => {
+  const { binId, status, fillLevel } = req.body || {};
+
+  if (!binId) {
+    return res.status(400).json({ message: "Bin ID is required" });
+  }
+
+  // In production, update bin in database
+  // For now, return success response
+  return res.json({ 
+    message: "Bin status updated successfully",
+    bin: { id: binId, status, fillLevel }
+  });
+});
