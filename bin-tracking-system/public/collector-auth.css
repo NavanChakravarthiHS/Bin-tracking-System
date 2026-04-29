@@ -1,0 +1,242 @@
+/* Collector Authentication Pages - Eco-Friendly Theme */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Auth Container */
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+/* Logo Section */
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo h1 {
+  color: #10b981;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.auth-logo p {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+/* Card */
+.auth-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.auth-card h2 {
+  color: #1e293b;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.auth-card .subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  color: #334155;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+/* Input Wrapper (for password toggle) */
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 45px 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: #10b981;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Password Toggle Button */
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 1.2rem;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+  color: #10b981;
+}
+
+/* Regular Input (without toggle) */
+.form-group input:not(.input-wrapper input) {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #10b981;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Error & Success Messages */
+.message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: none;
+}
+
+.message.error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  display: block;
+}
+
+.message.success {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  display: block;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.btn-submit:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Auth Link */
+.auth-link {
+  text-align: center;
+  margin-top: 24px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.auth-link a {
+  color: #10b981;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.auth-link a:hover {
+  color: #059669;
+  text-decoration: underline;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 28px 24px;
+  }
+
+  .auth-logo h1 {
+    font-size: 2rem;
+  }
+
+  .auth-card h2 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoTrack | Collector Dashboard</title>
+    <link rel="stylesheet" href="/collector-auth.css" />
+    <style>
+      /* Dashboard specific styles */
+      .dashboard-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ffffff;
+        padding: 24px 32px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 12px;
+        margin-bottom: 24px;
+      }
+
+      .dashboard-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .dashboard-header .mobile-number {
+        font-size: 1rem;
+        opacity: 0.9;
+      }
+
+      .btn-logout {
+        padding: 10px 24px;
+        background: #ffffff;
+        color: #059669;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-logout:hover {
+        background: #f0fdf4;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .dashboard-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .dashboard-card .icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+      }
+
+      .dashboard-card h3 {
+        color: #1e293b;
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+      }
+
+      .dashboard-card p {
+        color: #64748b;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #f0fdf4;
+        color: #16a34a;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-container" style="max-width: 800px;">
+      <!-- Dashboard Header -->
+      <div class="dashboard-header">
+        <div>
+          <h2>♻️ EcoTrack Dashboard</h2>
+          <div class="mobile-number" id="mobileDisplay">Loading...</div>
+        </div>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+
+      <!-- Main Content -->
+      <div class="dashboard-card">
+        <div class="icon">🗑️</div>
+        <h3>Welcome, Garbage Collector!</h3>
+        <p>
+          Your dashboard is ready. You can now view your assigned bins, 
+          track collection routes, and manage waste collection tasks.
+        </p>
+        <div class="status-badge">✓ Authenticated</div>
+      </div>
+
+      <!-- Additional Info -->
+      <div class="dashboard-card" style="margin-top: 24px;">
+        <h3>What's Next?</h3>
+        <p>
+          This is a basic dashboard template. You can extend it with:<br/>
+          • Bin collection tasks<br/>
+          • Route optimization<br/>
+          • Collection history<br/>
+          • Performance metrics
+        </p>
+      </div>
+    </div>
+
+    <script src="/collector-dashboard.js"></script>
+  </body>
+</html>

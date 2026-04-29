@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack | Collector Login</title>
+    <title>EcoTrack | Collector Signup</title>
     <link rel="stylesheet" href="/collector-auth.css" />
   </head>
   <body>
@@ -14,16 +14,16 @@
         <p>Smart Waste Bin Tracking System</p>
       </div>
 
-      <!-- Login Card -->
+      <!-- Signup Card -->
       <div class="auth-card">
-        <h2>Garbage Collector Login</h2>
-        <p class="subtitle">Welcome back! Please login to continue</p>
+        <h2>Garbage Collector Signup</h2>
+        <p class="subtitle">Create your account to get started</p>
 
         <!-- Message Display -->
         <div id="message" class="message"></div>
 
-        <!-- Login Form -->
-        <form id="loginForm">
+        <!-- Signup Form -->
+        <form id="signupForm">
           <!-- Mobile Number -->
           <div class="form-group">
             <label for="mobile">Mobile Number</label>
@@ -45,7 +45,8 @@
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder="Enter password (min 6 characters)"
+                minlength="6"
                 required
               />
               <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
@@ -54,15 +55,33 @@
             </div>
           </div>
 
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <div class="input-wrapper">
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Re-enter password"
+                minlength="6"
+                required
+              />
+              <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)">
+                👁️
+              </button>
+            </div>
+          </div>
+
           <!-- Submit Button -->
           <button type="submit" class="btn-submit" id="submitBtn">
-            Login
+            Sign Up
           </button>
         </form>
 
-        <!-- Signup Link -->
+        <!-- Login Link -->
         <div class="auth-link">
-          Don't have an account? <a href="/collector-signup.html">Sign up here</a>
+          Already have an account? <a href="/collector-login.html">Login here</a>
         </div>
       </div>
     </div>
@@ -102,12 +121,13 @@
       });
 
       // Form submission
-      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      document.getElementById('signupForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         clearMessage();
 
         const mobile = document.getElementById('mobile').value.trim();
         const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
         const submitBtn = document.getElementById('submitBtn');
 
         // Client-side validation
@@ -121,41 +141,41 @@
           return;
         }
 
+        if (password !== confirmPassword) {
+          showMessage('Passwords do not match', 'error');
+          return;
+        }
+
         // Disable button and show loading
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner"></span> Logging in...';
+        submitBtn.innerHTML = '<span class="spinner"></span> Creating account...';
 
         try {
-          const response = await fetch(`${API_URL}/collector/login`, {
+          const response = await fetch(`${API_URL}/collector/signup`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ mobile, password }),
+            body: JSON.stringify({ mobile, password, confirmPassword }),
           });
 
           const data = await response.json();
 
           if (response.ok) {
-            // Store token in localStorage
-            localStorage.setItem('collectorToken', data.token);
-            localStorage.setItem('collectorMobile', data.collector.mobile);
-            
-            showMessage('Login successful! Redirecting to dashboard...', 'success');
+            showMessage('Signup successful! Redirecting to login...', 'success');
             setTimeout(() => {
-              window.location.href = '/collector-dashboard.html';
-            }, 1000);
+              window.location.href = '/collector-login.html';
+            }, 1500);
           } else {
-            showMessage(data.message || 'Invalid credentials. Please try again.', 'error');
+            showMessage(data.message || 'Signup failed. Please try again.', 'error');
           }
         } catch (error) {
           showMessage('Network error. Please check your connection.', 'error');
         } finally {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Login';
+          submitBtn.innerHTML = 'Sign Up';
         }
       });
     </script>
   </body>
 </html>
-
