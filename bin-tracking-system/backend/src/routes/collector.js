@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import { Collector } from "../models/Collector.js";
+import { Bin } from "../models/Bin.js";
 import { signCollectorJwt } from "../utils/jwt.js";
 import { requireCollectorAuth } from "../middleware/requireCollectorAuth.js";
 
@@ -76,6 +77,17 @@ collectorRouter.get("/me", requireCollectorAuth, async (req, res) => {
   return res.json({ collector });
 });
 
+// GET /collector/bins - Get all bins (protected route)
+collectorRouter.get("/bins", requireCollectorAuth, async (req, res) => {
+  try {
+    const bins = await Bin.find().sort({ status: 1 }).lean();
+    return res.json({ bins });
+  } catch (error) {
+    console.error('Error fetching bins:', error);
+    return res.status(500).json({ message: "Failed to fetch bins" });
+  }
+});
+
 // POST /collector/update-status (protected route)
 collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) => {
   const { binId, status, fillLevel } = req.body || {};
@@ -84,10 +96,29 @@ collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) =>
     return res.status(400).json({ message: "Bin ID is required" });
   }
 
-  // In production, update bin in database
-  // For now, return success response
-  return res.json({ 
-    message: "Bin status updated successfully",
-    bin: { id: binId, status, fillLevel }
-  });
+  try {
+    // Find and update bin in database
+    const updatedBin = await Bin.findOneAndUpdate(
+      { id: binId },
+      { 
+        status: 'Empty',
+        fillLevel: 0,
+        lastCollected: new Date(),
+        assignedCollector: req.collector.mobile
+      },
+      { new: true }
+    );
+
+    if (!updatedBin) {
+      return res.status(404).json({ message: "Bin not found" });
+    }
+
+    return res.json({ 
+      message: "Bin status updated successfully",
+      bin: updatedBin
+    });
+  } catch (error) {
+    console.error('Error updating bin:', error);
+    return res.status(500).json({ message: "Failed to update bin status" });
+  }
 });

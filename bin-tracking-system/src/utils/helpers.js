@@ -6,6 +6,8 @@ export const getStatusColor = (status) => {
       return 'yellow';
     case 'Full':
       return 'red';
+    case 'Empty':
+      return 'blue';
     default:
       return 'gray';
   }
@@ -25,6 +27,8 @@ export const getMarkerColor = (status) => {
       return '#f59e0b';
     case 'Full':
       return '#ef4444';
+    case 'Empty':
+      return '#3b82f6';
     default:
       return '#6b7280';
   }

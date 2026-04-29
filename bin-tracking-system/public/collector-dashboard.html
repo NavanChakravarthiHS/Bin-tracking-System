@@ -18,6 +18,27 @@
 
     <!-- Main Content -->
     <main class="dashboard-content">
+      <!-- Filter Buttons -->
+      <section class="filter-section">
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-filter="All" onclick="filterBins('All')">
+            🗑️ All
+          </button>
+          <button class="filter-btn" data-filter="Full" onclick="filterBins('Full')">
+            🔴 Full
+          </button>
+          <button class="filter-btn" data-filter="Warning" onclick="filterBins('Warning')">
+            🟡 Warning
+          </button>
+          <button class="filter-btn" data-filter="Normal" onclick="filterBins('Normal')">
+            🟢 Normal
+          </button>
+          <button class="filter-btn" data-filter="Empty" onclick="filterBins('Empty')">
+            🔵 Empty
+          </button>
+        </div>
+      </section>
+
       <!-- Priority Alert Section -->
       <section class="priority-section">
         <h2>Priority Collections</h2>
@@ -29,7 +50,7 @@
 
       <!-- All Assigned Bins Section -->
       <section class="all-bins-section">
-        <h2>All Assigned Bins</h2>
+        <h2 id="binsSectionTitle">All Assigned Bins</h2>
         <div id="allBins" class="bins-container">
           <!-- All bins injected here -->
         </div>

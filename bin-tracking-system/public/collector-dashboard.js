@@ -1,16 +1,8 @@
-const API_URL = 'http://localhost:5000';
-
-// Mock assigned bins data (matching existing bin structure)
-const mockAssignedBins = [
-  { id: "BIN001", location: "MG Road, Bangalore", status: "Normal", fillLevel: 30, latitude: 12.9716, longitude: 77.5946 },
-  { id: "BIN002", location: "Brigade Road, Bangalore", status: "Full", fillLevel: 85, latitude: 12.98, longitude: 77.60 },
-  { id: "BIN004", location: "Whitefield, Bangalore", status: "Warning", fillLevel: 72, latitude: 12.9698, longitude: 77.7499 },
-  { id: "BIN005", location: "Hebbal, Bangalore", status: "Full", fillLevel: 92, latitude: 13.0358, longitude: 77.6187 },
-  { id: "BIN008", location: "HSR Layout, Bangalore", status: "Warning", fillLevel: 78, latitude: 12.9250, longitude: 77.6850 },
-];
+const API_URL = '';
 
 // Global variable to store bins
 let assignedBins = [];
+let currentFilter = 'All';
 
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', async function() {
@@ -24,6 +16,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // Verify token and load bins
   await verifyAndLoadBins(token);
+  
+  // Auto-refresh bins every 10 seconds
+  setInterval(async () => {
+    await loadBins();
+  }, 10000);
 });
 
 // Verify token and load bins
@@ -58,27 +55,56 @@ async function verifyAndLoadBins(token) {
   }
 }
 
-// Load bins (mock data for now, can be replaced with API call)
+// Load bins from API
 async function loadBins() {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+  const token = localStorage.getItem('collectorToken');
   
-  // In production, fetch from API:
-  // const response = await fetch(`${API_URL}/collector/bins`, {
-  //   headers: { 'Authorization': `Bearer ${localStorage.getItem('collectorToken')}` }
-  // });
-  // assignedBins = await response.json();
+  try {
+    const response = await fetch(`${API_URL}/collector/bins`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      assignedBins = data.bins;
+      renderBins();
+    } else {
+      console.error('Failed to load bins');
+    }
+  } catch (error) {
+    console.error('Failed to load bins:', error);
+    showToast('Failed to load bins. Please refresh.', 'error');
+  }
+}
+
+// Filter bins by status
+function filterBins(status) {
+  currentFilter = status;
   
-  // Using mock data
-  assignedBins = [...mockAssignedBins];
+  // Update active button
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector(`[data-filter="${status}"]`).classList.add('active');
   
-  // Render bins
+  // Update section title
+  const sectionTitle = document.getElementById('binsSectionTitle');
+  if (status === 'All') {
+    sectionTitle.textContent = 'All Assigned Bins';
+  } else {
+    sectionTitle.textContent = `${status} Bins`;
+  }
+  
+  // Re-render bins
   renderBins();
 }
 
-// Sort bins by priority: Full -> Warning -> Normal -> Collected
+// Sort bins by priority: Full -> Warning -> Normal -> Empty
 function sortByPriority(bins) {
-  const priorityOrder = { 'Full': 0, 'Warning': 1, 'Normal': 2, 'Collected': 3 };
+  const priorityOrder = { 'Full': 0, 'Warning': 1, 'Normal': 2, 'Empty': 3 };
   return bins.sort((a, b) => priorityOrder[a.status] - priorityOrder[b.status]);
 }
 
@@ -92,7 +118,7 @@ function getProgressColorClass(fillLevel) {
 // Create bin card HTML
 function createBinCard(bin) {
   const progressColor = getProgressColorClass(bin.fillLevel);
-  const isCollected = bin.status === 'Collected';
+  const isEmpty = bin.status === 'Empty';
   
   return `
     <div class="bin-card ${bin.status.toLowerCase()}" data-bin-id="${bin.id}" style="animation-delay: ${Math.random() * 0.3}s">
@@ -117,9 +143,9 @@ function createBinCard(bin) {
         <button 
           onclick="markAsCollected('${bin.id}')" 
           class="btn-action btn-collect"
-          ${isCollected ? 'disabled' : ''}
+          ${isEmpty ? 'disabled' : ''}
         >
-          ${isCollected ? '✓ Collected' : '✓ Mark as Collected'}
+          ${isEmpty ? '✓ Empty' : '✓ Mark as Collected'}
         </button>
       </div>
     </div>
@@ -138,18 +164,18 @@ async function markAsCollected(binId) {
   
   // Find the bin
   const bin = assignedBins.find(b => b.id === binId);
-  if (!bin || bin.status === 'Collected') {
+  if (!bin || bin.status === 'Empty') {
     return;
   }
   
   // Update UI immediately for better UX
   const binCard = document.querySelector(`[data-bin-id="${binId}"]`);
   if (binCard) {
-    binCard.classList.add('collected');
+    binCard.classList.add('empty');
   }
   
   // Update status in data
-  bin.status = 'Collected';
+  bin.status = 'Empty';
   bin.fillLevel = 0;
   
   // Call backend API
@@ -180,7 +206,7 @@ async function markAsCollected(binId) {
     
     // Revert UI changes on error
     bin.status = 'Warning'; // Revert to previous status
-    binCard.classList.remove('collected');
+    binCard.classList.remove('empty');
   }
 }
 
@@ -192,18 +218,41 @@ function renderBins() {
   );
   
   // Sort all bins by priority
-  const allBins = sortByPriority([...assignedBins]);
+  let allBins = sortByPriority([...assignedBins]);
   
-  // Render priority section
+  // Apply filter if not "All"
+  if (currentFilter !== 'All') {
+    allBins = allBins.filter(b => b.status === currentFilter);
+  }
+  
+  // Render priority section (only show if filter is All or matches priority statuses)
   const priorityContainer = document.getElementById('priorityBins');
-  if (priorityBins.length > 0) {
-    priorityContainer.innerHTML = priorityBins.map(createBinCard).join('');
+  const prioritySection = document.querySelector('.priority-section');
+  
+  if (currentFilter === 'All' || currentFilter === 'Full' || currentFilter === 'Warning') {
+    const filteredPriority = currentFilter === 'All' 
+      ? priorityBins 
+      : priorityBins.filter(b => b.status === currentFilter);
+    
+    if (filteredPriority.length > 0) {
+      priorityContainer.innerHTML = filteredPriority.map(createBinCard).join('');
+      prioritySection.style.display = 'block';
+    } else {
+      priorityContainer.innerHTML = '<p class="empty-message">No priority bins! Great job!</p>';
+      prioritySection.style.display = 'block';
+    }
   } else {
-    priorityContainer.innerHTML = '<p class="empty-message">No priority bins! Great job!</p>';
+    // Hide priority section when filtering by Normal or Empty
+    prioritySection.style.display = 'none';
   }
   
   // Render all bins section
-  document.getElementById('allBins').innerHTML = allBins.map(createBinCard).join('');
+  const allBinsContainer = document.getElementById('allBins');
+  if (allBins.length > 0) {
+    allBinsContainer.innerHTML = allBins.map(createBinCard).join('');
+  } else {
+    allBinsContainer.innerHTML = `<p class="empty-message">No ${currentFilter.toLowerCase()} bins found</p>`;
+  }
   
   // Hide loading state
   document.getElementById('loadingState').style.display = 'none';
@@ -212,8 +261,6 @@ function renderBins() {
   document.getElementById('emptyState').style.display = 
     assignedBins.length === 0 ? 'block' : 'none';
 }
-
-// Show toast notification
 function showToast(message, type = 'success') {
   // Remove existing toast
   const existingToast = document.querySelector('.toast');

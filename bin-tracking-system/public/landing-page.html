@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoTrack - Smart Waste Bin Tracking System</title>
+    <link rel="stylesheet" href="/ecotrack-theme.css" />
+    <style>
+      /* Landing Page Specific Styles */
+      .hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        color: #ffffff;
+        padding: 100px 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 1;
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+        animation: fadeIn 0.8s ease-out;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: -1px;
+      }
+
+      .hero-subtitle {
+        font-size: 1.35rem;
+        color: #94a3b8;
+        margin-bottom: 40px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: fadeIn 0.8s ease-out 0.2s both;
+        line-height: 1.7;
+      }
+
+      .hero-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        animation: fadeIn 0.8s ease-out 0.4s both;
+      }
+
+      .btn-large {
+        padding: 16px 40px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-large:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+
+      .stats-section {
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 80px 0;
+      }
+
+      .stats-section .section-title {
+        color: #0f172a;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+      }
+
+      .stats-section .section-subtitle {
+        color: #64748b;
+        font-size: 1.2rem;
+        margin-bottom: 50px;
+      }
+
+      .stat-card {
+        border: 1px solid #e2e8f0;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      }
+
+      .stat-card .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+      }
+
+      .stat-card.blue .stat-number {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-card.green .stat-number {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-card.orange .stat-number {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .stat-card.red .stat-number {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .features-section {
+        background: #ffffff;
+        padding: 80px 0;
+        position: relative;
+      }
+
+      .features-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+      }
+
+      .feature-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 16px;
+        padding: 40px 32px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        text-align: center;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+      }
+
+      .feature-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        border-color: #cbd5e1;
+      }
+
+      .feature-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        display: inline-block;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+      }
+
+      .feature-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 16px;
+        letter-spacing: -0.3px;
+      }
+
+      .feature-description {
+        color: #64748b;
+        line-height: 1.7;
+        font-size: 1rem;
+      }
+
+      .about-section {
+        background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
+        padding: 80px 0;
+      }
+
+      .about-section .section-title {
+        color: #0f172a;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 20px;
+      }
+
+      .about-section .section-subtitle {
+        color: #475569;
+        font-size: 1.15rem;
+        line-height: 1.8;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @media (max-width: 768px) {
+        .hero {
+          padding: 70px 0;
+        }
+
+        .hero-title {
+          font-size: 2.25rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1.1rem;
+        }
+
+        .btn-large {
+          padding: 14px 32px;
+          font-size: 1rem;
+        }
+
+        .stats-section,
+        .features-section,
+        .about-section {
+          padding: 60px 0;
+        }
+
+        .stats-section .section-title,
+        .about-section .section-title {
+          font-size: 2rem;
+        }
+
+        .stat-card .stat-number {
+          font-size: 2.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar animate-slide-down">
+      <div class="container">
+        <div class="logo">
+          <span class="logo-icon">♻️</span>
+          <span>EcoTrack</span>
+        </div>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#about">About</a>
+          <a href="/admin-login.html" class="btn btn-primary">Admin Login</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title">Smart Waste Bin Tracking System</h1>
+          <p class="hero-subtitle">
+            Monitor waste bin fill levels in real-time, optimize collection routes, 
+            and keep your city clean with intelligent waste management powered by IoT technology.
+          </p>
+          <div class="hero-buttons">
+            <a href="/dashboard" class="btn btn-success btn-large">Go to Dashboard</a>
+            <a href="/collector-login.html" class="btn btn-outline btn-large">Collector Login</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+      <div class="container">
+        <h2 class="section-title">Live System Overview</h2>
+        <p class="section-subtitle">Real-time monitoring of waste bins across the city</p>
+        
+        <div class="grid-4">
+          <!-- Total Bins -->
+          <div class="stat-card blue animate-fade-in">
+            <div class="stat-label">Total Bins</div>
+            <div class="stat-number">16</div>
+            <p style="color: var(--text-light); font-size: 0.875rem;">
+              Monitored across city
+            </p>
+          </div>
+
+          <!-- Normal -->
+          <div class="stat-card green animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="stat-label">Normal</div>
+            <div class="stat-number" style="color: var(--green);">8</div>
+            <p style="color: var(--text-light); font-size: 0.875rem;">
+              Operating normally
+            </p>
+          </div>
+
+          <!-- Warning -->
+          <div class="stat-card orange animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="stat-label">Warning</div>
+            <div class="stat-number" style="color: var(--orange);">3</div>
+            <p style="color: var(--text-light); font-size: 0.875rem;">
+              Needs attention soon
+            </p>
+          </div>
+
+          <!-- Full -->
+          <div class="stat-card red animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="stat-label">Full</div>
+            <div class="stat-number" style="color: var(--red);">5</div>
+            <p style="color: var(--text-light); font-size: 0.875rem;">
+              Requires immediate pickup
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+      <div class="container">
+        <h2 class="section-title">Key Features</h2>
+        <p class="section-subtitle">Everything you need for efficient waste management</p>
+        
+        <div class="grid-3">
+          <div class="feature-card animate-fade-in">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Measure Garbage Fill Level</h3>
+            <p class="feature-description">
+              IoT sensors accurately measure waste fill levels in real-time, providing precise data for optimal collection scheduling.
+            </p>
+          </div>
+
+          <div class="feature-card animate-fade-in" style="animation-delay: 0.1s;">
+            <div class="feature-icon">📡</div>
+            <h3 class="feature-title">Real-Time IoT Data Transmission</h3>
+            <p class="feature-description">
+              Seamless wireless data transmission from smart bins to the central monitoring system using advanced IoT technology.
+            </p>
+          </div>
+
+          <div class="feature-card animate-fade-in" style="animation-delay: 0.2s;">
+            <div class="feature-icon">🏷️</div>
+            <h3 class="feature-title">Smart Bin Classification</h3>
+            <p class="feature-description">
+              Automatic classification of bins into Normal, Warning, and Full categories based on real-time fill level data.
+            </p>
+          </div>
+
+          <div class="feature-card animate-fade-in" style="animation-delay: 0.3s;">
+            <div class="feature-icon">📍</div>
+            <h3 class="feature-title">Location & Status Display</h3>
+            <p class="feature-description">
+              Interactive map view showing exact bin locations with color-coded status indicators for quick visual monitoring.
+            </p>
+          </div>
+
+          <div class="feature-card animate-fade-in" style="animation-delay: 0.4s;">
+            <div class="feature-icon">🔔</div>
+            <h3 class="feature-title">Instant Full Bin Alerts</h3>
+            <p class="feature-description">
+              Automated notifications sent to collectors and administrators when bins reach full capacity for immediate action.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+      <div class="container">
+        <h2 class="section-title">About EcoTrack</h2>
+        <p class="section-subtitle">
+          EcoTrack is a comprehensive smart waste management solution designed to help cities 
+          manage waste collection efficiently. Using IoT sensors and real-time data analytics, 
+          we enable waste management teams to optimize routes, reduce operational costs, and 
+          keep urban environments clean.
+        </p>
+        
+        <div style="text-align: center; margin-top: 40px;">
+          <a href="/admin-login.html" class="btn btn-primary btn-large">
+            Get Started Now
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-logo">♻️ EcoTrack</div>
+          <p class="footer-text">
+            Smart Waste Bin Tracking System &copy; 2026. All rights reserved.
+          </p>
+          <p class="footer-text" style="margin-top: 8px;">
+            Built for cleaner, smarter cities.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

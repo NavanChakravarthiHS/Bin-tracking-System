@@ -1,20 +1,53 @@
 import { useState, useEffect } from 'react';
 import { mockBins } from '../data/mockData';
 
-export const useBins = () => {
+const API_URL = 'http://localhost:5000';
+
+export const useBins = (searchTerm = '', activeFilter = 'All') => {
   const [bins, setBins] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
 
   useEffect(() => {
-    // Simulate API call with timeout
-    const timer = setTimeout(() => {
-      setBins(mockBins);
-      setLoading(false);
-    }, 1000);
+    const fetchBins = async () => {
+      try {
+        const token = localStorage.getItem('adminToken');
+        
+        // If no admin token, use mock data
+        if (!token) {
+          console.log('No admin token found, using mock data');
+          setBins(mockBins);
+          setLoading(false);
+          return;
+        }
 
-    return () => clearTimeout(timer);
+        const response = await fetch(`${API_URL}/admin/bins`, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setBins(data.bins);
+        } else {
+          // If API fails, fallback to mock data
+          console.log('API fetch failed, using mock data');
+          setBins(mockBins);
+        }
+      } catch (error) {
+        console.error('Failed to fetch bins from API, using mock data:', error);
+        setBins(mockBins);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBins();
+    
+    // Poll every 5 seconds for real-time updates
+    const interval = setInterval(fetchBins, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   // Filter bins based on search and filter criteria
@@ -44,8 +77,6 @@ export const useBins = () => {
     allBins: bins,
     loading,
     searchTerm,
-    setSearchTerm,
     activeFilter,
-    setActiveFilter,
   };
 };

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Trash2, CheckCircle, AlertTriangle, AlertOctagon, Filter } from 'lucide-react';
+import { Trash2, CheckCircle, AlertTriangle, AlertOctagon, Filter, PackageOpen } from 'lucide-react';
 import Dashboard from '../components/Dashboard/Dashboard';
 import FilterBar from '../components/Common/FilterBar';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import { useBins } from '../hooks/useBins';
 
 const DashboardPage = ({ searchTerm }) => {
-  const { bins, loading, activeFilter, setActiveFilter } = useBins(searchTerm);
-  const { allBins } = useBins();
+  const [activeFilter, setActiveFilter] = useState('All');
+  const { bins, loading, allBins } = useBins(searchTerm, activeFilter);
 
   // Calculate stats
   const stats = {
@@ -15,12 +15,13 @@ const DashboardPage = ({ searchTerm }) => {
     normal: allBins.filter(b => b.status === 'Normal').length,
     warning: allBins.filter(b => b.status === 'Warning').length,
     full: allBins.filter(b => b.status === 'Full').length,
+    empty: allBins.filter(b => b.status === 'Empty').length,
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {/* Total Bins */}
         <div className="stat-card">
           <div className="flex items-center justify-between">
@@ -82,6 +83,22 @@ const DashboardPage = ({ searchTerm }) => {
           </div>
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-xs text-gray-600">Requires immediate pickup</p>
+          </div>
+        </div>
+
+        {/* Empty Bins */}
+        <div className="stat-card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-2">Empty</p>
+              <p className="text-3xl font-bold text-blue-700">{stats.empty}</p>
+            </div>
+            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+              <PackageOpen size={24} className="text-white" />
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-600">Recently collected</p>
           </div>
         </div>
       </div>

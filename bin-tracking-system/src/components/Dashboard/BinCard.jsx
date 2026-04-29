@@ -1,4 +1,4 @@
-import { MapPin } from 'lucide-react';
+import { MapPin, CheckCircle } from 'lucide-react';
 import StatusBadge from '../Common/StatusBadge';
 
 const BinCard = ({ bin, index }) => {
@@ -59,6 +59,21 @@ const BinCard = ({ bin, index }) => {
           <div>Lat: {bin.latitude.toFixed(4)}</div>
           <div>Lng: {bin.longitude.toFixed(4)}</div>
         </div>
+        
+        {/* Collection Info */}
+        {bin.lastCollected && (
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center gap-1.5 text-xs text-green-600">
+              <CheckCircle size={12} />
+              <span>Collected {new Date(bin.lastCollected).toLocaleDateString()}</span>
+            </div>
+            {bin.assignedCollector && (
+              <div className="text-xs text-gray-500 mt-1">
+                By: {bin.assignedCollector}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

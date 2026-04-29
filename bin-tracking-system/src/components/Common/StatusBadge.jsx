@@ -7,6 +7,7 @@ const StatusBadge = ({ status }) => {
     green: 'bg-green-500 text-white border border-green-600 font-semibold',
     yellow: 'bg-amber-500 text-black border border-amber-600 font-semibold',
     red: 'bg-red-500 text-white border border-red-600 font-semibold',
+    blue: 'bg-blue-500 text-white border border-blue-600 font-semibold',
     gray: 'bg-gray-400 text-white border border-gray-500 font-semibold'
   };
 
@@ -14,6 +15,7 @@ const StatusBadge = ({ status }) => {
     green: 'bg-white',
     yellow: 'bg-black',
     red: 'bg-white',
+    blue: 'bg-white',
     gray: 'bg-white'
   };
 
