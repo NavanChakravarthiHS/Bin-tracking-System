@@ -172,15 +172,17 @@
         </form>
 
         <div class="login-footer">
-          <p>Don't have access? <a href="/landing-page.html">Back to Home</a></p>
+          <p>Don't have access? <a href="/landing.html">Back to Home</a></p>
         </div>
 
-        <a href="/landing-page.html" class="back-link">← Back to Landing Page</a>
+        <a href="/landing.html" class="back-link">← Back to Landing Page</a>
       </div>
     </div>
 
     <script>
-      const API_URL = '';
+      const API_URL = 'http://localhost:5000';
+      const TOKEN_KEY = 'admin_token';
+      const nextUrl = new URLSearchParams(window.location.search).get('next') || '/app.html';
 
       function togglePassword() {
         const passwordInput = document.getElementById('password');
@@ -241,12 +243,15 @@
             body: JSON.stringify({ mobile, password }),
           });
 
-          const data = await response.json();
+          const data = await response.json().catch(() => ({}));
 
           if (response.ok) {
-            localStorage.setItem('adminToken', data.token);
+            // Keep token key aligned with dashboard auth guard
+            localStorage.setItem(TOKEN_KEY, data.token);
             localStorage.setItem('adminName', data.admin.name);
-            window.location.href = '/dashboard';
+            const u = new URL(nextUrl, window.location.origin);
+            u.hash = `token=${encodeURIComponent(data.token)}`;
+            window.location.href = u.toString();
           } else {
             showError(data.message || 'Invalid credentials. Please try again.');
           }

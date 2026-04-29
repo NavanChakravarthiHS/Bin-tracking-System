@@ -55,7 +55,7 @@ async function bootstrap() {
     console.log(`📡 Backend API: http://localhost:${env.port}`);
     console.log(`🏠 Landing Page: http://localhost:${env.port}/`);
     console.log(`👤 Admin Login: http://localhost:${env.port}/admin-login.html`);
-    console.log(`🚛 Collector Login: http://localhost:${env.port}/collector-login-new.html`);
+    console.log(`🚛 Collector Login: http://localhost:${env.port}/collector-login.html`);
     console.log(`📊 Collector Dashboard: http://localhost:${env.port}/collector-dashboard.html`);
     console.log(`✅ Health Check: http://localhost:${env.port}/health`);
     console.log(`========================================\n`);

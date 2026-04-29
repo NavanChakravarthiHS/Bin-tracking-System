@@ -1,4 +1,4 @@
-const API_URL = '';
+const API_URL = 'http://localhost:5000';
 
 // Global variable to store bins
 let assignedBins = [];

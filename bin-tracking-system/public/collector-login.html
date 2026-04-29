@@ -64,11 +64,16 @@
         <div class="auth-link">
           Don't have an account? <a href="/collector-signup.html">Sign up here</a>
         </div>
+
+        <!-- Back to Home -->
+        <div class="auth-link" style="margin-top: 10px;">
+          <a href="/landing.html">← Back to Home Page</a>
+        </div>
       </div>
     </div>
 
     <script>
-      const API_URL = '';
+      const API_URL = 'http://localhost:5000';
 
       // Toggle password visibility
       function togglePassword(inputId, btn) {
@@ -134,7 +139,7 @@
             body: JSON.stringify({ mobile, password }),
           });
 
-          const data = await response.json();
+          const data = await response.json().catch(() => ({}));
 
           if (response.ok) {
             // Store token in localStorage
@@ -149,7 +154,7 @@
             showMessage(data.message || 'Invalid credentials. Please try again.', 'error');
           }
         } catch (error) {
-          showMessage('Network error. Please check your connection.', 'error');
+          showMessage('Backend not reachable. Please start backend on http://localhost:5000', 'error');
         } finally {
           submitBtn.disabled = false;
           submitBtn.innerHTML = 'Login';
