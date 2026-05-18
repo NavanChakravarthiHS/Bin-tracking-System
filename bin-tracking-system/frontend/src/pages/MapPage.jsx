@@ -1,11 +1,14 @@
-import MapView from '../components/Map/MapView';
+import { useState } from 'react';
+import BinMap from '../components/BinMap';
 import SearchBar from '../components/Common/SearchBar';
 import FilterBar from '../components/Common/FilterBar';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import { useBins } from '../hooks/useBins';
 
 const MapPage = () => {
-  const { bins, allBins, loading, searchTerm, setSearchTerm, activeFilter, setActiveFilter } = useBins();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const { bins, loading } = useBins(searchTerm, activeFilter);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -29,7 +32,7 @@ const MapPage = () => {
       {loading ? (
         <LoadingSpinner size="large" />
       ) : (
-        <MapView bins={bins} />
+        <BinMap bins={bins} />
       )}
 
       {/* Legend */}
@@ -41,12 +44,16 @@ const MapPage = () => {
             <span className="text-sm text-gray-700 font-medium">Normal</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
+            <div className="w-4 h-4 rounded-full bg-amber-500"></div>
             <span className="text-sm text-gray-700 font-medium">Warning</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded-full bg-red-500"></div>
             <span className="text-sm text-gray-700 font-medium">Full</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded-full bg-gray-400"></div>
+            <span className="text-sm text-gray-700 font-medium">Collected</span>
           </div>
         </div>
       </div>

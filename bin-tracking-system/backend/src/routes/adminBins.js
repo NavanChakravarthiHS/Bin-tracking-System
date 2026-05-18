@@ -37,15 +37,21 @@ adminBinsRouter.post("/bins/:id/sensor", async (req, res) => {
   }
 
   let status = "Normal";
-  if (fillLevel >= 90) status = "Full";
-  else if (fillLevel >= 70) status = "Warning";
+  if (fillLevel >= 80) status = "Full";
+  else if (fillLevel >= 50) status = "Warning";
   else if (fillLevel > 0) status = "Normal";
-  else status = "Empty";
+  else status = "Collected";
+
+  const updateFields = { fillLevel, status };
+  if (fillLevel > 0) {
+    updateFields.lastCollected = null;
+    updateFields.assignedCollector = null;
+  }
 
   try {
     const bin = await Bin.findOneAndUpdate(
       { id },
-      { $set: { fillLevel, status } },
+      { $set: updateFields },
       { new: true }
     );
 

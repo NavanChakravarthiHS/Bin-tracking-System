@@ -2,23 +2,24 @@ import { MapPin, CheckCircle } from 'lucide-react';
 import StatusBadge from '../Common/StatusBadge';
 
 const BinCard = ({ bin, index }) => {
-  const getProgressColor = (fillLevel, status) => {
-    if (status === 'Empty' || fillLevel === 0) return 'progress-fill-empty';
-    if (fillLevel >= 90) return 'progress-fill-full';
-    if (fillLevel >= 70) return 'progress-fill-warning';
-    return 'progress-fill-normal';
-  };
+  // Use pre-computed style classes from our unified status hook
+  const cardStyle = bin.cardStyle || 'border-gray-200 bg-white';
+  const progressFillColor = bin.progressColor || 'bg-emerald-500';
+  const isCollected = bin.status === 'Collected';
 
-  const getProgressBg = (fillLevel, status) => {
-    if (status === 'Empty' || fillLevel === 0) return 'bg-blue-100';
-    if (fillLevel >= 90) return 'bg-red-100';
-    if (fillLevel >= 70) return 'bg-yellow-100';
-    return 'bg-green-100';
+  // Determine progress bar background color based on status
+  const getProgressBg = (status) => {
+    switch (status) {
+      case 'Collected': return 'bg-gray-100';
+      case 'Full': return 'bg-red-100';
+      case 'Warning': return 'bg-amber-100';
+      default: return 'bg-emerald-100';
+    }
   };
 
   return (
     <div
-      className="modern-card p-5 animate-slide-up cursor-pointer"
+      className={`modern-card p-5 animate-slide-up cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${cardStyle}`}
       style={{ animationDelay: `${index * 50}ms` }}
     >
       {/* Header */}
@@ -46,31 +47,31 @@ const BinCard = ({ bin, index }) => {
           </span>
         </div>
         
-        {/* Progress Bar */}
-        <div className={`w-full h-2 ${getProgressBg(bin.fillLevel, bin.status)} rounded-full overflow-hidden`}>
+        {/* Progress Bar with modern color transition */}
+        <div className={`w-full h-2 ${getProgressBg(bin.status)} rounded-full overflow-hidden transition-all duration-300`}>
           <div
-            className={`h-full ${getProgressColor(bin.fillLevel, bin.status)}`}
+            className={`h-full ${progressFillColor} rounded-full transition-all duration-500`}
             style={{ width: `${bin.fillLevel}%` }}
           ></div>
         </div>
       </div>
 
-      {/* Coordinates */}
-      <div className="mt-4 pt-3 border-t border-gray-200">
-        <div className="text-xs text-gray-500 space-y-0.5">
-          <div>Lat: {bin.latitude.toFixed(4)}</div>
-          <div>Lng: {bin.longitude.toFixed(4)}</div>
+      {/* Coordinates & Collection Metadata */}
+      <div className="mt-4 pt-3 border-t border-gray-200/60">
+        <div className="text-xs text-gray-500 space-y-0.5 font-medium">
+          <div>Lat: {bin.latitude ? bin.latitude.toFixed(4) : '0.0000'}</div>
+          <div>Lng: {bin.longitude ? bin.longitude.toFixed(4) : '0.0000'}</div>
         </div>
         
-        {/* Collection Info */}
-        {bin.lastCollected && (
+        {/* Collection Info - Only show when the bin is in Collected state */}
+        {isCollected && bin.lastCollected && (
           <div className="mt-2 pt-2 border-t border-gray-100">
-            <div className="flex items-center gap-1.5 text-xs text-green-600">
-              <CheckCircle size={12} />
+            <div className="flex items-center gap-1.5 text-xs text-gray-600">
+              <CheckCircle size={12} className="text-emerald-500" />
               <span>Collected {new Date(bin.lastCollected).toLocaleDateString()}</span>
             </div>
             {bin.assignedCollector && (
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 mt-1 pl-3.5">
                 By: {bin.assignedCollector}
               </div>
             )}

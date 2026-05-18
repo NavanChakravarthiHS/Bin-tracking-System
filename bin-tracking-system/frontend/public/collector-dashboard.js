@@ -69,7 +69,13 @@ async function loadBins() {
     
     if (response.ok) {
       const data = await response.json();
-      assignedBins = data.bins;
+      // Map and resolve statuses dynamically based on new thresholds
+      assignedBins = data.bins.map(bin => {
+        const resolvedStatus = (bin.fillLevel > 0 && (bin.status === 'Empty' || bin.status === 'Collected'))
+          ? (bin.fillLevel >= 80 ? 'Full' : bin.fillLevel >= 50 ? 'Warning' : 'Normal')
+          : (bin.fillLevel === 0 ? 'Collected' : bin.status);
+        return { ...bin, status: resolvedStatus };
+      });
       renderBins();
     } else {
       console.error('Failed to load bins');
@@ -102,23 +108,23 @@ function filterBins(status) {
   renderBins();
 }
 
-// Sort bins by priority: Full -> Warning -> Normal -> Empty
+// Sort bins by priority: Full -> Warning -> Normal -> Collected
 function sortByPriority(bins) {
-  const priorityOrder = { 'Full': 0, 'Warning': 1, 'Normal': 2, 'Empty': 3 };
+  const priorityOrder = { 'Full': 0, 'Warning': 1, 'Normal': 2, 'Collected': 3, 'Empty': 3 };
   return bins.sort((a, b) => priorityOrder[a.status] - priorityOrder[b.status]);
 }
 
 // Get progress bar color based on fill level
 function getProgressColorClass(fillLevel) {
-  if (fillLevel >= 90) return 'red';
-  if (fillLevel >= 70) return 'orange';
+  if (fillLevel >= 80) return 'red';
+  if (fillLevel >= 50) return 'orange';
   return 'green';
 }
 
 // Create bin card HTML
 function createBinCard(bin) {
   const progressColor = getProgressColorClass(bin.fillLevel);
-  const isEmpty = bin.status === 'Empty';
+  const isCollected = bin.status === 'Collected';
   
   return `
     <div class="bin-card ${bin.status.toLowerCase()}" data-bin-id="${bin.id}" style="animation-delay: ${Math.random() * 0.3}s">
@@ -138,7 +144,7 @@ function createBinCard(bin) {
       <div class="bin-fill">
         <span>Fill Level: ${bin.fillLevel}%</span>
         <div class="progress-bar">
-          <div class="progress-fill ${progressColor}" style="width: ${bin.fillLevel}%"></div>
+          <div class="progress-fill ${isCollected ? 'progress-fill-empty' : progressColor}" style="width: ${bin.fillLevel}%"></div>
         </div>
       </div>
       <div class="bin-actions">
@@ -153,12 +159,12 @@ function createBinCard(bin) {
         <button 
           onclick="markAsCollected('${bin.id}')" 
           class="btn-action btn-collect"
-          ${isEmpty ? 'disabled' : ''}
+          ${isCollected ? 'disabled' : ''}
         >
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
-          ${isEmpty ? 'Empty' : 'Mark as Collected'}
+          ${isCollected ? 'Collected' : 'Mark as Collected'}
         </button>
       </div>
     </div>
@@ -177,18 +183,18 @@ async function markAsCollected(binId) {
   
   // Find the bin
   const bin = assignedBins.find(b => b.id === binId);
-  if (!bin || bin.status === 'Empty') {
+  if (!bin || bin.status === 'Collected') {
     return;
   }
   
   // Update UI immediately for better UX
   const binCard = document.querySelector(`[data-bin-id="${binId}"]`);
   if (binCard) {
-    binCard.classList.add('empty');
+    binCard.classList.add('collected');
   }
   
   // Update status in data
-  bin.status = 'Empty';
+  bin.status = 'Collected';
   bin.fillLevel = 0;
   
   // Call backend API
@@ -199,7 +205,7 @@ async function markAsCollected(binId) {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ binId, status: 'Normal', fillLevel: 0 }),
+      body: JSON.stringify({ binId, status: 'Collected', fillLevel: 0 }),
     });
     
     if (response.ok) {
@@ -255,7 +261,7 @@ function renderBins() {
       prioritySection.style.display = 'block';
     }
   } else {
-    // Hide priority section when filtering by Normal or Empty
+    // Hide priority section when filtering by Normal or Collected
     prioritySection.style.display = 'none';
   }
   

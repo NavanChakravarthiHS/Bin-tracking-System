@@ -1,5 +1,5 @@
 const FilterBar = ({ activeFilter, onFilterChange }) => {
-  const filters = ['All', 'Normal', 'Warning', 'Full'];
+  const filters = ['All', 'Normal', 'Warning', 'Full', 'Collected'];
 
   const getFilterColor = (filter) => {
     switch (filter) {
@@ -19,6 +19,10 @@ const FilterBar = ({ activeFilter, onFilterChange }) => {
         return activeFilter === filter
           ? 'bg-red-600 text-white border-red-700 shadow-lg'
           : 'bg-white text-red-700 border-2 border-red-500 hover:bg-red-50';
+      case 'Collected':
+        return activeFilter === filter
+          ? 'bg-gray-600 text-white border-gray-700 shadow-lg'
+          : 'bg-white text-gray-700 border-2 border-gray-500 hover:bg-gray-50';
     }
   };
 

@@ -6,32 +6,32 @@ const binsData = [
     location: "College Library",
     fillLevel: 30,
     status: "Normal",
-    latitude: 12.9716,
-    longitude: 77.5946,
+    latitude: 12.884826192901519,
+    longitude: 76.16705545090305,
   },
   {
     id: "BIN002",
     location: "Principal's Office",
     fillLevel: 85,
     status: "Full",
-    latitude: 12.98,
-    longitude: 77.60,
+    latitude: 12.88434509283807,
+    longitude: 76.16648145829812,
   },
   {
     id: "BIN003",
     location: "Government College of Engineering, Mosalehosahalli",
     fillLevel: 45,
     status: "Normal",
-    latitude: 12.884875,
-    longitude: 76.166738,
+    latitude: 12.88399547624362,
+    longitude: 76.16687634296892,
   },
   {
     id: "BIN004",
     location: "Seminar Hall",
     fillLevel: 72,
     status: "Warning",
-    latitude: 12.9698,
-    longitude: 77.7499,
+    latitude: 12.883773704898823,
+    longitude: 76.16671399141555,
   },
 ];
 
@@ -40,5 +40,44 @@ export async function seedBins() {
   if (count === 0) {
     await Bin.insertMany(binsData);
     console.log("✅ Bins seeded successfully");
+  } else {
+    // Force update all four bins coordinates to match requested values in database
+    await Bin.updateOne(
+      { id: "BIN001" },
+      { 
+        $set: { 
+          latitude: 12.884826192901519, 
+          longitude: 76.16705545090305 
+        } 
+      }
+    );
+    await Bin.updateOne(
+      { id: "BIN002" },
+      { 
+        $set: { 
+          latitude: 12.88434509283807, 
+          longitude: 76.16648145829812 
+        } 
+      }
+    );
+    await Bin.updateOne(
+      { id: "BIN003" },
+      { 
+        $set: { 
+          latitude: 12.88399547624362, 
+          longitude: 76.16687634296892 
+        } 
+      }
+    );
+    await Bin.updateOne(
+      { id: "BIN004" },
+      { 
+        $set: { 
+          latitude: 12.883773704898823, 
+          longitude: 76.16671399141555 
+        } 
+      }
+    );
+    console.log("✅ All bins coordinates synchronized in database");
   }
 }

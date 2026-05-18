@@ -101,7 +101,7 @@ collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) =>
     const updatedBin = await Bin.findOneAndUpdate(
       { id: binId },
       { 
-        status: 'Empty',
+        status: 'Collected',
         fillLevel: 0,
         lastCollected: new Date(),
         assignedCollector: req.collector.mobile

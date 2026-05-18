@@ -198,10 +198,10 @@ body {
   box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
 }
 
-.filter-btn[data-filter="Empty"].active {
-  background: linear-gradient(135deg, var(--color-blue) 0%, var(--color-blue-dark) 100%);
-  border-color: var(--color-blue);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+.filter-btn[data-filter="Collected"].active {
+  background: linear-gradient(135deg, #9ca3af 0%, #4b5563 100%);
+  border-color: #9ca3af;
+  box-shadow: 0 8px 20px rgba(156, 163, 175, 0.35);
 }
 
 /* Section Titles */
@@ -256,9 +256,10 @@ body {
 .bin-card.full { border-left-color: var(--color-red); }
 .bin-card.warning { border-left-color: var(--color-orange); }
 .bin-card.normal { border-left-color: var(--color-green); }
-.bin-card.empty {
-  border-left-color: var(--color-blue);
-  background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);
+.bin-card.collected {
+  border-left-color: #6b7280;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  opacity: 0.85;
 }
 
 @keyframes fadeInUp {
@@ -317,10 +318,10 @@ body {
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-.status-badge.status-empty {
-  background: #eff6ff;
-  color: var(--color-blue);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+.status-badge.status-collected {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid rgba(75, 85, 99, 0.2);
 }
 
 /* Bin Location */
@@ -378,6 +379,9 @@ body {
 
 .progress-fill.red {
   background: linear-gradient(90deg, var(--color-red) 0%, #f87171 100%);
+}
+.progress-fill.progress-fill-empty {
+  background: linear-gradient(90deg, #9ca3af 0%, #4b5563 100%);
 }
 
 /* Bin Actions */
@@ -447,7 +451,7 @@ body {
 .btn-indicator--full { background-color: var(--color-red); }
 .btn-indicator--warning { background-color: var(--color-orange); }
 .btn-indicator--normal { background-color: var(--color-green); }
-.btn-indicator--empty { background-color: var(--color-blue); }
+.btn-indicator--collected { background-color: #9ca3af; }
 
 .filter-btn.active .btn-indicator {
   background-color: #ffffff !important;

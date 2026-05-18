@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { mockBins } from '../data/mockData';
+import { getBinStatus } from '../utils/helpers';
 
 const API_URL = 'http://localhost:5000';
 
@@ -15,7 +16,11 @@ export const useBins = (searchTerm = '', activeFilter = 'All') => {
         // If no admin token, use mock data
         if (!token) {
           console.log('No admin token found, using mock data');
-          setBins(mockBins);
+          const resolvedMock = mockBins.map(bin => {
+            const resolved = getBinStatus(bin.fillLevel, bin.status);
+            return { ...bin, ...resolved };
+          });
+          setBins(resolvedMock);
           setLoading(false);
           return;
         }
@@ -29,15 +34,27 @@ export const useBins = (searchTerm = '', activeFilter = 'All') => {
         
         if (response.ok) {
           const data = await response.json();
-          setBins(data.bins);
+          const resolvedBins = data.bins.map(bin => {
+            const resolved = getBinStatus(bin.fillLevel, bin.status);
+            return { ...bin, ...resolved };
+          });
+          setBins(resolvedBins);
         } else {
           // If API fails, fallback to mock data
           console.log('API fetch failed, using mock data');
-          setBins(mockBins);
+          const resolvedMock = mockBins.map(bin => {
+            const resolved = getBinStatus(bin.fillLevel, bin.status);
+            return { ...bin, ...resolved };
+          });
+          setBins(resolvedMock);
         }
       } catch (error) {
         console.error('Failed to fetch bins from API, using mock data:', error);
-        setBins(mockBins);
+        const resolvedMock = mockBins.map(bin => {
+          const resolved = getBinStatus(bin.fillLevel, bin.status);
+          return { ...bin, ...resolved };
+        });
+        setBins(resolvedMock);
       } finally {
         setLoading(false);
       }

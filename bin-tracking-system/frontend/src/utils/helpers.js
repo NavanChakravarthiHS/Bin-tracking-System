@@ -1,22 +1,58 @@
+export const getBinStatus = (fillLevel, status) => {
+  // If status is 'Collected' or fillLevel is 0, it is in Collected state
+  const isCollectedState = status === 'Collected' || fillLevel === 0;
+
+  if (isCollectedState && fillLevel === 0) {
+    return {
+      status: 'Collected',
+      badgeColor: 'gray',
+      progressColor: 'progress-fill-empty', // Gray/blue progress bar css class
+      markerColor: '#6b7280', // Gray marker
+      cardStyle: 'border-gray-200 bg-gray-50/60 opacity-80 border shadow-sm', // Slightly reflected collected state
+    };
+  }
+
+  // Once new garbage starts filling again after collection:
+  if (fillLevel >= 80) {
+    return {
+      status: 'Full',
+      badgeColor: 'red',
+      progressColor: 'progress-fill-full', // Red progress bar
+      markerColor: '#ef4444', // Red marker
+      cardStyle: 'border-red-200 bg-red-50/30 hover:bg-red-50/50 border shadow-md shadow-red-50/50',
+    };
+  } else if (fillLevel >= 50) {
+    return {
+      status: 'Warning',
+      badgeColor: 'orange',
+      progressColor: 'progress-fill-warning', // Orange progress bar
+      markerColor: '#f59e0b', // Orange marker
+      cardStyle: 'border-amber-200 bg-amber-50/30 hover:bg-amber-50/50 border shadow-md shadow-amber-50/50',
+    };
+  } else {
+    return {
+      status: 'Normal',
+      badgeColor: 'green',
+      progressColor: 'progress-fill-normal', // Green progress bar
+      markerColor: '#10b981', // Green marker
+      cardStyle: 'border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50/50 border shadow-md shadow-emerald-50/50',
+    };
+  }
+};
+
 export const getStatusColor = (status) => {
   switch (status) {
     case 'Normal':
       return 'green';
     case 'Warning':
-      return 'yellow';
+      return 'orange';
     case 'Full':
       return 'red';
-    case 'Empty':
-      return 'blue';
+    case 'Collected':
+      return 'gray';
     default:
       return 'gray';
   }
-};
-
-export const getStatusFromFillLevel = (fillLevel) => {
-  if (fillLevel >= 90) return 'Full';
-  if (fillLevel >= 70) return 'Warning';
-  return 'Normal';
 };
 
 export const getMarkerColor = (status) => {
@@ -27,8 +63,8 @@ export const getMarkerColor = (status) => {
       return '#f59e0b';
     case 'Full':
       return '#ef4444';
-    case 'Empty':
-      return '#3b82f6';
+    case 'Collected':
+      return '#6b7280';
     default:
       return '#6b7280';
   }
@@ -41,5 +77,5 @@ export const formatDate = (date) => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(date);
+  }).format(new Date(date));
 };

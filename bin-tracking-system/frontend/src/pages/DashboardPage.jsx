@@ -15,7 +15,7 @@ const DashboardPage = ({ searchTerm }) => {
     normal: allBins.filter(b => b.status === 'Normal').length,
     warning: allBins.filter(b => b.status === 'Warning').length,
     full: allBins.filter(b => b.status === 'Full').length,
-    empty: allBins.filter(b => b.status === 'Empty').length,
+    collected: allBins.filter(b => b.status === 'Collected').length,
   };
 
   return (
@@ -86,14 +86,14 @@ const DashboardPage = ({ searchTerm }) => {
           </div>
         </div>
 
-        {/* Empty Bins */}
+        {/* Collected Bins */}
         <div className="stat-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 mb-2">Empty</p>
-              <p className="text-3xl font-bold text-blue-700">{stats.empty}</p>
+              <p className="text-sm font-medium text-gray-600 mb-2">Collected</p>
+              <p className="text-3xl font-bold text-gray-600">{stats.collected}</p>
             </div>
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 bg-gradient-to-br from-gray-500 to-gray-600 rounded-lg flex items-center justify-center shadow-lg">
               <PackageOpen size={24} className="text-white" />
             </div>
           </div>
