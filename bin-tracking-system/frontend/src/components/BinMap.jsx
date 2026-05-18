@@ -97,12 +97,21 @@ const BinMap = ({ bins }) => {
   const [selectedBin, setSelectedBin] = useState(null);
   const mapRef = useRef(null);
 
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+  
+  if (!apiKey) {
+    console.warn("Missing VITE_GOOGLE_MAPS_API_KEY in .env file");
+  } else {
+    console.log("✅ Google Maps API key loaded");
+  }
+
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey: apiKey,
   });
 
   const onMapLoad = useCallback((map) => {
+    console.log("🗺️ Map initialized");
     mapRef.current = map;
   }, []);
 
@@ -113,10 +122,30 @@ const BinMap = ({ bins }) => {
     }
   };
 
+  if (!apiKey) {
+    return (
+      <div className="h-[550px] flex items-center justify-center bg-amber-50 text-amber-800 rounded-2xl border border-amber-200 p-6 text-center shadow-sm">
+        <div>
+          <h3 className="font-bold text-xl mb-2 flex items-center justify-center gap-2">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Invalid API Configuration
+          </h3>
+          <p className="font-medium text-amber-700">Missing API Key: Please configure VITE_GOOGLE_MAPS_API_KEY in your .env file.</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loadError) {
     return (
-      <div className="h-[550px] flex items-center justify-center bg-red-50 text-red-700 rounded-2xl border border-red-200 p-6">
-        <p className="font-semibold text-lg">Error loading Google Maps. Please check your credentials.</p>
+      <div className="h-[550px] flex items-center justify-center bg-red-50 text-red-800 rounded-2xl border border-red-200 p-6 text-center shadow-sm">
+        <div>
+          <h3 className="font-bold text-xl mb-2 flex items-center justify-center gap-2">
+            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            Google Maps failed to load
+          </h3>
+          <p className="font-medium text-red-700">Please check your network connection and API credentials.</p>
+        </div>
       </div>
     );
   }

@@ -111,10 +111,20 @@ function filterBins(status) {
   renderBins();
 }
 
-// Sort bins by priority: Full -> Warning -> Normal -> Collected
+// Sort bins by priority
 function sortByPriority(bins) {
-  const priorityOrder = { 'Full': 0, 'Warning': 1, 'Normal': 2, 'Collected': 3, 'Empty': 3 };
-  return bins.sort((a, b) => priorityOrder[a.status] - priorityOrder[b.status]);
+  return bins.sort((a, b) => {
+    // Highest priority: fillLevel >= 90
+    const aHigh = a.fillLevel >= 90 ? 0 : 1;
+    const bHigh = b.fillLevel >= 90 ? 0 : 1;
+    if (aHigh !== bHigh) return aHigh - bHigh;
+    // Next priority based on status order
+    const priorityOrder = { 'Full': 1, 'Warning': 2, 'Normal': 3, 'Collected': 4, 'Empty': 4 };
+    const statusDiff = priorityOrder[a.status] - priorityOrder[b.status];
+    if (statusDiff !== 0) return statusDiff;
+    // Within same status, higher fillLevel first
+    return b.fillLevel - a.fillLevel;
+  });
 }
 
 // Get progress bar color based on fill level
@@ -239,8 +249,8 @@ async function markAsCollected(binId) {
 // Render bins to the DOM
 function renderBins() {
   // Get priority bins (Full and Warning only)
-  const priorityBins = assignedBins.filter(b => 
-    b.status === 'Full' || b.status === 'Warning'
+  const priorityBins = assignedBins.filter(b =>
+    b.fillLevel >= 90 || b.status === 'Full' || b.status === 'Warning'
   );
   
   // Sort all bins by priority

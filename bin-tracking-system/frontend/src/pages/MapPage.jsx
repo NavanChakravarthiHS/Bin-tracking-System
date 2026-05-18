@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BinMap from '../components/BinMap';
 import SearchBar from '../components/Common/SearchBar';
 import FilterBar from '../components/Common/FilterBar';
@@ -9,6 +9,16 @@ const MapPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const { bins, loading } = useBins(searchTerm, activeFilter);
+
+  useEffect(() => {
+    console.log("🚦 Map Route mounted");
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      console.log(`📦 Bin data loaded: ${bins.length} bins found`);
+    }
+  }, [loading, bins.length]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
