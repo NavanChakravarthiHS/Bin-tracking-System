@@ -127,7 +127,12 @@ function createBinCard(bin) {
         <span class="status-badge status-${bin.status.toLowerCase()}">${bin.status}</span>
       </div>
       <div class="bin-location">
-        <span class="icon">📍</span>
+        <span class="icon">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+        </span>
         <span>${bin.location}</span>
       </div>
       <div class="bin-fill">
@@ -138,14 +143,22 @@ function createBinCard(bin) {
       </div>
       <div class="bin-actions">
         <button onclick="viewOnMap('${bin.location}')" class="btn-action btn-map">
-          🗺️ View on Map
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+            <line x1="9" y1="3" x2="9" y2="18"></line>
+            <line x1="15" y1="6" x2="15" y2="21"></line>
+          </svg>
+          View on Map
         </button>
         <button 
           onclick="markAsCollected('${bin.id}')" 
           class="btn-action btn-collect"
           ${isEmpty ? 'disabled' : ''}
         >
-          ${isEmpty ? '✓ Empty' : '✓ Mark as Collected'}
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          ${isEmpty ? 'Empty' : 'Mark as Collected'}
         </button>
       </div>
     </div>

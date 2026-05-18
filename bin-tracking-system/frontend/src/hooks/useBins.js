@@ -10,7 +10,7 @@ export const useBins = (searchTerm = '', activeFilter = 'All') => {
   useEffect(() => {
     const fetchBins = async () => {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('admin_token') || localStorage.getItem('adminToken');
         
         // If no admin token, use mock data
         if (!token) {
