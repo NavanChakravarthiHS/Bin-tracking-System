@@ -2,13 +2,15 @@ import { MapPin, CheckCircle } from 'lucide-react';
 import StatusBadge from '../Common/StatusBadge';
 
 const BinCard = ({ bin, index }) => {
-  const getProgressColor = (fillLevel) => {
+  const getProgressColor = (fillLevel, status) => {
+    if (status === 'Empty' || fillLevel === 0) return 'progress-fill-empty';
     if (fillLevel >= 90) return 'progress-fill-full';
     if (fillLevel >= 70) return 'progress-fill-warning';
     return 'progress-fill-normal';
   };
 
-  const getProgressBg = (fillLevel) => {
+  const getProgressBg = (fillLevel, status) => {
+    if (status === 'Empty' || fillLevel === 0) return 'bg-blue-100';
     if (fillLevel >= 90) return 'bg-red-100';
     if (fillLevel >= 70) return 'bg-yellow-100';
     return 'bg-green-100';
@@ -45,9 +47,9 @@ const BinCard = ({ bin, index }) => {
         </div>
         
         {/* Progress Bar */}
-        <div className={`w-full h-2 ${getProgressBg(bin.fillLevel)} rounded-full overflow-hidden`}>
+        <div className={`w-full h-2 ${getProgressBg(bin.fillLevel, bin.status)} rounded-full overflow-hidden`}>
           <div
-            className={`h-full ${getProgressColor(bin.fillLevel)}`}
+            className={`h-full ${getProgressColor(bin.fillLevel, bin.status)}`}
             style={{ width: `${bin.fillLevel}%` }}
           ></div>
         </div>
