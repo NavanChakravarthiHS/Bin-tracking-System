@@ -1,8 +1,5 @@
 export const getBinStatus = (fillLevel, status) => {
-  // If status is 'Collected' or fillLevel is 0, it is in Collected state
-  const isCollectedState = status === 'Collected' || fillLevel === 0;
-
-  if (isCollectedState && fillLevel === 0) {
+  if (fillLevel === 0) {
     return {
       status: 'Collected',
       badgeColor: 'gray',

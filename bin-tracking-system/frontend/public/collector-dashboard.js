@@ -71,9 +71,12 @@ async function loadBins() {
       const data = await response.json();
       // Map and resolve statuses dynamically based on new thresholds
       assignedBins = data.bins.map(bin => {
-        const resolvedStatus = (bin.fillLevel > 0 && (bin.status === 'Empty' || bin.status === 'Collected'))
-          ? (bin.fillLevel >= 80 ? 'Full' : bin.fillLevel >= 50 ? 'Warning' : 'Normal')
-          : (bin.fillLevel === 0 ? 'Collected' : bin.status);
+        let resolvedStatus;
+        if (bin.fillLevel === 0) resolvedStatus = 'Collected';
+        else if (bin.fillLevel >= 80) resolvedStatus = 'Full';
+        else if (bin.fillLevel >= 50) resolvedStatus = 'Warning';
+        else resolvedStatus = 'Normal';
+        
         return { ...bin, status: resolvedStatus };
       });
       renderBins();
