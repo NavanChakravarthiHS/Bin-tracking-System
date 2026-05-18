@@ -13,9 +13,11 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.8",
     "eco-track-workspace": "file:..",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.8.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.14.0"
   },
   "devDependencies": {
