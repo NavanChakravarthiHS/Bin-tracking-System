@@ -148,7 +148,7 @@ function createBinCard(bin) {
         </div>
       </div>
       <div class="bin-actions">
-        <button onclick="viewOnMap('${bin.location}')" class="btn-action btn-map">
+        <button onclick="viewOnMap(${bin.latitude || 'null'}, ${bin.longitude || 'null'}, '${(bin.location || '').replace(/'/g, "\\'")}')" class="btn-action btn-map">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
             <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
             <line x1="9" y1="3" x2="9" y2="18"></line>
@@ -172,9 +172,13 @@ function createBinCard(bin) {
 }
 
 // View bin location on Google Maps
-function viewOnMap(location) {
-  const encodedLocation = encodeURIComponent(location);
-  window.open(`https://www.google.com/maps?q=${encodedLocation}`, '_blank');
+function viewOnMap(latitude, longitude, location) {
+  if (latitude && longitude && latitude !== null && longitude !== null) {
+    window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
+  } else {
+    const encodedLocation = encodeURIComponent(location);
+    window.open(`https://www.google.com/maps?q=${encodedLocation}`, '_blank');
+  }
 }
 
 // Mark bin as collected
