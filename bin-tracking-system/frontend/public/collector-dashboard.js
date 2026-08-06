@@ -137,7 +137,6 @@ function getProgressColorClass(fillLevel) {
 // Create bin card HTML
 function createBinCard(bin) {
   const progressColor = getProgressColorClass(bin.fillLevel);
-  const isCollected = bin.status === 'Collected';
   
   return `
     <div class="bin-card ${bin.status.toLowerCase()}" data-bin-id="${bin.id}" style="animation-delay: ${Math.random() * 0.3}s">
@@ -157,7 +156,7 @@ function createBinCard(bin) {
       <div class="bin-fill">
         <span>Fill Level: ${bin.fillLevel}%</span>
         <div class="progress-bar">
-          <div class="progress-fill ${isCollected ? 'progress-fill-empty' : progressColor}" style="width: ${bin.fillLevel}%"></div>
+          <div class="progress-fill ${progressColor}" style="width: ${bin.fillLevel}%"></div>
         </div>
       </div>
       <div class="bin-actions">
@@ -172,12 +171,11 @@ function createBinCard(bin) {
         <button 
           onclick="markAsCollected('${bin.id}')" 
           class="btn-action btn-collect"
-          ${isCollected ? 'disabled' : ''}
         >
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
-          ${isCollected ? 'Collected' : 'Mark as Collected'}
+          Mark as Collected
         </button>
       </div>
     </div>
@@ -200,21 +198,12 @@ async function markAsCollected(binId) {
   
   // Find the bin
   const bin = assignedBins.find(b => b.id === binId);
-  if (!bin || bin.status === 'Collected') {
-    return;
-  }
+  if (!bin) return;
   
-  // Update UI immediately for better UX
-  const binCard = document.querySelector(`[data-bin-id="${binId}"]`);
-  if (binCard) {
-    binCard.classList.add('collected');
-  }
-  
-  // Update status in data
-  bin.status = 'Collected';
+  // Update fill level locally so the UI responds instantly
   bin.fillLevel = 0;
-  
-  // Call backend API
+  bin.distance = 100;
+  bin.status = 'Normal';// Call backend API
   try {
     const response = await fetch(`${API_URL}/collector/update-status`, {
       method: 'POST',
@@ -239,10 +228,9 @@ async function markAsCollected(binId) {
   } catch (error) {
     console.error('Error updating bin status:', error);
     showToast('Failed to update status. Please try again.', 'error');
-    
     // Revert UI changes on error
-    bin.status = 'Warning'; // Revert to previous status
-    binCard.classList.remove('empty');
+    bin.fillLevel = 100; // Force it to re-evaluate from backend
+    showToast('Failed to update status. Please try again.', 'error');
   }
 }
 

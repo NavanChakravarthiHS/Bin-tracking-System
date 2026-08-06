@@ -5,6 +5,8 @@ const binsData = [
     id: "BIN001",
     location: "College Library",
     fillLevel: 30,
+    distance: 70,
+    blynkPin: "V0",
     status: "Normal",
     latitude: 12.884826192901519,
     longitude: 76.16705545090305,
@@ -47,7 +49,8 @@ export async function seedBins() {
       { 
         $set: { 
           latitude: 12.884826192901519, 
-          longitude: 76.16705545090305 
+          longitude: 76.16705545090305,
+          blynkPin: "V0"
         } 
       }
     );

@@ -9,6 +9,7 @@ import { adminBinsRouter } from "./routes/adminBins.js";
 import { collectorRouter } from "./routes/collector.js";
 import { ensureDefaultAdmin } from "./seed/ensureDefaultAdmin.js";
 import { seedBins } from "./seed/seedBins.js";
+import { syncAllBins } from "./services/blynkService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,11 @@ async function bootstrap() {
   const app = express();
   app.use(cors());
   app.use(express.json());
+
+  // Start background polling to sync Blynk data every 5 seconds
+  setInterval(async () => {
+    await syncAllBins();
+  }, 5000);
 
   // Serve static files from public directory
   app.use(express.static(publicPath));

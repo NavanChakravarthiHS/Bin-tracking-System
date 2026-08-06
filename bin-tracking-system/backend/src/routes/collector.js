@@ -4,6 +4,7 @@ import { Collector } from "../models/Collector.js";
 import { Bin } from "../models/Bin.js";
 import { signCollectorJwt } from "../utils/jwt.js";
 import { requireCollectorAuth } from "../middleware/requireCollectorAuth.js";
+import { pushBlynkValue } from "../services/blynkService.js";
 
 export const collectorRouter = express.Router();
 
@@ -101,8 +102,8 @@ collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) =>
     const updatedBin = await Bin.findOneAndUpdate(
       { id: binId },
       { 
-        status: 'Collected',
         fillLevel: 0,
+        distance: 100, // Reset distance to Max Depth
         lastCollected: new Date(),
         assignedCollector: req.collector.mobile
       },
@@ -111,6 +112,10 @@ collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) =>
 
     if (!updatedBin) {
       return res.status(404).json({ message: "Bin not found" });
+    }
+
+    if (updatedBin.blynkPin) {
+      await pushBlynkValue(updatedBin.blynkPin, 100);
     }
 
     return res.json({ 

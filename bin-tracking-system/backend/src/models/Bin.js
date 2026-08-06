@@ -7,9 +7,11 @@ const binSchema = new mongoose.Schema(
     fillLevel: { type: Number, required: true, default: 0 },
     status: { 
       type: String, 
-      enum: ['Normal', 'Warning', 'Full', 'Empty'], 
+      enum: ['Normal', 'Warning', 'Full', 'Empty', 'Collected'], 
       default: 'Normal' 
     },
+    blynkPin: { type: String, default: null },
+    distance: { type: Number, default: 100 },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
     lastCollected: { type: Date, default: null },
