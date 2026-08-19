@@ -125,10 +125,6 @@ function navigateCollector(section, event) {
   document.querySelectorAll('.sidebar-link').forEach((link) => {
     link.classList.toggle('active', link.getAttribute('data-nav') === section);
   });
-  if (section === 'map') {
-    viewAssignedBinsOnMap();
-    return;
-  }
   if (section === 'alerts') {
     document.getElementById('alerts')?.scrollIntoView({ behavior: 'smooth' });
     return;
@@ -250,32 +246,21 @@ function createBinCard(bin) {
   const fillHeight = Math.max(0, Math.min(100, Number(bin.fillLevel) || 0));
   const statusLabel = getStatusLabel(bin.status);
   const statusClass = bin.status.toLowerCase();
-  const isCollected = bin.status === 'Collected';
-  const lat = bin.latitude != null ? Number(bin.latitude).toFixed(4) : '—';
-  const lng = bin.longitude != null ? Number(bin.longitude).toFixed(4) : '—';
-  const collectedBlock = isCollected ? `
-        <div class="collect-meta">
-          ${bin.lastCollected ? `Collected ${new Date(bin.lastCollected).toLocaleDateString()}` : 'Recently collected'}
-          ${bin.assignedCollector ? `<div>By: ${bin.assignedCollector}</div>` : ''}
-          <div>Lat: ${lat} · Lng: ${lng}</div>
-        </div>
-      ` : '';
-  
   return `
     <div class="bin-card ${statusClass}" data-bin-id="${bin.id}">
       <div class="bin-header">
         <h3>${bin.id}</h3>
         <span class="status-badge status-${statusClass}">${statusLabel}</span>
       </div>
-      <div class="bin-body">
-        <div class="bin-visual bin-visual--${progressColor}" aria-hidden="true">
+      <div class="bin-content">
+        <div class="bin-visual bin-visual--${progressColor}">
           <div class="bin-lid"></div>
           <div class="bin-can">
             <div class="bin-fill-liquid" style="height: ${fillHeight}%"></div>
             <span class="bin-pct">${fillHeight}%</span>
           </div>
         </div>
-        <div class="bin-facts">
+        <div class="bin-details">
           <div class="fact">
             <span>Location</span>
             <div class="bin-location">
@@ -284,20 +269,14 @@ function createBinCard(bin) {
             </div>
           </div>
           <div class="fact">
-            <div class="bin-fill-row"><span>Fill Level</span><strong>${bin.fillLevel}%</strong></div>
-            <div class="progress-bar">
-              <div class="progress-fill ${progressColor}" style="width: ${bin.fillLevel}%"></div>
-            </div>
+            <span>Status</span>
+            <strong class="status-text status-text--${statusClass}"><i></i>${statusLabel}</strong>
           </div>
           <div class="fact">
-            <span>Status</span>
-            <strong>${statusLabel}</strong>
+            <span>Last Updated</span>
+            <strong>${formatUpdatedAt(bin)}</strong>
           </div>
         </div>
-      </div>
-      <div class="bin-meta">
-        Last Updated: ${formatUpdatedAt(bin)}
-        ${collectedBlock}
       </div>
       <div class="bin-actions">
         <button onclick="viewOnMap(${bin.latitude || 'null'}, ${bin.longitude || 'null'}, '${escapeAttr(bin.location)}')" class="btn-action btn-map">
