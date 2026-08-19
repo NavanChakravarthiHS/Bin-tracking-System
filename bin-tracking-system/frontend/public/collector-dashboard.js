@@ -3,6 +3,7 @@ const API_URL = 'http://localhost:5000';
 // Global variable to store bins
 let assignedBins = [];
 let currentFilter = 'All';
+let searchTerm = '';
 
 // Check authentication on page load
 document.addEventListener('DOMContentLoaded', async function() {
@@ -38,8 +39,7 @@ async function verifyAndLoadBins(token) {
     if (response.ok) {
       const data = await response.json();
       // Display mobile number
-      document.getElementById('userMobile').textContent = 
-        `Mobile: ${data.collector.mobile}`;
+      document.getElementById('userMobile').textContent = data.collector.mobile;
       
       // Load bins (using mock data for now)
       await loadBins();
@@ -111,6 +111,47 @@ function filterBins(status) {
   renderBins();
 }
 
+function onBinSearch(value) {
+  searchTerm = value || '';
+  renderBins();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('is-open');
+}
+
+function navigateCollector(section, event) {
+  if (event) event.preventDefault();
+  document.querySelectorAll('.sidebar-link').forEach((link) => {
+    link.classList.toggle('active', link.getAttribute('data-nav') === section);
+  });
+  if (section === 'map') {
+    viewAssignedBinsOnMap();
+    return;
+  }
+  if (section === 'alerts') {
+    document.getElementById('alerts')?.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  if (section === 'assigned') {
+    document.getElementById('assigned')?.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+  document.getElementById('dashboard')?.scrollIntoView({ behavior: 'smooth' });
+}
+
+function updateSummaryCards() {
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText('statAssigned', assignedBins.length);
+  setText('statNormal', assignedBins.filter((b) => b.status === 'Normal').length);
+  setText('statWarning', assignedBins.filter((b) => b.status === 'Warning').length);
+  setText('statFull', assignedBins.filter((b) => b.status === 'Full').length);
+  setText('statCollected', assignedBins.filter((b) => b.status === 'Collected').length);
+}
+
 // Sort bins by priority
 function sortByPriority(bins) {
   return bins.sort((a, b) => {
@@ -128,53 +169,144 @@ function sortByPriority(bins) {
 }
 
 // Get progress bar color based on fill level
-function getProgressColorClass(fillLevel) {
+function getProgressColorClass(fillLevel, status) {
+  if (status === 'Collected' || fillLevel === 0) return 'gray';
   if (fillLevel >= 80) return 'red';
-  if (fillLevel >= 50) return 'orange';
+  if (fillLevel >= 60) return 'orange';
   return 'green';
+}
+
+function getStatusLabel(status) {
+  return status;
+}
+
+function getDeviceState(bin) {
+  const raw = String(bin.deviceStatus || bin.connectivity || bin.onlineStatus || '').toLowerCase();
+  if (raw === 'inactive' || raw === 'offline') return 'offline';
+  return 'online';
+}
+
+function formatUpdatedAt(bin) {
+  const ts = bin.updatedAt || bin.lastCollected;
+  if (!ts) return 'Just now';
+  const date = new Date(ts);
+  if (Number.isNaN(date.getTime())) return 'Just now';
+  return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeAttr(value) {
+  return String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+function viewAssignedBinsOnMap() {
+  const withCoords = assignedBins.find((bin) => bin.latitude && bin.longitude);
+  if (withCoords) {
+    viewOnMap(withCoords.latitude, withCoords.longitude, withCoords.location);
+    return;
+  }
+  const withLocation = assignedBins.find((bin) => bin.location);
+  if (withLocation) {
+    viewOnMap(null, null, withLocation.location);
+    return;
+  }
+  showToast('No bin locations available.', 'error');
+}
+
+function viewBinDetails(binId) {
+  const bin = assignedBins.find((b) => b.id === binId);
+  if (!bin) return;
+  const modal = document.getElementById('detailsModal');
+  const body = document.getElementById('detailsBody');
+  const title = document.getElementById('detailsTitle');
+  const device = getDeviceState(bin);
+  title.textContent = bin.id;
+  body.innerHTML = `
+    <div class="detail-grid">
+      <div><span>Location</span><strong>${bin.location || '—'}</strong></div>
+      <div><span>Fill level</span><strong>${bin.fillLevel}%</strong></div>
+      <div><span>Status</span><strong>${getStatusLabel(bin.status)}</strong></div>
+      <div><span>Device</span><strong>${device === 'online' ? 'Online' : 'Offline'}</strong></div>
+      <div><span>Latitude</span><strong>${bin.latitude ?? '—'}</strong></div>
+      <div><span>Longitude</span><strong>${bin.longitude ?? '—'}</strong></div>
+      <div><span>Last updated</span><strong>${formatUpdatedAt(bin)}</strong></div>
+      <div><span>Last collected</span><strong>${bin.lastCollected ? formatUpdatedAt({ updatedAt: bin.lastCollected }) : '—'}</strong></div>
+    </div>
+    <div class="detail-actions">
+      <button type="button" class="btn-action btn-map" onclick="viewOnMap(${bin.latitude || 'null'}, ${bin.longitude || 'null'}, '${escapeAttr(bin.location)}')">View on Map</button>
+      <button type="button" class="btn-action btn-collect" onclick="markAsCollected('${escapeAttr(bin.id)}'); closeBinDetails();">Mark as Collected</button>
+    </div>
+  `;
+  modal.hidden = false;
+}
+
+function closeBinDetails() {
+  const modal = document.getElementById('detailsModal');
+  if (modal) modal.hidden = true;
 }
 
 // Create bin card HTML
 function createBinCard(bin) {
-  const progressColor = getProgressColorClass(bin.fillLevel);
+  const progressColor = getProgressColorClass(bin.fillLevel, bin.status);
+  const fillHeight = Math.max(0, Math.min(100, Number(bin.fillLevel) || 0));
+  const statusLabel = getStatusLabel(bin.status);
+  const statusClass = bin.status.toLowerCase();
+  const isCollected = bin.status === 'Collected';
+  const lat = bin.latitude != null ? Number(bin.latitude).toFixed(4) : '—';
+  const lng = bin.longitude != null ? Number(bin.longitude).toFixed(4) : '—';
+  const collectedBlock = isCollected ? `
+        <div class="collect-meta">
+          ${bin.lastCollected ? `Collected ${new Date(bin.lastCollected).toLocaleDateString()}` : 'Recently collected'}
+          ${bin.assignedCollector ? `<div>By: ${bin.assignedCollector}</div>` : ''}
+          <div>Lat: ${lat} · Lng: ${lng}</div>
+        </div>
+      ` : '';
   
   return `
-    <div class="bin-card ${bin.status.toLowerCase()}" data-bin-id="${bin.id}" style="animation-delay: ${Math.random() * 0.3}s">
+    <div class="bin-card ${statusClass}" data-bin-id="${bin.id}">
       <div class="bin-header">
         <h3>${bin.id}</h3>
-        <span class="status-badge status-${bin.status.toLowerCase()}">${bin.status}</span>
+        <span class="status-badge status-${statusClass}">${statusLabel}</span>
       </div>
-      <div class="bin-location">
-        <span class="icon">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-        </span>
-        <span>${bin.location}</span>
-      </div>
-      <div class="bin-fill">
-        <span>Fill Level: ${bin.fillLevel}%</span>
-        <div class="progress-bar">
-          <div class="progress-fill ${progressColor}" style="width: ${bin.fillLevel}%"></div>
+      <div class="bin-body">
+        <div class="bin-visual bin-visual--${progressColor}" aria-hidden="true">
+          <div class="bin-lid"></div>
+          <div class="bin-can">
+            <div class="bin-fill-liquid" style="height: ${fillHeight}%"></div>
+            <span class="bin-pct">${fillHeight}%</span>
+          </div>
+        </div>
+        <div class="bin-facts">
+          <div class="fact">
+            <span>Location</span>
+            <div class="bin-location">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <strong>${bin.location}</strong>
+            </div>
+          </div>
+          <div class="fact">
+            <div class="bin-fill-row"><span>Fill Level</span><strong>${bin.fillLevel}%</strong></div>
+            <div class="progress-bar">
+              <div class="progress-fill ${progressColor}" style="width: ${bin.fillLevel}%"></div>
+            </div>
+          </div>
+          <div class="fact">
+            <span>Status</span>
+            <strong>${statusLabel}</strong>
+          </div>
         </div>
       </div>
+      <div class="bin-meta">
+        Last Updated: ${formatUpdatedAt(bin)}
+        ${collectedBlock}
+      </div>
       <div class="bin-actions">
-        <button onclick="viewOnMap(${bin.latitude || 'null'}, ${bin.longitude || 'null'}, '${(bin.location || '').replace(/'/g, "\\'")}')" class="btn-action btn-map">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-            <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
-            <line x1="9" y1="3" x2="9" y2="18"></line>
-            <line x1="15" y1="6" x2="15" y2="21"></line>
-          </svg>
+        <button onclick="viewOnMap(${bin.latitude || 'null'}, ${bin.longitude || 'null'}, '${escapeAttr(bin.location)}')" class="btn-action btn-map">
           View on Map
         </button>
-        <button 
-          onclick="markAsCollected('${bin.id}')" 
-          class="btn-action btn-collect"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
+        <button onclick="viewBinDetails('${escapeAttr(bin.id)}')" class="btn-action btn-details">
+          View Details
+        </button>
+        <button onclick="markAsCollected('${bin.id}')" class="btn-action btn-collect">
           Mark as Collected
         </button>
       </div>
@@ -248,15 +380,30 @@ function renderBins() {
   if (currentFilter !== 'All') {
     allBins = allBins.filter(b => b.status === currentFilter);
   }
+
+  if (searchTerm) {
+    const q = searchTerm.toLowerCase();
+    allBins = allBins.filter((b) =>
+      String(b.id).toLowerCase().includes(q) ||
+      String(b.location || '').toLowerCase().includes(q)
+    );
+  }
+
+  updateSummaryCards();
   
   // Render priority section (only show if filter is All or matches priority statuses)
   const priorityContainer = document.getElementById('priorityBins');
   const prioritySection = document.querySelector('.priority-section');
   
   if (currentFilter === 'All' || currentFilter === 'Full' || currentFilter === 'Warning') {
-    const filteredPriority = currentFilter === 'All' 
+    const filteredPriority = (currentFilter === 'All' 
       ? priorityBins 
-      : priorityBins.filter(b => b.status === currentFilter);
+      : priorityBins.filter(b => b.status === currentFilter)
+    ).filter((b) => {
+      if (!searchTerm) return true;
+      const q = searchTerm.toLowerCase();
+      return String(b.id).toLowerCase().includes(q) || String(b.location || '').toLowerCase().includes(q);
+    });
     
     if (filteredPriority.length > 0) {
       priorityContainer.innerHTML = filteredPriority.map(createBinCard).join('');
@@ -277,7 +424,7 @@ function renderBins() {
   } else {
     allBinsContainer.innerHTML = `<p class="empty-message">No ${currentFilter.toLowerCase()} bins found</p>`;
   }
-  
+
   // Hide loading state
   document.getElementById('loadingState').style.display = 'none';
   

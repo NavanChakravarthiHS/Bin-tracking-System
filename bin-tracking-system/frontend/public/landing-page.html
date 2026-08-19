@@ -1,470 +1,389 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack - Smart Waste Bin Tracking System</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/ecotrack-theme.css" />
-    <style>
-      /* Landing Page Specific Styles */
-      .hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-        color: #ffffff;
-        padding: 100px 0;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-      }
 
-      .hero::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
-        pointer-events: none;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoTrack | Smart City Bin Intelligence</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/landing.css" />
+</head>
 
-      .hero-content {
-        position: relative;
-        z-index: 1;
-      }
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-      .hero-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        margin-bottom: 20px;
-        animation: fadeIn 0.8s ease-out;
-        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -1px;
-      }
-
-      .hero-subtitle {
-        font-size: 1.35rem;
-        color: #94a3b8;
-        margin-bottom: 40px;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-        animation: fadeIn 0.8s ease-out 0.2s both;
-        line-height: 1.7;
-      }
-
-      .hero-buttons {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        animation: fadeIn 0.8s ease-out 0.4s both;
-      }
-
-      .btn-large {
-        padding: 16px 40px;
-        font-size: 1.1rem;
-        border-radius: 10px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-      }
-
-      .btn-large:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      }
-
-      .stats-section {
-        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-        padding: 80px 0;
-      }
-
-      .stats-section .section-title {
-        color: #0f172a;
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 16px;
-        letter-spacing: -0.5px;
-      }
-
-      .stats-section .section-subtitle {
-        color: #64748b;
-        font-size: 1.2rem;
-        margin-bottom: 50px;
-      }
-
-      .stat-card {
-        border: 1px solid #e2e8f0;
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-      }
-
-      .stat-card .stat-number {
-        font-size: 3rem;
-        font-weight: 800;
-        letter-spacing: -1px;
-      }
-
-      .stat-card.blue .stat-number {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .stat-card.green .stat-number {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .stat-card.orange .stat-number {
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .stat-card.red .stat-number {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .features-section {
-        background: #ffffff;
-        padding: 80px 0;
-        position: relative;
-      }
-
-      .features-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
-      }
-
-      .feature-card {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-radius: 16px;
-        padding: 40px 32px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-        text-align: center;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid #e2e8f0;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .feature-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
-        transform: scaleX(0);
-        transition: transform 0.4s ease;
-      }
-
-      .feature-card:hover::before {
-        transform: scaleX(1);
-      }
-
-      .feature-card:hover {
-        transform: translateY(-12px) scale(1.02);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-        border-color: #cbd5e1;
-      }
-
-      .feature-icon {
-        font-size: 3.5rem;
-        margin-bottom: 20px;
-        display: inline-block;
-        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-      }
-
-      .feature-title {
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 16px;
-        letter-spacing: -0.3px;
-      }
-
-      .feature-description {
-        color: #64748b;
-        line-height: 1.7;
-        font-size: 1rem;
-      }
-
-      .about-section {
-        background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
-        padding: 80px 0;
-      }
-
-      .about-section .section-title {
-        color: #0f172a;
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 20px;
-      }
-
-      .about-section .section-subtitle {
-        color: #475569;
-        font-size: 1.15rem;
-        line-height: 1.8;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      @media (max-width: 768px) {
-        .hero {
-          padding: 70px 0;
-        }
-
-        .hero-title {
-          font-size: 2.25rem;
-        }
-
-        .hero-subtitle {
-          font-size: 1.1rem;
-        }
-
-        .btn-large {
-          padding: 14px 32px;
-          font-size: 1rem;
-        }
-
-        .stats-section,
-        .features-section,
-        .about-section {
-          padding: 60px 0;
-        }
-
-        .stats-section .section-title,
-        .about-section .section-title {
-          font-size: 2rem;
-        }
-
-        .stat-card .stat-number {
-          font-size: 2.5rem;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar animate-slide-down">
-      <div class="container">
-        <div class="logo">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <polyline points="1 20 1 14 7 14"></polyline>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+  <header class="navbar">
+    <div class="container navbar__inner">
+      <a class="logo" href="/landing.html" aria-label="EcoTrack">
+        <span class="logo__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20V9l8-5 8 5v11"></path>
+            <path d="M9 20v-6h6v6"></path>
           </svg>
-          <span style="font-weight: 800; font-size: 1.4rem; vertical-align: middle; color: var(--text-dark, #0f172a);">EcoTrack</span>
-        </div>
-        <div class="nav-links">
-          <a href="#features">Features</a>
-          <a href="#about">About</a>
-          <a href="/admin-login.html" class="btn btn-primary">Admin Login</a>
-        </div>
-      </div>
-    </nav>
+        </span>
+        <span class="logo__text">EcoTrack</span>
+      </a>
 
-    <!-- Hero Section -->
+      <nav class="nav" aria-label="Primary">
+        <a class="nav__link" href="#features">Features</a>
+        <a class="nav__link" href="#how-it-works">How It Works</a>
+        <a class="nav__link" href="#about">About</a>
+      </nav>
+
+      <div class="nav__actions">
+        <a class="nav__link" href="/collector-login.html">Collector Login</a>
+        <a class="nav__link" href="/collector-signup.html">Signup</a>
+        <a class="btn btn--primary" href="/admin-login.html">Admin Login</a>
+        <button id="menuBtn" class="icon-btn" type="button" aria-label="Open menu" aria-expanded="false">
+          <span class="icon-btn__bar"></span>
+          <span class="icon-btn__bar"></span>
+          <span class="icon-btn__bar"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobileNav" class="mobile-nav" hidden>
+      <div class="container mobile-nav__inner">
+        <a class="mobile-nav__link" href="#features">Features</a>
+        <a class="mobile-nav__link" href="#how-it-works">How It Works</a>
+        <a class="mobile-nav__link" href="#about">About</a>
+        <a class="mobile-nav__link" href="/collector-login.html">Collector Login</a>
+        <a class="mobile-nav__link" href="/collector-signup.html">Signup</a>
+        <a class="btn btn--primary btn--full" href="/admin-login.html">Admin Login</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
     <section class="hero">
-      <div class="container">
-        <div class="hero-content">
-          <h1 class="hero-title">Smart Waste Bin Tracking System</h1>
-          <p class="hero-subtitle">
-            Monitor waste bin fill levels in real-time, optimize collection routes, 
-            and keep your city clean with intelligent waste management powered by IoT technology.
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="container hero__inner">
+        <div class="hero__content reveal">
+          <p class="kicker"><span class="kicker__dot" aria-hidden="true"></span> IoT Smart City Platform</p>
+          <h1>Smarter Bins. Cleaner Cities.</h1>
+          <p class="hero__subtitle">
+            EcoTrack is a real-time IoT platform that monitors fill levels, classifies bin status,
+            and alerts collection teams before overflow happens.
           </p>
-          <div class="hero-buttons">
-            <a href="/dashboard" class="btn btn-success btn-large">Go to Dashboard</a>
-            <a href="/collector-login.html" class="btn btn-outline btn-large">Collector Login</a>
+
+          <div class="hero__actions">
+            <a class="btn btn--primary btn--lg" href="/admin-login.html">Admin Login</a>
+            <a class="btn btn--secondary btn--lg" href="/collector-login.html">Collector Login</a>
+          </div>
+
+          <div class="hero__meta">
+            <div class="meta-item"><span class="dot dot--green"></span> Online devices</div>
+            <div class="meta-item"><span class="dot dot--orange"></span> Warning thresholds</div>
+            <div class="meta-item"><span class="dot dot--red"></span> Critical overflow</div>
+          </div>
+        </div>
+
+        <div class="viz reveal">
+          <div class="viz__frame">
+            <div class="viz__chrome">
+              <div>
+                <div class="viz__title">Live bin telemetry</div>
+                <div class="viz__live"><span class="kicker__dot"></span> Device online</div>
+              </div>
+              <div class="viz__dots" aria-hidden="true"><span></span><span></span><span></span></div>
+            </div>
+
+            <div class="viz__bin">
+              <div class="bin-visual" aria-hidden="true">
+                <div class="bin-visual__lid"></div>
+                <div class="bin-visual__fill"></div>
+                <div class="bin-visual__pct">72%</div>
+              </div>
+              <div class="viz__meta">
+                <h3>BIN004 · Seminar Hall</h3>
+                <div class="viz-row"><span>Fill level</span><strong>72%</strong></div>
+                <div class="viz-row"><span>Status</span><strong class="badge badge--orange">Warning</strong></div>
+                <div class="viz-row"><span>Location</span><strong>Campus North</strong></div>
+                <div class="viz-row"><span>Connectivity</span><strong class="badge badge--green">Online</strong></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats-section">
+    <section class="section" id="monitoring">
       <div class="container">
-        <h2 class="section-title">Live System Overview</h2>
-        <p class="section-subtitle">Real-time monitoring of waste bins across the city</p>
-        
-        <div class="grid-4">
-          <!-- Total Bins -->
-          <div class="stat-card blue animate-fade-in">
-            <div class="stat-label">Total Bins</div>
-            <div class="stat-number">16</div>
-            <p style="color: var(--text-light); font-size: 0.875rem;">
-              Monitored across city
-            </p>
-          </div>
+        <div class="section__head reveal">
+          <div class="eyebrow">Operations preview</div>
+          <h2>Real-time monitoring at a glance</h2>
+          <p>Color-coded fill intelligence so teams know exactly which bins need attention now.</p>
+        </div>
 
-          <!-- Normal -->
-          <div class="stat-card green animate-fade-in" style="animation-delay: 0.1s;">
-            <div class="stat-label">Normal</div>
-            <div class="stat-number" style="color: var(--green);">8</div>
-            <p style="color: var(--text-light); font-size: 0.875rem;">
-              Operating normally
-            </p>
-          </div>
+        <div class="monitor-grid">
+          <article class="bin-card reveal">
+            <div class="bin-card__top">
+              <div>
+                <div class="bin-card__id">BIN001</div>
+                <div class="bin-card__loc">College Library</div>
+              </div>
+              <span class="badge badge--green">Normal</span>
+            </div>
+            <div class="bin-card__level"><span>Fill level</span><strong>32%</strong></div>
+            <div class="bar bar--green"><span style="width:32%"></span></div>
+            <div class="bin-card__foot"><span>Campus East</span><span class="online">● Online</span></div>
+          </article>
 
-          <!-- Warning -->
-          <div class="stat-card orange animate-fade-in" style="animation-delay: 0.2s;">
-            <div class="stat-label">Warning</div>
-            <div class="stat-number" style="color: var(--orange);">3</div>
-            <p style="color: var(--text-light); font-size: 0.875rem;">
-              Needs attention soon
-            </p>
-          </div>
+          <article class="bin-card reveal">
+            <div class="bin-card__top">
+              <div>
+                <div class="bin-card__id">BIN002</div>
+                <div class="bin-card__loc">Principal's Office</div>
+              </div>
+              <span class="badge badge--red">Full</span>
+            </div>
+            <div class="bin-card__level"><span>Fill level</span><strong>91%</strong></div>
+            <div class="bar bar--red"><span style="width:91%"></span></div>
+            <div class="bin-card__foot"><span>Admin Block</span><span class="online">● Online</span></div>
+          </article>
 
-          <!-- Full -->
-          <div class="stat-card red animate-fade-in" style="animation-delay: 0.3s;">
-            <div class="stat-label">Full</div>
-            <div class="stat-number" style="color: var(--red);">5</div>
-            <p style="color: var(--text-light); font-size: 0.875rem;">
-              Requires immediate pickup
-            </p>
-          </div>
+          <article class="bin-card reveal">
+            <div class="bin-card__top">
+              <div>
+                <div class="bin-card__id">BIN003</div>
+                <div class="bin-card__loc">Engineering Block</div>
+              </div>
+              <span class="badge badge--green">Normal</span>
+            </div>
+            <div class="bin-card__level"><span>Fill level</span><strong>45%</strong></div>
+            <div class="bar bar--green"><span style="width:45%"></span></div>
+            <div class="bin-card__foot"><span>Main Quad</span><span class="online">● Online</span></div>
+          </article>
+
+          <article class="bin-card reveal">
+            <div class="bin-card__top">
+              <div>
+                <div class="bin-card__id">BIN004</div>
+                <div class="bin-card__loc">Seminar Hall</div>
+              </div>
+              <span class="badge badge--orange">Warning</span>
+            </div>
+            <div class="bin-card__level"><span>Fill level</span><strong>72%</strong></div>
+            <div class="bar bar--orange"><span style="width:72%"></span></div>
+            <div class="bin-card__foot"><span>Campus North</span><span class="online">● Online</span></div>
+          </article>
         </div>
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features-section">
+    <section id="how-it-works" class="section">
       <div class="container">
-        <h2 class="section-title">Key Features</h2>
-        <p class="section-subtitle">Everything you need for efficient waste management</p>
-        
-        <div class="grid-3">
-          <div class="feature-card animate-fade-in">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
-                <line x1="18" y1="20" x2="18" y2="10"></line>
-                <line x1="12" y1="20" x2="12" y2="4"></line>
-                <line x1="6" y1="20" x2="6" y2="14"></line>
+        <div class="section__head reveal">
+          <div class="eyebrow">Pipeline</div>
+          <h2>How it works</h2>
+          <p>From sensor detection to operator alerts — a closed-loop IoT workflow.</p>
+        </div>
+
+        <div class="steps">
+          <article class="step reveal">
+            <div class="step__num">01</div>
+            <h3>Detect</h3>
+            <p>Ultrasonic sensors on each bin measure remaining depth and convert it into fill percentage.</p>
+          </article>
+          <article class="step reveal">
+            <div class="step__num">02</div>
+            <h3>Process</h3>
+            <p>NodeMCU devices transmit telemetry to EcoTrack, where readings are stored and classified.</p>
+          </article>
+          <article class="step reveal">
+            <div class="step__num">03</div>
+            <h3>Monitor</h3>
+            <p>Admins watch live dashboards, maps, and device status from a single control surface.</p>
+          </article>
+          <article class="step reveal">
+            <div class="step__num">04</div>
+            <h3>Alert</h3>
+            <p>Warning and full bins trigger overflow alerts so collectors can act before spillover.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section__head reveal">
+          <div class="eyebrow">Platform</div>
+          <h2>Built for smart-city operations</h2>
+          <p>The core intelligence layer behind EcoTrack’s monitoring and collection workflow.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card reveal">
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
               </svg>
             </div>
-            <h3 class="feature-title">Measure Garbage Fill Level</h3>
-            <p class="feature-description">
-              IoT sensors accurately measure waste fill levels in real-time, providing precise data for optimal collection scheduling.
-            </p>
-          </div>
+            <h3>Real-Time Monitoring</h3>
+            <p>Live fill-level telemetry from connected bins, refreshed continuously for operators.</p>
+          </article>
 
-          <div class="feature-card animate-fade-in" style="animation-delay: 0.1s;">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
-                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                <path d="M8.58 16.14a6 6 0 0 1 6.84 0"></path>
-                <circle cx="12" cy="19" r="2"></circle>
+          <article class="feature-card reveal">
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
               </svg>
             </div>
-            <h3 class="feature-title">Real-Time IoT Data Transmission</h3>
-            <p class="feature-description">
-              Seamless wireless data transmission from smart bins to the central monitoring system using advanced IoT technology.
-            </p>
-          </div>
+            <h3>Smart Status Classification</h3>
+            <p>Automatic Normal, Warning, and Full states based on fill thresholds — not guesswork.</p>
+          </article>
 
-          <div class="feature-card animate-fade-in" style="animation-delay: 0.2s;">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                <line x1="7" y1="7" x2="7.01" y2="7"></line>
-              </svg>
-            </div>
-            <h3 class="feature-title">Smart Bin Classification</h3>
-            <p class="feature-description">
-              Automatic classification of bins into Normal, Warning, and Full categories based on real-time fill level data.
-            </p>
-          </div>
-
-          <div class="feature-card animate-fade-in" style="animation-delay: 0.3s;">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+          <article class="feature-card reveal">
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
             </div>
-            <h3 class="feature-title">Location & Status Display</h3>
-            <p class="feature-description">
-              Interactive map view showing exact bin locations with color-coded status indicators for quick visual monitoring.
-            </p>
-          </div>
+            <h3>Location Tracking</h3>
+            <p>Every bin is mapped with coordinates so collection teams can route by priority and place.</p>
+          </article>
 
-          <div class="feature-card animate-fade-in" style="animation-delay: 0.4s;">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto; display: block;">
+          <article class="feature-card reveal">
+            <div class="feature-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
             </div>
-            <h3 class="feature-title">Instant Full Bin Alerts</h3>
-            <p class="feature-description">
-              Automated notifications sent to collectors and administrators when bins reach full capacity for immediate action.
+            <h3>Overflow Alerts</h3>
+            <p>Critical bins surface immediately so pickups happen before overflow, not after.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container">
+        <div class="about-card reveal">
+          <div>
+            <div class="eyebrow">About</div>
+            <h2>Intelligence for urban waste operations</h2>
+            <p>
+              EcoTrack connects hardware, cloud, and operations into one control layer. Administrators
+              oversee the city network; collectors execute high-priority pickups. The product is designed
+              as IoT infrastructure — precise, observable, and built for daily field use.
             </p>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="about-section">
-      <div class="container">
-        <h2 class="section-title">About EcoTrack</h2>
-        <p class="section-subtitle">
-          EcoTrack is a comprehensive smart waste management solution designed to help cities 
-          manage waste collection efficiently. Using IoT sensors and real-time data analytics, 
-          we enable waste management teams to optimize routes, reduce operational costs, and 
-          keep urban environments clean.
-        </p>
-        
-        <div style="text-align: center; margin-top: 40px;">
-          <a href="/admin-login.html" class="btn btn-primary btn-large">
-            Get Started Now
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-content">
-          <div class="footer-logo" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 800; font-size: 1.4rem; color: #ffffff;">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block;">
-              <polyline points="23 4 23 10 17 10"></polyline>
-              <polyline points="1 20 1 14 7 14"></polyline>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-            </svg>
-            EcoTrack
+          <div class="about-side">
+            <div class="about-side__item"><strong>Hardware</strong><span>NodeMCU + ultrasonic sensors</span></div>
+            <div class="about-side__item"><strong>Control plane</strong><span>Admin dashboard & live map</span></div>
+            <div class="about-side__item"><strong>Field ops</strong><span>Collector login & pickup workflow</span></div>
           </div>
-          <p class="footer-text">
-            Smart Waste Bin Tracking System &copy; 2026. All rights reserved.
-          </p>
-          <p class="footer-text" style="margin-top: 8px;">
-            Built for cleaner, smarter cities.
-          </p>
         </div>
       </div>
-    </footer>
-  </body>
+    </section>
+
+    <section class="cta">
+      <div class="container">
+        <div class="cta__card reveal">
+          <h2>Deploy smarter collection today</h2>
+          <p>
+            Sign in to the operations console or join as a collector. EcoTrack keeps bins visible,
+            prioritized, and one step ahead of overflow.
+          </p>
+          <div class="cta__actions">
+            <a class="btn btn--primary btn--lg" href="/admin-login.html">Open Admin Console</a>
+            <a class="btn btn--secondary btn--lg" href="/collector-signup.html">Collector Signup</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div class="footer__brand">
+          <a class="logo" href="/landing.html">
+            <span class="logo__mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20V9l8-5 8 5v11"></path>
+                <path d="M9 20v-6h6v6"></path>
+              </svg>
+            </span>
+            <span class="logo__text">EcoTrack</span>
+          </a>
+          <p>Smart-city IoT platform for real-time bin intelligence, overflow prevention, and field operations.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#about">About</a>
+        </div>
+        <div>
+          <h4>Access</h4>
+          <a href="/admin-login.html">Admin Login</a>
+          <a href="/collector-login.html">Collector Login</a>
+          <a href="/collector-signup.html">Collector Signup</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© <span id="year"></span> EcoTrack. All rights reserved.</span>
+        <span>Smart Waste Bin Tracking System</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileNav = document.getElementById("mobileNav");
+    menuBtn.addEventListener("click", () => {
+      const isOpen = mobileNav.hasAttribute("hidden") === false;
+      if (isOpen) {
+        mobileNav.setAttribute("hidden", "");
+        menuBtn.setAttribute("aria-expanded", "false");
+        menuBtn.setAttribute("aria-label", "Open menu");
+      } else {
+        mobileNav.removeAttribute("hidden");
+        menuBtn.setAttribute("aria-expanded", "true");
+        menuBtn.setAttribute("aria-label", "Close menu");
+      }
+    });
+
+    document.querySelectorAll("#mobileNav a").forEach((link) => {
+      link.addEventListener("click", () => {
+        mobileNav.setAttribute("hidden", "");
+        menuBtn.setAttribute("aria-expanded", "false");
+        menuBtn.setAttribute("aria-label", "Open menu");
+      });
+    });
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!prefersReduced && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("is-visible");
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    } else {
+      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+    }
+  </script>
+</body>
+
 </html>

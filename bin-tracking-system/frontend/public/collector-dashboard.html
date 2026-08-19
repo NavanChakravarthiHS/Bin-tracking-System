@@ -8,68 +8,215 @@
     <link rel="stylesheet" href="/collector-dashboard.css" />
   </head>
   <body>
-    <!-- Header -->
-    <header class="dashboard-header">
-      <div>
-        <h1>Garbage Collector Dashboard</h1>
-        <p id="userMobile">Mobile: Loading...</p>
-      </div>
-      <button onclick="logout()" class="btn-logout">Logout</button>
-    </header>
-
-    <!-- Main Content -->
-    <main class="dashboard-content">
-      <!-- Filter Buttons -->
-      <section class="filter-section">
-        <div class="filter-buttons">
-          <button class="filter-btn active" data-filter="All" onclick="filterBins('All')">
-            <span class="btn-indicator btn-indicator--all"></span> All
-          </button>
-          <button class="filter-btn" data-filter="Full" onclick="filterBins('Full')">
-            <span class="btn-indicator btn-indicator--full"></span> Full
-          </button>
-          <button class="filter-btn" data-filter="Warning" onclick="filterBins('Warning')">
-            <span class="btn-indicator btn-indicator--warning"></span> Warning
-          </button>
-          <button class="filter-btn" data-filter="Normal" onclick="filterBins('Normal')">
-            <span class="btn-indicator btn-indicator--normal"></span> Normal
-          </button>
-          <button class="filter-btn" data-filter="Collected" onclick="filterBins('Collected')">
-            <span class="btn-indicator btn-indicator--collected"></span> Collected
-          </button>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <div class="sidebar-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+            </svg>
+          </div>
+          <div>
+            <h1>EcoTrack</h1>
+            <p>Smart Waste Management</p>
+          </div>
         </div>
-      </section>
 
-      <!-- Priority Alert Section -->
-      <section class="priority-section">
-        <h2>Priority Collections</h2>
-        <p class="section-subtitle">Full & Warning bins need immediate attention</p>
-        <div id="priorityBins" class="bins-container">
-          <!-- Full and Warning bins injected here -->
+        <nav class="sidebar-nav" aria-label="Collector">
+          <p class="sidebar-label">Navigation</p>
+          <a class="sidebar-link active" href="#dashboard" data-nav="dashboard" onclick="navigateCollector('dashboard', event)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            <span>Collector Dashboard</span>
+          </a>
+          <a class="sidebar-link" href="#map" data-nav="map" onclick="navigateCollector('map', event)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            <span>Map View</span>
+          </a>
+          <a class="sidebar-link" href="#alerts" data-nav="alerts" onclick="navigateCollector('alerts', event)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Alerts</span>
+          </a>
+          <a class="sidebar-link" href="#assigned" data-nav="assigned" onclick="navigateCollector('assigned', event)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            <span>Assigned Bins</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-foot">
+          <div class="status-card">
+            <p>System Status</p>
+            <div class="status-row">
+              <span class="live-dot"></span>
+              <span>All systems operational</span>
+            </div>
+          </div>
         </div>
-      </section>
+      </aside>
 
-      <!-- All Assigned Bins Section -->
-      <section class="all-bins-section">
-        <h2 id="binsSectionTitle">All Assigned Bins</h2>
-        <div id="allBins" class="bins-container">
-          <!-- All bins injected here -->
+      <div class="app-main">
+        <header class="navbar">
+          <div class="navbar-left">
+            <button type="button" class="icon-btn lg-hidden" onclick="toggleSidebar()" aria-label="Open menu">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div>
+              <h2>Collector Dashboard</h2>
+              <p>Monitor and manage your assigned waste bins</p>
+            </div>
+          </div>
+
+          <div class="navbar-search">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="binSearch" type="search" placeholder="Search bins by ID or location..." oninput="onBinSearch(this.value)" />
+          </div>
+
+          <div class="navbar-right">
+            <button type="button" class="icon-btn notify" aria-label="Notifications">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="notify-dot"></span>
+            </button>
+            <div class="profile">
+              <div class="profile-text">
+                <p>Collector</p>
+                <p id="userMobile">Mobile: Loading...</p>
+              </div>
+              <div class="avatar" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <button onclick="logout()" class="btn-logout" type="button">Logout</button>
+            </div>
+          </div>
+        </header>
+
+        <main class="dashboard-content" id="dashboard">
+          <section class="stats-grid" id="statsGrid">
+            <article class="stat-card">
+              <div class="stat-card__row">
+                <div>
+                  <p class="stat-card__label">Assigned Bins</p>
+                  <p class="stat-card__value" id="statAssigned">0</p>
+                </div>
+                <div class="stat-icon stat-icon--blue">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </div>
+              </div>
+              <p class="stat-card__foot">All assigned bins</p>
+            </article>
+            <article class="stat-card">
+              <div class="stat-card__row">
+                <div>
+                  <p class="stat-card__label">Normal</p>
+                  <p class="stat-card__value text-green" id="statNormal">0</p>
+                </div>
+                <div class="stat-icon stat-icon--green">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+              </div>
+              <p class="stat-card__foot">Operating normally</p>
+            </article>
+            <article class="stat-card">
+              <div class="stat-card__row">
+                <div>
+                  <p class="stat-card__label">Warning</p>
+                  <p class="stat-card__value text-amber" id="statWarning">0</p>
+                </div>
+                <div class="stat-icon stat-icon--amber">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+              </div>
+              <p class="stat-card__foot">Needs attention soon</p>
+            </article>
+            <article class="stat-card">
+              <div class="stat-card__row">
+                <div>
+                  <p class="stat-card__label">Full</p>
+                  <p class="stat-card__value text-red" id="statFull">0</p>
+                </div>
+                <div class="stat-icon stat-icon--red">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+              </div>
+              <p class="stat-card__foot">Requires immediate pickup</p>
+            </article>
+            <article class="stat-card">
+              <div class="stat-card__row">
+                <div>
+                  <p class="stat-card__label">Collected</p>
+                  <p class="stat-card__value text-gray" id="statCollected">0</p>
+                </div>
+                <div class="stat-icon stat-icon--gray">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+              </div>
+              <p class="stat-card__foot">Recently collected</p>
+            </article>
+          </section>
+
+          <section class="filter-section">
+            <div class="filter-head">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              <h3>Filter Bins</h3>
+            </div>
+            <div class="filter-buttons">
+              <button class="filter-btn active" data-filter="All" onclick="filterBins('All')" type="button">All</button>
+              <button class="filter-btn" data-filter="Normal" onclick="filterBins('Normal')" type="button">Normal</button>
+              <button class="filter-btn" data-filter="Warning" onclick="filterBins('Warning')" type="button">Warning</button>
+              <button class="filter-btn" data-filter="Full" onclick="filterBins('Full')" type="button">Full</button>
+              <button class="filter-btn" data-filter="Collected" onclick="filterBins('Collected')" type="button">Collected</button>
+            </div>
+          </section>
+
+          <section class="priority-section" id="alerts">
+            <div class="section-heading">
+              <div>
+                <h2>Priority Collections</h2>
+                <p class="section-subtitle">Full and warning bins that need attention first</p>
+              </div>
+            </div>
+            <div id="priorityBins" class="bins-container"></div>
+          </section>
+
+          <section class="all-bins-section" id="assigned">
+            <div class="section-heading">
+              <div>
+                <h2 id="binsSectionTitle">All Assigned Bins</h2>
+                <p class="section-subtitle">Monitor the live status of all your assigned bins</p>
+              </div>
+              <div class="section-tools">
+                <button type="button" class="btn-toolbar" onclick="viewAssignedBinsOnMap()">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+                  View on Map
+                </button>
+              </div>
+            </div>
+            <div id="allBins" class="bins-container"></div>
+          </section>
+
+          <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading your assigned bins...</p>
+          </div>
+
+          <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">✓</div>
+            <h3>No Bins Assigned</h3>
+            <p>All bins have been collected! Great job!</p>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div id="detailsModal" class="modal" hidden>
+      <div class="modal__backdrop" onclick="closeBinDetails()"></div>
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="detailsTitle">
+        <div class="modal__head">
+          <h3 id="detailsTitle">Bin details</h3>
+          <button type="button" class="icon-btn" onclick="closeBinDetails()" aria-label="Close">×</button>
         </div>
-      </section>
-
-      <!-- Loading State -->
-      <div id="loadingState" class="loading-state">
-        <div class="spinner"></div>
-        <p>Loading your assigned bins...</p>
+        <div id="detailsBody" class="modal__body"></div>
       </div>
-
-      <!-- Empty State -->
-      <div id="emptyState" class="empty-state" style="display: none;">
-        <div class="empty-icon">✓</div>
-        <h3>No Bins Assigned</h3>
-        <p>All bins have been collected! Great job!</p>
-      </div>
-    </main>
+    </div>
 
     <script src="/collector-dashboard.js"></script>
   </body>
