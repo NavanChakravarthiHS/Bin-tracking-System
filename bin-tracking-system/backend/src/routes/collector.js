@@ -4,13 +4,14 @@ import { Collector } from "../models/Collector.js";
 import { Bin } from "../models/Bin.js";
 import { signCollectorJwt } from "../utils/jwt.js";
 import { requireCollectorAuth } from "../middleware/requireCollectorAuth.js";
-import { pushBlynkValue } from "../services/blynkService.js";
+import { markBinCollected } from "../services/collectionService.js";
+import { withMonitoring } from "../utils/sensorMonitoring.js";
 
 export const collectorRouter = express.Router();
 
 // POST /collector/signup
 collectorRouter.post("/signup", async (req, res) => {
-  const { mobile, password, confirmPassword } = req.body || {};
+  const { name, mobile, password, confirmPassword } = req.body || {};
 
   // Validation
   if (!/^\d{10}$/.test(String(mobile || ""))) {
@@ -31,11 +32,15 @@ collectorRouter.post("/signup", async (req, res) => {
 
   // Hash password and save
   const passwordHash = await bcrypt.hash(password, 10);
-  const collector = await Collector.create({ mobile: String(mobile), passwordHash });
+  const collector = await Collector.create({
+    name: typeof name === "string" ? name.trim() : "",
+    mobile: String(mobile),
+    passwordHash,
+  });
 
   return res.status(201).json({ 
     message: "Signup successful", 
-    collector: { mobile: collector.mobile } 
+    collector: { name: collector.name, mobile: collector.mobile } 
   });
 });
 
@@ -63,14 +68,14 @@ collectorRouter.post("/login", async (req, res) => {
   const token = signCollectorJwt({ collectorId: String(collector._id), mobile: collector.mobile });
   return res.json({ 
     token, 
-    collector: { mobile: collector.mobile } 
+    collector: { name: collector.name, mobile: collector.mobile } 
   });
 });
 
 // GET /collector/me (protected route)
 collectorRouter.get("/me", requireCollectorAuth, async (req, res) => {
   const collector = await Collector.findById(req.collector.collectorId)
-    .select("mobile")
+    .select("name mobile")
     .lean();
   if (!collector) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -81,8 +86,13 @@ collectorRouter.get("/me", requireCollectorAuth, async (req, res) => {
 // GET /collector/bins - Get all bins (protected route)
 collectorRouter.get("/bins", requireCollectorAuth, async (req, res) => {
   try {
-    const bins = await Bin.find().sort({ status: 1 }).lean();
-    return res.json({ bins });
+    const bins = await Bin.find({
+      assignedCollectorId: req.collector.collectorId,
+      isActive: { $ne: false },
+    })
+      .sort({ status: 1 })
+      .lean();
+    return res.json({ bins: bins.map(withMonitoring) });
   } catch (error) {
     console.error('Error fetching bins:', error);
     return res.status(500).json({ message: "Failed to fetch bins" });
@@ -98,29 +108,20 @@ collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) =>
   }
 
   try {
-    // Find and update bin in database
-    const updatedBin = await Bin.findOneAndUpdate(
-      { id: binId },
-      { 
-        fillLevel: 0,
-        distance: 100, // Reset distance to Max Depth
-        lastCollected: new Date(),
-        assignedCollector: req.collector.mobile
-      },
-      { new: true }
-    );
+    const collector = await Collector.findById(req.collector.collectorId);
+    if (!collector) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    if (!updatedBin) {
+    const result = await markBinCollected({ binId, collector });
+    if (!result) {
       return res.status(404).json({ message: "Bin not found" });
     }
 
-    if (updatedBin.blynkPin) {
-      await pushBlynkValue(updatedBin.blynkPin, 100);
-    }
-
-    return res.json({ 
+    return res.json({
       message: "Bin status updated successfully",
-      bin: updatedBin
+      bin: result.bin,
+      collection: result.collection,
     });
   } catch (error) {
     console.error('Error updating bin:', error);

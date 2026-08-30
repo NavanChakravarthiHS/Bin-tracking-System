@@ -1,4 +1,7 @@
-export const getBinStatus = (fillLevel, status) => {
+export const getBinStatus = (fillLevel, status, bin = {}) => {
+  const warningThreshold = Number(bin.warningThreshold ?? 50);
+  const fullThreshold = Number(bin.fullThreshold ?? 80);
+
   if (fillLevel === 0) {
     return {
       status: 'Collected',
@@ -10,7 +13,7 @@ export const getBinStatus = (fillLevel, status) => {
   }
 
   // Once new garbage starts filling again after collection:
-  if (fillLevel >= 80) {
+  if (fillLevel >= fullThreshold) {
     return {
       status: 'Full',
       badgeColor: 'red',
@@ -18,7 +21,7 @@ export const getBinStatus = (fillLevel, status) => {
       markerColor: '#ef4444', // Red marker
       cardStyle: 'border-red-200 bg-red-50/30 hover:bg-red-50/50 border shadow-md shadow-red-50/50',
     };
-  } else if (fillLevel >= 50) {
+  } else if (fillLevel >= warningThreshold) {
     return {
       status: 'Warning',
       badgeColor: 'orange',
@@ -75,4 +78,17 @@ export const formatDate = (date) => {
     hour: '2-digit',
     minute: '2-digit'
   }).format(new Date(date));
+};
+
+export const formatSensorTime = (date) => {
+  if (!date) return 'Never';
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return 'Never';
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(parsed);
 };

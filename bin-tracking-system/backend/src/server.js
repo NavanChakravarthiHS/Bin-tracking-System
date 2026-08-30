@@ -6,6 +6,8 @@ import { assertRequiredEnv, env } from "./config/env.js";
 import { connectDb } from "./db/connect.js";
 import { adminRouter } from "./routes/admin.js";
 import { adminBinsRouter } from "./routes/adminBins.js";
+import { adminCollectorsRouter } from "./routes/adminCollectors.js";
+import { adminCollectionsRouter } from "./routes/adminCollections.js";
 import { collectorRouter } from "./routes/collector.js";
 import { ensureDefaultAdmin } from "./seed/ensureDefaultAdmin.js";
 import { seedBins } from "./seed/seedBins.js";
@@ -39,6 +41,8 @@ async function bootstrap() {
   // API Routes
   app.use("/admin", adminRouter);
   app.use("/admin", adminBinsRouter);
+  app.use("/admin", adminCollectorsRouter);
+  app.use("/admin", adminCollectionsRouter);
   app.use("/collector", collectorRouter);
 
   // Serve landing page on root

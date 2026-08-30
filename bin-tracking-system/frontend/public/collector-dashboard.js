@@ -71,10 +71,12 @@ async function loadBins() {
       const data = await response.json();
       // Map and resolve statuses dynamically based on new thresholds
       assignedBins = data.bins.map(bin => {
+        const warning = Number(bin.warningThreshold ?? 50);
+        const full = Number(bin.fullThreshold ?? 80);
         let resolvedStatus;
         if (bin.fillLevel === 0) resolvedStatus = 'Collected';
-        else if (bin.fillLevel >= 80) resolvedStatus = 'Full';
-        else if (bin.fillLevel >= 50) resolvedStatus = 'Warning';
+        else if (bin.fillLevel >= full) resolvedStatus = 'Full';
+        else if (bin.fillLevel >= warning) resolvedStatus = 'Warning';
         else resolvedStatus = 'Normal';
         
         return { ...bin, status: resolvedStatus };
@@ -165,10 +167,12 @@ function sortByPriority(bins) {
 }
 
 // Get progress bar color based on fill level
-function getProgressColorClass(fillLevel, status) {
+function getProgressColorClass(fillLevel, status, bin = {}) {
+  const warning = Number(bin.warningThreshold ?? 50);
+  const full = Number(bin.fullThreshold ?? 80);
   if (status === 'Collected' || fillLevel === 0) return 'gray';
-  if (fillLevel >= 80) return 'red';
-  if (fillLevel >= 60) return 'orange';
+  if (fillLevel >= full) return 'red';
+  if (fillLevel >= warning) return 'orange';
   return 'green';
 }
 
@@ -179,15 +183,17 @@ function getStatusLabel(status) {
 function getDeviceState(bin) {
   const raw = String(bin.deviceStatus || bin.connectivity || bin.onlineStatus || '').toLowerCase();
   if (raw === 'inactive' || raw === 'offline') return 'offline';
-  return 'online';
+  if (bin.sensorConnected === false) return 'offline';
+  if (raw === 'active' || raw === 'online') return 'online';
+  return bin.sensorConnected ? 'online' : 'offline';
 }
 
 function formatUpdatedAt(bin) {
-  const ts = bin.updatedAt || bin.lastCollected;
-  if (!ts) return 'Just now';
+  const ts = bin.lastSensorUpdate || bin.updatedAt || bin.lastCollected;
+  if (!ts) return 'Never';
   const date = new Date(ts);
-  if (Number.isNaN(date.getTime())) return 'Just now';
-  return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  if (Number.isNaN(date.getTime())) return 'Never';
+  return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
 function escapeAttr(value) {
@@ -219,13 +225,14 @@ function viewBinDetails(binId) {
   body.innerHTML = `
     <div class="detail-grid">
       <div><span>Location</span><strong>${bin.location || '—'}</strong></div>
-      <div><span>Fill level</span><strong>${bin.fillLevel}%</strong></div>
+      <div><span>Fill level</span><strong>${Number(bin.fillLevel) || 0}%</strong></div>
       <div><span>Status</span><strong>${getStatusLabel(bin.status)}</strong></div>
-      <div><span>Device</span><strong>${device === 'online' ? 'Online' : 'Offline'}</strong></div>
+      <div><span>Device</span><strong>${bin.deviceStatus || (device === 'online' ? 'Active' : 'Inactive')}</strong></div>
+      <div><span>Sensor</span><strong>${bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</strong></div>
+      <div><span>Last sensor</span><strong>${formatUpdatedAt(bin)}</strong></div>
       <div><span>Latitude</span><strong>${bin.latitude ?? '—'}</strong></div>
       <div><span>Longitude</span><strong>${bin.longitude ?? '—'}</strong></div>
-      <div><span>Last updated</span><strong>${formatUpdatedAt(bin)}</strong></div>
-      <div><span>Last collected</span><strong>${bin.lastCollected ? formatUpdatedAt({ updatedAt: bin.lastCollected }) : '—'}</strong></div>
+      <div><span>Last collected</span><strong>${bin.lastCollected ? formatUpdatedAt({ lastSensorUpdate: bin.lastCollected }) : '—'}</strong></div>
     </div>
     <div class="detail-actions">
       <button type="button" class="btn-action btn-map" onclick="viewOnMap(${bin.latitude || 'null'}, ${bin.longitude || 'null'}, '${escapeAttr(bin.location)}')">View on Map</button>
@@ -242,7 +249,7 @@ function closeBinDetails() {
 
 // Create bin card HTML
 function createBinCard(bin) {
-  const progressColor = getProgressColorClass(bin.fillLevel, bin.status);
+  const progressColor = getProgressColorClass(bin.fillLevel, bin.status, bin);
   const fillHeight = Math.max(0, Math.min(100, Number(bin.fillLevel) || 0));
   const statusLabel = getStatusLabel(bin.status);
   const statusClass = bin.status.toLowerCase();
@@ -275,6 +282,14 @@ function createBinCard(bin) {
           <div class="fact">
             <span>Last Updated</span>
             <strong>${formatUpdatedAt(bin)}</strong>
+          </div>
+          <div class="fact">
+            <span>Device</span>
+            <strong>${bin.deviceStatus || (getDeviceState(bin) === 'online' ? 'Active' : 'Inactive')}</strong>
+          </div>
+          <div class="fact">
+            <span>Sensor</span>
+            <strong>${bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</strong>
           </div>
         </div>
       </div>

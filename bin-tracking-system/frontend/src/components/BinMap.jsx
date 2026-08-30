@@ -127,7 +127,7 @@ const BinMap = ({ bins }) => {
                   <div style={{ marginBottom: '6px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 600, marginBottom: '4px' }}>
                       <span style={{ color: '#6b7280' }}>Fill Level:</span>
-                      <span style={{ color: '#111827' }}>{bin.fillLevel}%</span>
+                      <span style={{ color: '#111827' }}>{Number(bin.fillLevel) || 0}%</span>
                     </div>
                     <div style={{ width: '100%', height: '8px', backgroundColor: '#f3f4f6', borderRadius: '9999px', overflow: 'hidden' }}>
                       <div style={{
@@ -138,6 +138,12 @@ const BinMap = ({ bins }) => {
                         transition: 'width 0.5s ease',
                       }}></div>
                     </div>
+                  </div>
+
+                  <div style={{ marginTop: '8px', fontSize: '11px', color: '#6b7280', lineHeight: 1.6 }}>
+                    <div>Device: {bin.deviceStatus || 'Inactive'}</div>
+                    <div>Sensor: {bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</div>
+                    <div>Last sensor: {bin.lastSensorUpdate ? new Date(bin.lastSensorUpdate).toLocaleString() : 'Never'}</div>
                   </div>
 
                   {/* Collection Info */}

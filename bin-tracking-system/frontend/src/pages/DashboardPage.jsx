@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Trash2, CheckCircle, AlertTriangle, AlertOctagon, Filter, PackageOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Trash2, CheckCircle, AlertTriangle, AlertOctagon, Filter, PackageOpen, Plus, Settings } from 'lucide-react';
 import Dashboard from '../components/Dashboard/Dashboard';
 import FilterBar from '../components/Common/FilterBar';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
@@ -20,6 +21,24 @@ const DashboardPage = ({ searchTerm }) => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Header with Quick Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-heading">Live Waste Monitoring</h1>
+          <p className="text-sm text-gray-600 mt-1">Real-time bin telemetry, fill levels, and status tracking</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link to="/bins" className="btn-secondary inline-flex items-center gap-2 text-xs py-2 px-3">
+            <Settings size={16} />
+            Manage Bins
+          </Link>
+          <Link to="/bins?action=add" className="btn-primary inline-flex items-center gap-2 text-xs py-2 px-3">
+            <Plus size={16} />
+            Add Bin
+          </Link>
+        </div>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {/* Total Bins */}

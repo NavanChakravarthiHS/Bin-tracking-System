@@ -9,6 +9,7 @@ const DEFAULT_ADMIN = {
 };
 
 const DEFAULT_COLLECTOR = {
+  name: "Default Collector",
   mobile: "8765432109",
   password: "driver123",
 };
@@ -23,7 +24,11 @@ export async function ensureDefaultAdmin() {
   const existingCollector = await Collector.findOne({ mobile: DEFAULT_COLLECTOR.mobile }).lean();
   if (!existingCollector) {
     const passwordHash = await bcrypt.hash(DEFAULT_COLLECTOR.password, 10);
-    await Collector.create({ mobile: DEFAULT_COLLECTOR.mobile, passwordHash });
+    await Collector.create({
+      name: DEFAULT_COLLECTOR.name,
+      mobile: DEFAULT_COLLECTOR.mobile,
+      passwordHash,
+    });
   }
 }
 

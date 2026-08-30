@@ -72,7 +72,17 @@ const MapView = ({ bins }) => {
                   <span className="font-semibold">Location:</span> {selectedBin.location}
                 </p>
                 <p>
-                  <span className="font-semibold">Fill Level:</span> {selectedBin.fillLevel}%
+                  <span className="font-semibold">Fill Level:</span> {Number(selectedBin.fillLevel) || 0}%
+                </p>
+                <p>
+                  <span className="font-semibold">Device:</span> {selectedBin.deviceStatus || 'Inactive'}
+                </p>
+                <p>
+                  <span className="font-semibold">Sensor:</span> {selectedBin.sensorStatus || (selectedBin.sensorConnected ? 'Connected' : 'Disconnected')}
+                </p>
+                <p>
+                  <span className="font-semibold">Last sensor:</span>{' '}
+                  {selectedBin.lastSensorUpdate ? new Date(selectedBin.lastSensorUpdate).toLocaleString() : 'Never'}
                 </p>
                 <p>
                   <span className="font-semibold">Status:</span>{' '}

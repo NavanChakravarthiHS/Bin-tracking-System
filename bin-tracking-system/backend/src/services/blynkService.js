@@ -1,21 +1,15 @@
 import { Bin } from "../models/Bin.js";
+import { applyFailedSensorRead, applySuccessfulSensorRead, isSensorFresh } from "../utils/sensorMonitoring.js";
+import { statusFromFillLevel } from "../utils/binStatus.js";
 
 const BLYNK_API_URL = process.env.BLYNK_API_URL || "https://blynk.cloud/external/api";
 
 const MAX_BIN_DEPTH_CM = 100;
 
-function calculateBinMetrics(distance) {
+function calculateBinMetrics(distance, bin = {}) {
   const validDistance = Math.max(0, Math.min(MAX_BIN_DEPTH_CM, distance));
   const fillLevel = Math.round(((MAX_BIN_DEPTH_CM - validDistance) / MAX_BIN_DEPTH_CM) * 100);
-  
-  let status = "Normal";
-  if (fillLevel >= 80) {
-    status = "Full";
-  } else if (fillLevel >= 50) {
-    status = "Warning";
-  }
-
-  return { fillLevel, status };
+  return { fillLevel, status: statusFromFillLevel(fillLevel, bin) };
 }
 
 async function fetchBlynkValue(pin) {
@@ -62,20 +56,29 @@ export async function pushBlynkValue(pin, value) {
 
 export async function syncAllBins() {
   try {
-    const bins = await Bin.find();
+    const bins = await Bin.find({ isActive: { $ne: false } });
     
     const updatePromises = bins.map(async (bin) => {
       if (!bin.blynkPin) return bin;
 
       const distance = await fetchBlynkValue(bin.blynkPin);
-      if (distance === null) return bin;
+      if (distance === null) {
+        const wasConnected = bin.sensorConnected;
+        const wasActive = bin.deviceStatus;
+        applyFailedSensorRead(bin);
+        if (wasConnected !== bin.sensorConnected || wasActive !== bin.deviceStatus) {
+          await bin.save();
+        }
+        return bin;
+      }
 
-      const { fillLevel, status } = calculateBinMetrics(distance);
+      const { fillLevel, status } = calculateBinMetrics(distance, bin);
+      const now = new Date();
+      const fillChanged = bin.distance !== distance || bin.fillLevel !== fillLevel || bin.status !== status;
+      const heartbeatStale = !isSensorFresh(bin.lastSensorUpdate, now.getTime());
 
-      if (bin.distance !== distance || bin.fillLevel !== fillLevel || bin.status !== status) {
-        bin.distance = distance;
-        bin.fillLevel = fillLevel;
-        bin.status = status;
+      if (fillChanged || heartbeatStale || !bin.sensorConnected || bin.deviceStatus !== "Active") {
+        applySuccessfulSensorRead(bin, { distance, fillLevel, status, lastSensorUpdate: now });
         await bin.save();
       }
       return bin;

@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const collectorSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     mobile: { 
       type: String, 
       required: true, 

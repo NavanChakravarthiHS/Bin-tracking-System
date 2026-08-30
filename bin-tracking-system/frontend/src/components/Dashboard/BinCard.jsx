@@ -1,5 +1,7 @@
-import { MapPin, CheckCircle } from 'lucide-react';
+import { MapPin, CheckCircle, Pencil } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import StatusBadge from '../Common/StatusBadge';
+import { formatSensorTime } from '../../utils/helpers';
 
 const BinCard = ({ bin, index }) => {
   // Use pre-computed style classes from our unified status hook
@@ -19,7 +21,7 @@ const BinCard = ({ bin, index }) => {
 
   return (
     <div
-      className={`modern-card p-5 animate-slide-up cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${cardStyle}`}
+      className={`modern-card p-5 animate-slide-up transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${cardStyle}`}
       style={{ animationDelay: `${index * 50}ms` }}
     >
       {/* Header */}
@@ -43,7 +45,7 @@ const BinCard = ({ bin, index }) => {
             Fill Level
           </span>
           <span className="text-xl font-bold text-heading">
-            {bin.fillLevel}%
+            {Number(bin.fillLevel) || 0}%
           </span>
         </div>
         
@@ -54,15 +56,28 @@ const BinCard = ({ bin, index }) => {
             style={{ width: `${bin.fillLevel}%` }}
           ></div>
         </div>
+
+        {/* Threshold Summary */}
+        <div className="flex justify-between text-[11px] text-gray-500 pt-0.5">
+          <span>Warn: <strong className="text-amber-600">{bin.warningThreshold ?? 50}%</strong></span>
+          <span>Full: <strong className="text-red-600">{bin.fullThreshold ?? 80}%</strong></span>
+        </div>
       </div>
 
       {/* Coordinates & Collection Metadata */}
       <div className="mt-4 pt-3 border-t border-gray-200/60">
         <div className="text-xs text-gray-500 space-y-0.5 font-medium">
-          <div>Lat: {bin.latitude ? bin.latitude.toFixed(4) : '0.0000'}</div>
-          <div>Lng: {bin.longitude ? bin.longitude.toFixed(4) : '0.0000'}</div>
+          <div>Lat: {bin.latitude ? bin.latitude.toFixed(4) : '0.0000'} | Lng: {bin.longitude ? bin.longitude.toFixed(4) : '0.0000'}</div>
+          <div>Device: {bin.deviceStatus || 'Inactive'} | Sensor: {bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</div>
+          <div>Last sensor: {formatSensorTime(bin.lastSensorUpdate)}</div>
         </div>
         
+        {bin.assignedCollectorName && (
+          <div className="text-xs text-gray-600 mt-2">
+            Assigned to: {bin.assignedCollectorName}
+          </div>
+        )}
+
         {/* Collection Info - Only show when the bin is in Collected state */}
         {isCollected && bin.lastCollected && (
           <div className="mt-2 pt-2 border-t border-gray-100">
@@ -77,6 +92,17 @@ const BinCard = ({ bin, index }) => {
             )}
           </div>
         )}
+
+        {/* Quick Edit Footer */}
+        <div className="mt-3 pt-2.5 border-t border-gray-100 flex justify-end">
+          <Link
+            to={`/bins?edit=${bin.id}`}
+            className="text-xs font-semibold text-green-700 hover:text-green-800 inline-flex items-center gap-1 hover:underline"
+          >
+            <Pencil size={12} />
+            Configure / Edit
+          </Link>
+        </div>
       </div>
     </div>
   );
