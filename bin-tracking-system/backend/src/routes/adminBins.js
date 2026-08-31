@@ -5,6 +5,7 @@ import { requireAuth } from "../middleware/requireAuth.js";
 import { withMonitoring } from "../utils/sensorMonitoring.js";
 import { parseBinPayload, statusFromFillLevel } from "../utils/binStatus.js";
 import { Collection } from "../models/Collection.js";
+import { processBinAlert } from "../services/alertService.js";
 
 export const adminBinsRouter = express.Router();
 
@@ -172,6 +173,13 @@ adminBinsRouter.post("/bins/:id/sensor", async (req, res) => {
     );
 
     if (!bin) return res.status(404).json({ message: "Bin not found" });
+
+    // Process threshold alerts (80% warning, 90% critical with TextBee SMS)
+    try {
+      await processBinAlert({ bin, fillLevel });
+    } catch (err) {
+      console.error(`Error processing alert for sensor update on bin ${id}:`, err);
+    }
 
     // eslint-disable-next-line no-console
     console.log(`📡 IoT Sensor Update - Bin: ${id} | Fill Level: ${fillLevel}% | Status: ${status}`);

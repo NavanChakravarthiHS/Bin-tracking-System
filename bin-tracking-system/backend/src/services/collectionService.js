@@ -1,6 +1,7 @@
 import { Bin } from "../models/Bin.js";
 import { Collector } from "../models/Collector.js";
 import { Collection } from "../models/Collection.js";
+import { Alert } from "../models/Alert.js";
 import { pushBlynkValue } from "./blynkService.js";
 import { withMonitoring } from "../utils/sensorMonitoring.js";
 
@@ -16,11 +17,18 @@ export async function markBinCollected({ binId, collector }) {
       status: "Collected",
       lastCollected: collectedAt,
       assignedCollector: collectorLabel,
+      lastAlertSeverity: "NONE",
     },
     { new: true }
   );
 
   if (!bin) return null;
+
+  // Mark all active alerts for this bin as resolved
+  await Alert.updateMany(
+    { binId: bin.id, status: "ACTIVE" },
+    { $set: { status: "RESOLVED", resolvedAt: collectedAt } }
+  );
 
   const record = await Collection.create({
     binId: bin.id,

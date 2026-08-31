@@ -1,6 +1,7 @@
 import { Bin } from "../models/Bin.js";
 import { applyFailedSensorRead, applySuccessfulSensorRead, isSensorFresh } from "../utils/sensorMonitoring.js";
 import { statusFromFillLevel } from "../utils/binStatus.js";
+import { processBinAlert } from "./alertService.js";
 
 const BLYNK_API_URL = process.env.BLYNK_API_URL || "https://blynk.cloud/external/api";
 
@@ -81,6 +82,14 @@ export async function syncAllBins() {
         applySuccessfulSensorRead(bin, { distance, fillLevel, status, lastSensorUpdate: now });
         await bin.save();
       }
+
+      // Check alert thresholds (80% warning, 90% critical with TextBee SMS)
+      try {
+        await processBinAlert({ bin, fillLevel });
+      } catch (err) {
+        console.error(`Error processing alert for bin ${bin.id}:`, err);
+      }
+
       return bin;
     });
 

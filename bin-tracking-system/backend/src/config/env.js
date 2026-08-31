@@ -7,6 +7,10 @@ export const env = {
   mongoUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
   seedDefaultAdmin: String(process.env.SEED_DEFAULT_ADMIN || "").toLowerCase() === "true",
+  textbeeApiKey: process.env.TEXTBEE_API_KEY || "",
+  textbeeDeviceId: process.env.TEXTBEE_DEVICE_ID || "",
+  textbeeBaseUrl: process.env.TEXTBEE_BASE_URL || "https://api.textbee.dev/api/v1",
+  defaultCountryCode: process.env.DEFAULT_COUNTRY_CODE || "+91",
 };
 
 export function assertRequiredEnv() {

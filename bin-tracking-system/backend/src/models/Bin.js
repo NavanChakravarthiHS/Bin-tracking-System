@@ -32,6 +32,12 @@ const binSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true },
     warningThreshold: { type: Number, default: 50, min: 1, max: 99 },
     fullThreshold: { type: Number, default: 80, min: 2, max: 100 },
+    lastAlertSeverity: {
+      type: String,
+      enum: ["NONE", "WARNING", "CRITICAL"],
+      default: "NONE",
+    },
+    lastAlertAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
