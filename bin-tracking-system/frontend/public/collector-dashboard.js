@@ -15,6 +15,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     return;
   }
 
+  // Use cached user details if available for instant display
+  const cachedName = localStorage.getItem('collectorName');
+  const cachedMobile = localStorage.getItem('collectorMobile');
+  if (cachedName) {
+    const userNameEl = document.getElementById('userName');
+    if (userNameEl) userNameEl.textContent = cachedName;
+  }
+  if (cachedMobile) {
+    const userMobileEl = document.getElementById('userMobile');
+    if (userMobileEl) userMobileEl.textContent = cachedMobile;
+  }
+
   // Verify token and load bins
   await verifyAndLoadBins(token);
   
@@ -38,8 +50,26 @@ async function verifyAndLoadBins(token) {
 
     if (response.ok) {
       const data = await response.json();
-      // Display mobile number
-      document.getElementById('userMobile').textContent = data.collector.mobile;
+      const collector = data.collector || {};
+      const name = collector.name || 'Collector';
+      const mobile = collector.mobile || '';
+
+      // Display collector name and mobile number
+      const userNameEl = document.getElementById('userName');
+      if (userNameEl) {
+        userNameEl.textContent = name;
+      }
+      const userMobileEl = document.getElementById('userMobile');
+      if (userMobileEl) {
+        userMobileEl.textContent = mobile;
+      }
+
+      if (collector.name) {
+        localStorage.setItem('collectorName', collector.name);
+      }
+      if (collector.mobile) {
+        localStorage.setItem('collectorMobile', collector.mobile);
+      }
       
       // Load bins (using mock data for now)
       await loadBins();
@@ -51,6 +81,7 @@ async function verifyAndLoadBins(token) {
     // Clear invalid token and redirect to login
     localStorage.removeItem('collectorToken');
     localStorage.removeItem('collectorMobile');
+    localStorage.removeItem('collectorName');
     window.location.href = '/collector-login.html';
   }
 }
@@ -451,6 +482,7 @@ function logout() {
   // Clear tokens
   localStorage.removeItem('collectorToken');
   localStorage.removeItem('collectorMobile');
+  localStorage.removeItem('collectorName');
   
   // Redirect to login
   window.location.href = '/collector-login.html';

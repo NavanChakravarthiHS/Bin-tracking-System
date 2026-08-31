@@ -152,7 +152,12 @@
           if (response.ok) {
             // Store token in localStorage
             localStorage.setItem('collectorToken', data.token);
-            localStorage.setItem('collectorMobile', data.collector.mobile);
+            if (data.collector && data.collector.mobile) {
+              localStorage.setItem('collectorMobile', data.collector.mobile);
+            }
+            if (data.collector && data.collector.name) {
+              localStorage.setItem('collectorName', data.collector.name);
+            }
             
             showMessage('Login successful! Redirecting to dashboard...', 'success');
             setTimeout(() => {
