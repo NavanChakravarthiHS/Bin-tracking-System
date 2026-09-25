@@ -9,6 +9,7 @@ import { adminBinsRouter } from "./routes/adminBins.js";
 import { adminCollectorsRouter } from "./routes/adminCollectors.js";
 import { adminCollectionsRouter } from "./routes/adminCollections.js";
 import { adminAlertsRouter } from "./routes/adminAlerts.js";
+import { adminPerformanceRouter } from "./routes/adminPerformance.js";
 import { collectorRouter } from "./routes/collector.js";
 import { ensureDefaultAdmin } from "./seed/ensureDefaultAdmin.js";
 import { seedBins } from "./seed/seedBins.js";
@@ -45,6 +46,7 @@ async function bootstrap() {
   app.use("/admin", adminCollectorsRouter);
   app.use("/admin", adminCollectionsRouter);
   app.use("/admin", adminAlertsRouter);
+  app.use("/admin", adminPerformanceRouter);
   app.use("/collector", collectorRouter);
 
   // Serve landing page on root

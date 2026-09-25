@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Map, AlertTriangle, Leaf, Users, Truck, Trash2 } from 'lucide-react';
+import { LayoutDashboard, Map, AlertTriangle, Leaf, Users, Truck, Trash2, TrendingUp } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
@@ -10,7 +10,8 @@ const Sidebar = () => {
     { path: '/alerts', icon: AlertTriangle, label: 'Alerts' },
     { path: '/bins', icon: Trash2, label: 'Bins' },
     { path: '/collectors', icon: Users, label: 'Collectors' },
-    { path: '/collections', icon: Truck, label: 'Collections' }
+    { path: '/collections', icon: Truck, label: 'Collections' },
+    { path: '/performance', icon: TrendingUp, label: 'Collector Performance' },
   ];
 
   const isActive = (path) => {

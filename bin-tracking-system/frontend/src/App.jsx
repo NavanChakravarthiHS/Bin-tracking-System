@@ -9,6 +9,7 @@ import CollectorsPage from './pages/CollectorsPage';
 import CollectionsPage from './pages/CollectionsPage';
 import BinsPage from './pages/BinsPage';
 import RequireAdmin from './components/Auth/RequireAdmin';
+import PerformancePage from './pages/PerformancePage';
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,6 +32,7 @@ function App() {
                 <Route path="/bins" element={<BinsPage />} />
                 <Route path="/collectors" element={<CollectorsPage />} />
                 <Route path="/collections" element={<CollectionsPage />} />
+                <Route path="/performance" element={<PerformancePage />} />
               </Route>
             </Routes>
           </main>
