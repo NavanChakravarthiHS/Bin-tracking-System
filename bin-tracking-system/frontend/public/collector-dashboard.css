@@ -435,6 +435,94 @@ body {
 
 .bin-header h3 { font-size: 1rem; font-weight: 800; color: var(--heading); }
 
+.bin-header-badges {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blynk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 99px;
+  line-height: 1.2;
+}
+
+.blynk-badge .blynk-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.blynk-badge--active {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.blynk-badge--active .blynk-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+}
+
+.blynk-badge--inactive {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.blynk-badge--inactive .blynk-dot {
+  background: #ef4444;
+}
+
+.blynk-badge--none {
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+.blynk-badge--none .blynk-dot {
+  background: #9ca3af;
+}
+
+.device-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.device-text .device-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.device-text--online {
+  color: #15803d;
+}
+
+.device-text--online .device-dot {
+  background: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.device-text--offline {
+  color: #b91c1c;
+}
+
+.device-text--offline .device-dot {
+  background: #ef4444;
+}
+
 .status-badge {
   display: inline-flex;
   align-items: center;

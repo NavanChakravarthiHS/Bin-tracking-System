@@ -179,6 +179,16 @@ function updateSummaryCards() {
   setText('statWarning', assignedBins.filter((b) => b.status === 'Warning').length);
   setText('statFull', assignedBins.filter((b) => b.status === 'Full').length);
   setText('statCollected', assignedBins.filter((b) => b.status === 'Collected').length);
+
+  const activeBlynkCount = assignedBins.filter((b) => getDeviceState(b) === 'online').length;
+  const statusTextEl = document.querySelector('.status-row span:last-child');
+  const liveDotEl = document.querySelector('.live-dot');
+  if (statusTextEl) {
+    statusTextEl.textContent = `Blynk IoT: ${activeBlynkCount}/${assignedBins.length} Active`;
+  }
+  if (liveDotEl) {
+    liveDotEl.style.background = activeBlynkCount > 0 ? '#22c55e' : '#ef4444';
+  }
 }
 
 // Sort bins by priority
@@ -212,11 +222,27 @@ function getStatusLabel(status) {
 }
 
 function getDeviceState(bin) {
+  if (!bin) return 'offline';
   const raw = String(bin.deviceStatus || bin.connectivity || bin.onlineStatus || '').toLowerCase();
   if (raw === 'inactive' || raw === 'offline') return 'offline';
   if (bin.sensorConnected === false) return 'offline';
   if (raw === 'active' || raw === 'online') return 'online';
   return bin.sensorConnected ? 'online' : 'offline';
+}
+
+function getBlynkBadgeHtml(bin) {
+  const isOnline = getDeviceState(bin) === 'online';
+  const hasPin = Boolean(bin.blynkPin);
+
+  if (!hasPin) {
+    return `<span class="blynk-badge blynk-badge--none" title="No Blynk Virtual Pin configured"><i class="blynk-dot"></i> No Blynk Pin</span>`;
+  }
+
+  if (isOnline) {
+    return `<span class="blynk-badge blynk-badge--active" title="Blynk Pin: ${bin.blynkPin} | Device Status: Active"><i class="blynk-dot"></i> Blynk ${bin.blynkPin}: Active</span>`;
+  } else {
+    return `<span class="blynk-badge blynk-badge--inactive" title="Blynk Pin: ${bin.blynkPin} | Device Status: Inactive"><i class="blynk-dot"></i> Blynk ${bin.blynkPin}: Inactive</span>`;
+  }
 }
 
 function formatUpdatedAt(bin) {
@@ -252,15 +278,18 @@ function viewBinDetails(binId) {
   const body = document.getElementById('detailsBody');
   const title = document.getElementById('detailsTitle');
   const device = getDeviceState(bin);
+  const deviceLabel = bin.deviceStatus || (device === 'online' ? 'Active' : 'Inactive');
+  const sensorLabel = bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected');
   title.textContent = bin.id;
   body.innerHTML = `
     <div class="detail-grid">
       <div><span>Location</span><strong>${bin.location || '—'}</strong></div>
       <div><span>Fill level</span><strong>${Number(bin.fillLevel) || 0}%</strong></div>
-      <div><span>Status</span><strong>${getStatusLabel(bin.status)}</strong></div>
-      <div><span>Device</span><strong>${bin.deviceStatus || (device === 'online' ? 'Active' : 'Inactive')}</strong></div>
-      <div><span>Sensor</span><strong>${bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</strong></div>
-      <div><span>Last sensor</span><strong>${formatUpdatedAt(bin)}</strong></div>
+      <div><span>Fill Status</span><strong>${getStatusLabel(bin.status)}</strong></div>
+      <div><span>Blynk Virtual Pin</span><strong>${bin.blynkPin ? `Blynk ${bin.blynkPin}` : 'Not configured'}</strong></div>
+      <div><span>Device Status</span><strong class="device-text device-text--${device}"><i class="device-dot"></i>${deviceLabel}</strong></div>
+      <div><span>Sensor Status</span><strong>${sensorLabel}</strong></div>
+      <div><span>Last sensor update</span><strong>${formatUpdatedAt(bin)}</strong></div>
       <div><span>Latitude</span><strong>${bin.latitude ?? '—'}</strong></div>
       <div><span>Longitude</span><strong>${bin.longitude ?? '—'}</strong></div>
       <div><span>Last collected</span><strong>${bin.lastCollected ? formatUpdatedAt({ lastSensorUpdate: bin.lastCollected }) : '—'}</strong></div>
@@ -284,10 +313,20 @@ function createBinCard(bin) {
   const fillHeight = Math.max(0, Math.min(100, Number(bin.fillLevel) || 0));
   const statusLabel = getStatusLabel(bin.status);
   const statusClass = bin.status.toLowerCase();
+  const blynkBadge = getBlynkBadgeHtml(bin);
+  const deviceState = getDeviceState(bin);
+  const deviceLabel = bin.deviceStatus || (deviceState === 'online' ? 'Active' : 'Inactive');
+  const sensorLabel = bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected');
+
   return `
     <div class="bin-card ${statusClass}" data-bin-id="${bin.id}">
       <div class="bin-header">
-        <h3>${bin.id}</h3>
+        <div>
+          <h3>${bin.id}</h3>
+          <div class="bin-header-badges">
+            ${blynkBadge}
+          </div>
+        </div>
         <span class="status-badge status-${statusClass}">${statusLabel}</span>
       </div>
       <div class="bin-content">
@@ -307,20 +346,22 @@ function createBinCard(bin) {
             </div>
           </div>
           <div class="fact">
-            <span>Status</span>
+            <span>Fill Status</span>
             <strong class="status-text status-text--${statusClass}"><i></i>${statusLabel}</strong>
+          </div>
+          <div class="fact">
+            <span>Blynk IoT Device</span>
+            <strong class="device-text device-text--${deviceState}">
+              <i class="device-dot"></i>${deviceLabel} ${bin.blynkPin ? `(Pin ${bin.blynkPin})` : ''}
+            </strong>
+          </div>
+          <div class="fact">
+            <span>Sensor</span>
+            <strong>${sensorLabel}</strong>
           </div>
           <div class="fact">
             <span>Last Updated</span>
             <strong>${formatUpdatedAt(bin)}</strong>
-          </div>
-          <div class="fact">
-            <span>Device</span>
-            <strong>${bin.deviceStatus || (getDeviceState(bin) === 'online' ? 'Active' : 'Inactive')}</strong>
-          </div>
-          <div class="fact">
-            <span>Sensor</span>
-            <strong>${bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</strong>
           </div>
         </div>
       </div>
