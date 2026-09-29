@@ -267,9 +267,28 @@ body {
   border: 1px solid #e5e7eb;
 }
 
-/* Primary color utilities for text/bg */
+/* Primary color utilities for text/bg/border (green palette) */
+.text-primary-400 { color: #4ade80; }
+.text-primary-500 { color: #22c55e; }
 .text-primary-600 { color: #16a34a; }
 .text-primary-800 { color: #14532d; }
-.text-primary-600 { color: #16a34a; }
-.text-primary-400 { color: #4ade80; }
+
+.bg-primary-50  { background-color: #f0fdf4; }
+.bg-primary-100 { background-color: #dcfce7; }
+.bg-primary-600 { background-color: #16a34a; }
+.bg-primary-700 { background-color: #15803d; }
+
+.border-primary-200 { border-color: #bbf7d0; }
+.border-primary-500 { border-color: #22c55e; }
+
+/* Hover variants */
+.hover\:bg-primary-50:hover  { background-color: #f0fdf4; }
+.hover\:bg-primary-100:hover { background-color: #dcfce7; }
+.hover\:bg-primary-700:hover { background-color: #15803d; }
+
+/* Focus ring */
+.focus\:ring-primary-500:focus {
+  --tw-ring-color: #22c55e;
+  box-shadow: 0 0 0 3px var(--tw-ring-color, rgba(34,197,94,0.4));
+}
 

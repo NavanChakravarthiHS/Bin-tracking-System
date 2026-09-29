@@ -20,9 +20,32 @@ function calculateBinMetrics(distance, bin = {}) {
   return { fillLevel, status: statusFromFillLevel(fillLevel, bin) };
 }
 
+export async function isBlynkHardwareConnected(token = process.env.BLYNK_AUTH_TOKEN) {
+  if (!token) return false;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    const url = `${BLYNK_API_URL}/isHardwareConnected?token=${token}`;
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!response.ok) return false;
+    const text = await response.text();
+    return text.trim().toLowerCase() === "true";
+  } catch (error) {
+    return false;
+  }
+}
+
 async function fetchBlynkValue(pin) {
   const token = process.env.BLYNK_AUTH_TOKEN;
   if (!token || !pin) return null;
+
+  // Verify that the physical hardware device is online and connected to Blynk Cloud.
+  // Do NOT rely on cached pin values when hardware is disconnected.
+  const isConnected = await isBlynkHardwareConnected(token);
+  if (!isConnected) {
+    return null;
+  }
 
   try {
     const controller = new AbortController();

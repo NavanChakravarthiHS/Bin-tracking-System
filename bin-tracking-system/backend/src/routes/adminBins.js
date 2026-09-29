@@ -140,75 +140,63 @@ adminBinsRouter.delete("/bins/:id", requireAuth, async (req, res) => {
   }
 });
 
-// POST /admin/bins/:id/sensor - Public sensor update route for IoT hardware (ESP8266 / ESP32)
+// POST /admin/bins/:id/sensor - Public sensor update route for IoT hardware (NodeMCU / ESP8266 / ESP32)
 adminBinsRouter.post("/bins/:id/sensor", async (req, res) => {
   const { id } = req.params;
-  const { fillLevel } = req.body || {};
+  const { fillLevel, distance, fillPercentage, deviceId } = req.body || {};
+  const targetId = (id && id !== "sensor") ? id : (deviceId || id);
 
-  if (typeof fillLevel !== "number" || fillLevel < 0 || fillLevel > 100) {
-    return res.status(400).json({ message: "Fill level must be a number between 0 and 100" });
+  let currentFill = null;
+  if (typeof fillPercentage === "number") {
+    currentFill = Math.round(fillPercentage);
+  } else if (typeof fillLevel === "number") {
+    currentFill = Math.round(fillLevel);
   }
 
   try {
-    const bin = await Bin.findOne({ id });
-    if (!bin) return res.status(404).json({ message: "Bin not found" });
+    const bin = await Bin.findOne({ id: targetId });
+    if (!bin) return res.status(404).json({ message: `Bin '${targetId}' not found` });
 
-    const currentFill = Math.round(fillLevel);
+    if (typeof distance === "number") {
+      bin.distance = distance;
+      if (currentFill === null) {
+        // Calculate fill level from distance using standard range (50cm empty to 10cm full)
+        const validDist = Math.max(10, Math.min(50, distance));
+        currentFill = Math.round(((50 - validDist) / (50 - 10)) * 100);
+      }
+    }
+
+    if (currentFill === null) {
+      return res.status(400).json({ message: "Payload must contain distance, fillLevel, or fillPercentage" });
+    }
+
+    currentFill = Math.max(0, Math.min(100, currentFill));
     const currentStatus = statusFromFillLevel(currentFill, bin);
     const now = new Date();
 
-    // 1. Reading interval: IoT sensor sends readings every 5 seconds
-    // 2, 3, 4, 5, 7. Change-detection & Heartbeat evaluation:
-    // - 2% change threshold (abs(currentFill - previousFill) < 2% -> no update)
-    // - Status change between Normal / Warning / Full forces immediate update
-    // - Heartbeat update (every 2 minutes) if fill level is static to maintain last-seen active status
-    const { shouldUpdate, isHeartbeatOnly, reason } = evaluateSensorUpdate(bin, currentFill, currentStatus, now);
-
-    if (!shouldUpdate) {
-      // Keep dashboard showing the last received value when no update is required.
-      // Avoid duplicate database/API updates.
-      return res.json({
-        message: "Fill level change below threshold (<2%), no dashboard update required",
-        updated: false,
-        bin: withMonitoring(bin.toObject()),
-      });
-    }
-
-    if (isHeartbeatOnly) {
-      // Periodic heartbeat update: Refresh lastSensorUpdate & deviceStatus without modifying fill level
-      applySuccessfulSensorRead(bin, { lastSensorUpdate: now });
-      await bin.save();
-
-      return res.json({
-        message: "Sensor heartbeat recorded successfully",
-        updated: true,
-        isHeartbeat: true,
-        bin: withMonitoring(bin.toObject()),
-      });
-    }
-
-    // Meaningful fill change (>= 2%) or status transition: Update fill level & status
+    // Whenever valid sensor data is received, update lastSensorUpdate and set status = ACTIVE
     bin.fillLevel = currentFill;
     bin.status = currentStatus;
     if (currentFill > 0) {
       bin.lastCollected = null;
       bin.assignedCollector = null;
     }
-    applySuccessfulSensorRead(bin, { lastSensorUpdate: now });
+
+    applySuccessfulSensorRead(bin, { distance: bin.distance, fillLevel: currentFill, status: currentStatus, lastSensorUpdate: now });
     await bin.save();
 
     // Process threshold alerts (80% warning, 90% critical with TextBee SMS)
     try {
       await processBinAlert({ bin, fillLevel: currentFill });
     } catch (err) {
-      console.error(`Error processing alert for sensor update on bin ${id}:`, err);
+      console.error(`Error processing alert for sensor update on bin ${targetId}:`, err);
     }
 
     // eslint-disable-next-line no-console
-    console.log(`📡 IoT Sensor Update - Bin: ${id} | Fill Level: ${currentFill}% | Status: ${currentStatus} | Reason: ${reason}`);
+    console.log(`📡 IoT Sensor Update - Bin: ${targetId} | Distance: ${bin.distance ?? 'N/A'} cm | Fill: ${currentFill}% | Status: ACTIVE`);
 
     return res.json({
-      message: "Bin level updated by sensor successfully",
+      message: "Sensor data received successfully",
       updated: true,
       bin: withMonitoring(bin.toObject()),
     });

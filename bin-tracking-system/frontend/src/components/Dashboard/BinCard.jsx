@@ -66,10 +66,23 @@ const BinCard = ({ bin, index }) => {
 
       {/* Coordinates & Collection Metadata */}
       <div className="mt-4 pt-3 border-t border-gray-200/60">
-        <div className="text-xs text-gray-500 space-y-0.5 font-medium">
+        <div className="text-xs text-gray-600 space-y-1 font-medium">
+          <div>
+            <span>
+              Device:{' '}
+              {bin.sensorConnected || bin.deviceStatus === 'Active' ? (
+                <strong className="text-emerald-600 font-bold inline-flex items-center gap-1">
+                  🟢 ACTIVE
+                </strong>
+              ) : (
+                <strong className="text-red-600 font-bold inline-flex items-center gap-1">
+                  🔴 INACTIVE
+                </strong>
+              )}
+            </span>
+          </div>
           <div>Lat: {bin.latitude ? bin.latitude.toFixed(4) : '0.0000'} | Lng: {bin.longitude ? bin.longitude.toFixed(4) : '0.0000'}</div>
-          <div>Device: {bin.deviceStatus || 'Inactive'} | Sensor: {bin.sensorStatus || (bin.sensorConnected ? 'Connected' : 'Disconnected')}</div>
-          <div>Last sensor: {formatSensorTime(bin.lastSensorUpdate)}</div>
+          <div>Last Seen: <strong className="text-gray-800">{formatSensorTime(bin.lastSensorUpdate)}</strong></div>
         </div>
         
         {bin.assignedCollectorName && (

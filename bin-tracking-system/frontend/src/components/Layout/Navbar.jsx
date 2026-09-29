@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Search, Bell, UserCog, Menu, X, LogOut } from 'lucide-react';
+import { UserCog, Menu, X, LogOut } from 'lucide-react';
 import { clearToken, goToLogin } from '../../auth/adminAuth';
 
-const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
+const Navbar = ({ title = 'Dashboard' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const handleLogout = () => {
@@ -28,27 +28,8 @@ const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
             </div>
           </div>
 
-          {/* Center: Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-xl mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search bins by ID or location..."
-                value={searchTerm}
-                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                className="input-field w-full pl-10 pr-4"
-              />
-            </div>
-          </div>
-
-          {/* Right: Notifications & Profile */}
+          {/* Right: Profile & Logout */}
           <div className="flex items-center gap-3">
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Bell size={20} className="text-gray-700" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            
             <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
               <div className="hidden md:block text-right">
                 <p className="text-sm font-semibold text-heading">Admin User</p>
@@ -69,22 +50,6 @@ const Navbar = ({ title = 'Dashboard', searchTerm = '', onSearchChange }) => {
             </div>
           </div>
         </div>
-
-        {/* Mobile Search */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 animate-fade-in">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400" size={18} />
-              <input
-                type="text"
-                placeholder="Search bins..."
-                value={searchTerm}
-                onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                className="input-field w-full pl-10 pr-4"
-              />
-            </div>
-          </div>
-        )}
       </div>
     </header>
   );

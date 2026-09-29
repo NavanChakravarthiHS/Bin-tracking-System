@@ -81,7 +81,17 @@ export const useBins = (searchTerm = '', activeFilter = 'All') => {
 
     // Apply status filter
     if (activeFilter !== 'All') {
-      filtered = filtered.filter((bin) => bin.status === activeFilter);
+      if (activeFilter === 'Active') {
+        filtered = filtered.filter(
+          (bin) => bin.deviceStatus === 'Active' || bin.sensorConnected === true
+        );
+      } else if (activeFilter === 'Inactive') {
+        filtered = filtered.filter(
+          (bin) => bin.deviceStatus === 'Inactive' || bin.sensorConnected === false
+        );
+      } else {
+        filtered = filtered.filter((bin) => bin.status === activeFilter);
+      }
     }
 
     return filtered;

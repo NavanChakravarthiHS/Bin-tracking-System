@@ -68,11 +68,18 @@ const BinsPage = () => {
     });
   }, []);
 
-  const stats = useMemo(() => ({
-    total: bins.length,
-    active: bins.filter((bin) => bin.isActive !== false).length,
-    inactive: bins.filter((bin) => bin.isActive === false).length,
-  }), [bins]);
+  const stats = useMemo(() => {
+    const activeCount = bins.filter(
+      (bin) => bin.isActive !== false && (bin.deviceStatus === 'Active' || bin.sensorConnected === true)
+    ).length;
+    const inactiveCount = bins.length - activeCount;
+
+    return {
+      total: bins.length,
+      active: activeCount,
+      inactive: inactiveCount,
+    };
+  }, [bins]);
 
   const filteredBins = useMemo(() => {
     return bins.filter((bin) => {
@@ -83,8 +90,8 @@ const BinsPage = () => {
       if (!matchesSearch) return false;
 
       if (filterStatus === 'All') return true;
-      if (filterStatus === 'Active') return bin.isActive !== false;
-      if (filterStatus === 'Inactive') return bin.isActive === false;
+      if (filterStatus === 'Active') return bin.isActive !== false && (bin.deviceStatus === 'Active' || bin.sensorConnected === true);
+      if (filterStatus === 'Inactive') return bin.isActive === false || bin.deviceStatus === 'Inactive' || bin.sensorConnected === false;
       return bin.status === filterStatus;
     });
   }, [bins, searchTerm, filterStatus]);
@@ -252,14 +259,14 @@ const BinsPage = () => {
           <p className="text-xs text-gray-500 mt-2">Stored in MongoDB database</p>
         </div>
         <div className="stat-card">
-          <p className="text-sm font-medium text-gray-600 mb-2">Active Bins</p>
+          <p className="text-sm font-medium text-gray-600 mb-2">Active Devices</p>
           <p className="text-3xl font-bold text-green-700">{stats.active}</p>
-          <p className="text-xs text-gray-500 mt-2">Operational and tracked</p>
+          <p className="text-xs text-gray-500 mt-2">Receiving live sensor data</p>
         </div>
         <div className="stat-card">
-          <p className="text-sm font-medium text-gray-600 mb-2">Inactive / Disabled</p>
-          <p className="text-3xl font-bold text-gray-500">{stats.inactive}</p>
-          <p className="text-xs text-gray-500 mt-2">Temporarily deactivated</p>
+          <p className="text-sm font-medium text-gray-600 mb-2">Inactive / Disconnected</p>
+          <p className="text-3xl font-bold text-red-600">{stats.inactive}</p>
+          <p className="text-xs text-gray-500 mt-2">No sensor data for &ge; 2 minutes</p>
         </div>
       </div>
 

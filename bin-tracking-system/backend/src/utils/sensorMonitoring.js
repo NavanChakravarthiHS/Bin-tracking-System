@@ -1,17 +1,18 @@
 // Monitoring and change detection constants
-// 1. Reading interval: Ultrasonic sensor reads every 5 seconds.
-// 2. 2% change threshold: Ignores sensor noise when fill level change is < 2%.
-// 3. Heartbeat update interval: Updates lastSensorUpdate every 2 minutes (120,000 ms) to keep device status active.
-// 4. Stale threshold: Sensor is marked inactive/disconnected after 3 minutes (180,000 ms) without a successful read/heartbeat.
+// 1. DEVICE_TIMEOUT_MS: Configurable timeout (2 minutes = 120,000 ms). Device becomes INACTIVE if no sensor data received for 2 minutes.
+// 2. Reading interval: Ultrasonic sensor reads every 5 seconds.
+// 3. 2% change threshold: Ignores sensor noise when fill level change is < 2%.
+export const DEVICE_TIMEOUT_MS = 2 * 60 * 1000; // 2 minutes timeout
+export const SENSOR_STALE_MS = DEVICE_TIMEOUT_MS; // Alias for backward compatibility
+export const SENSOR_HEARTBEAT_INTERVAL_MS = 60 * 1000; // Heartbeat update every 1 minute
 export const SENSOR_FILL_CHANGE_THRESHOLD = 2; // 2% change threshold
-export const SENSOR_HEARTBEAT_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes heartbeat
-export const SENSOR_STALE_MS = 3 * 60 * 1000; // 3 minutes stale timeout
 
 export function isSensorFresh(lastSensorUpdate, now = Date.now()) {
   if (!lastSensorUpdate) return false;
   const timestamp = new Date(lastSensorUpdate).getTime();
   if (Number.isNaN(timestamp)) return false;
-  return now - timestamp <= SENSOR_STALE_MS;
+  const timeDiff = (typeof now === "number" ? now : new Date(now).getTime()) - timestamp;
+  return timeDiff < DEVICE_TIMEOUT_MS;
 }
 
 /**
