@@ -29,7 +29,9 @@ async function bootstrap() {
   app.use(cors());
   app.use(express.json());
 
-  // Start background polling to sync Blynk data every 5 seconds
+  // Requirement 1: Keep ultrasonic sensor reading interval at 5 seconds.
+  // syncAllBins evaluates 2% change threshold, status transitions, and periodic 2-minute heartbeats
+  // to avoid unnecessary database writes and dashboard API updates.
   setInterval(async () => {
     await syncAllBins();
   }, 5000);

@@ -47,10 +47,12 @@ export async function processBinAlert({ bin, fillLevel }) {
   if (!bin || typeof fillLevel !== "number") return null;
 
   const currentLevel = Math.max(0, Math.min(100, Math.round(fillLevel)));
+  const warningThreshold = Number(bin.warningThreshold ?? 50);
+  const fullThreshold = Number(bin.fullThreshold ?? 80);
   const previousSeverity = bin.lastAlertSeverity || "NONE";
 
-  // If fill level has dropped below 80% (e.g. collected or emptied)
-  if (currentLevel < 80) {
+  // If fill level has dropped below warning threshold (e.g. < 50%)
+  if (currentLevel < warningThreshold) {
     if (previousSeverity !== "NONE") {
       bin.lastAlertSeverity = "NONE";
       await bin.save();
@@ -64,8 +66,8 @@ export async function processBinAlert({ bin, fillLevel }) {
     return null;
   }
 
-  // 80% - 89%: WARNING alert
-  if (currentLevel >= 80 && currentLevel < 90) {
+  // Warning level: warningThreshold <= currentLevel < fullThreshold (e.g., 50% to 80%)
+  if (currentLevel >= warningThreshold && currentLevel < fullThreshold && currentLevel <= 80) {
     if (previousSeverity === "WARNING" || previousSeverity === "CRITICAL") {
       // Already alerted for this threshold, do not duplicate
       return null;
@@ -91,16 +93,18 @@ export async function processBinAlert({ bin, fillLevel }) {
       collectorMobile: collector?.mobile || "",
       smsStatus: "NOT_SENT",
       whatsappStatus: "NOT_SENT",
-      adminNote: collector ? "Warning threshold reached (80%)" : "Warning threshold reached (80%). No collector assigned.",
-      message: `Bin ${bin.id} reached warning fill level (${currentLevel}%).`,
+      adminNote: collector
+        ? `Warning threshold reached (${currentLevel}%)`
+        : `Warning threshold reached (${currentLevel}%). No collector assigned.`,
+      message: `Warning: Bin ${bin.id} at ${bin.location} reached ${currentLevel}% fill level.`,
     });
 
     console.log(`⚠️ [Warning Alert Created] Bin: ${bin.id} | Level: ${currentLevel}%`);
     return alertDoc;
   }
 
-  // 90% - 100%: CRITICAL alert with TextBee SMS to assigned collector
-  if (currentLevel >= 90) {
+  // Full condition: currentLevel > 80% or currentLevel >= fullThreshold
+  if (currentLevel > 80 || currentLevel >= fullThreshold) {
     if (previousSeverity === "CRITICAL") {
       // Already sent critical notification, do not duplicate
       return null;
@@ -146,8 +150,8 @@ export async function processBinAlert({ bin, fillLevel }) {
       return alertDoc;
     }
 
-    // Collector is assigned: Send SMS via TextBee SMS Gateway
-    console.log(`🚨 [Critical Alert Dispatch] Bin: ${bin.id} (${currentLevel}%) -> Collector: ${collector.name || collector.mobile} (${collector.mobile})`);
+    // Collector is assigned: Send SMS alert message via TextBee SMS Gateway
+    console.log(`🚨 [Critical Full Alert Dispatch (>80%)] Bin: ${bin.id} (${currentLevel}%) -> Collector: ${collector.name || collector.mobile} (${collector.mobile})`);
 
     const smsRes = await sendSMS(collector.mobile, messageText);
 

@@ -68,10 +68,22 @@
           </div>
 
           <div class="navbar-right">
-            <button type="button" class="icon-btn notify" aria-label="Notifications">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              <span class="notify-dot"></span>
-            </button>
+            <div class="notify-wrapper">
+              <button type="button" class="icon-btn notify" id="notifyBellBtn" onclick="toggleNotificationDropdown()" aria-label="Notifications">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="notify-dot" id="notifyBadge" style="display: none;"></span>
+              </button>
+              <div id="notifyDropdown" class="notify-dropdown" hidden>
+                <div class="notify-dropdown-head">
+                  <h4>🚨 Active Bin Alerts</h4>
+                  <button type="button" onclick="closeNotificationDropdown()" class="btn-text">Close</button>
+                </div>
+                <div id="notifyList" class="notify-list">
+                  <p class="notify-empty">No active full/warning alerts</p>
+                </div>
+              </div>
+            </div>
+
             <div class="profile">
               <div class="profile-text">
                 <p id="userName">Collector</p>
@@ -211,6 +223,30 @@
           <button type="button" class="icon-btn" onclick="closeBinDetails()" aria-label="Close">×</button>
         </div>
         <div id="detailsBody" class="modal__body"></div>
+      </div>
+    </div>
+
+    <!-- Notification Alert Pop-up Modal -->
+    <div id="alertPopupModal" class="alert-popup-modal" hidden>
+      <div class="alert-popup-backdrop" onclick="dismissAlertPopup()"></div>
+      <div class="alert-popup-card" id="alertPopupCard">
+        <div class="alert-popup-header" id="alertPopupHeader">
+          <div class="alert-popup-badge" id="alertPopupBadge">🚨 FULL BIN ALERT</div>
+          <button type="button" class="alert-popup-close" onclick="dismissAlertPopup()" aria-label="Close">&times;</button>
+        </div>
+        <div class="alert-popup-body">
+          <div class="alert-popup-icon" id="alertPopupIcon">🚨</div>
+          <div class="alert-popup-info">
+            <h3 id="alertPopupTitle">Bin BIN002 requires immediate collection!</h3>
+            <p id="alertPopupLocation">Location: Principal's Office</p>
+            <p id="alertPopupLevel">Fill Level: <strong>85% (>80% Full)</strong></p>
+          </div>
+        </div>
+        <div class="alert-popup-actions">
+          <button type="button" class="btn-popup btn-popup-map" id="alertPopupMapBtn">📍 View on Map</button>
+          <button type="button" class="btn-popup btn-popup-collect" id="alertPopupCollectBtn">🧹 Mark as Collected</button>
+          <button type="button" class="btn-popup btn-popup-dismiss" onclick="dismissAlertPopup()">Dismiss</button>
+        </div>
       </div>
     </div>
 

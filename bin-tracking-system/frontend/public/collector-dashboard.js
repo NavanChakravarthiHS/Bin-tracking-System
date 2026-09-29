@@ -456,7 +456,139 @@ function renderBins() {
   // Show empty state if no bins
   document.getElementById('emptyState').style.display = 
     assignedBins.length === 0 ? 'block' : 'none';
+
+  // Evaluate and trigger notification pop-up for Full / Warning bins
+  triggerNotificationAlerts();
 }
+
+// Global state for notifications & popups
+const dismissedAlertsSet = new Set();
+let currentPopupBin = null;
+
+// Notification Pop-up and Dropdown evaluation
+function triggerNotificationAlerts() {
+  const urgentBins = assignedBins.filter((b) => b.status === 'Full' || b.status === 'Warning' || b.fillLevel >= 50);
+  const notifyBadge = document.getElementById('notifyBadge');
+  const notifyList = document.getElementById('notifyList');
+
+  // Update notification badge dot on bell
+  if (notifyBadge) {
+    notifyBadge.style.display = urgentBins.length > 0 ? 'block' : 'none';
+  }
+
+  // Update notification dropdown list
+  if (notifyList) {
+    if (urgentBins.length === 0) {
+      notifyList.innerHTML = '<p class="notify-empty">No active full or warning bin alerts</p>';
+    } else {
+      notifyList.innerHTML = urgentBins
+        .map((bin) => {
+          const isFull = bin.status === 'Full' || bin.fillLevel >= 80;
+          return `
+            <div class="notify-item ${isFull ? 'full' : 'warning'}" onclick="viewBinDetails('${escapeAttr(bin.id)}'); closeNotificationDropdown();">
+              <div class="notify-item-icon">${isFull ? '🚨' : '⚠️'}</div>
+              <div>
+                <div class="notify-item-title">${bin.id} - ${isFull ? 'CRITICAL FULL' : 'WARNING'} (${bin.fillLevel}%)</div>
+                <div class="notify-item-sub">📍 ${bin.location || 'Location'}</div>
+              </div>
+            </div>
+          `;
+        })
+        .join('');
+    }
+  }
+
+  // Find highest priority un-dismissed alert bin (Full bins > 80% first, then Warning bins)
+  const undismissedAlerts = urgentBins.filter((b) => !dismissedAlertsSet.has(b.id));
+  if (undismissedAlerts.length > 0) {
+    // Sort so highest fill level Full bins come first
+    undismissedAlerts.sort((a, b) => {
+      const aFull = a.status === 'Full' || a.fillLevel >= 80 ? 0 : 1;
+      const bFull = b.status === 'Full' || b.fillLevel >= 80 ? 0 : 1;
+      if (aFull !== bFull) return aFull - bFull;
+      return b.fillLevel - a.fillLevel;
+    });
+
+    const targetBin = undismissedAlerts[0];
+    const modal = document.getElementById('alertPopupModal');
+    // If modal is not already showing a different bin, show targetBin
+    if (modal && modal.hidden) {
+      showAlertPopup(targetBin);
+    }
+  }
+}
+
+function showAlertPopup(bin) {
+  currentPopupBin = bin;
+  const modal = document.getElementById('alertPopupModal');
+  const card = document.getElementById('alertPopupCard');
+  const badge = document.getElementById('alertPopupBadge');
+  const icon = document.getElementById('alertPopupIcon');
+  const title = document.getElementById('alertPopupTitle');
+  const location = document.getElementById('alertPopupLocation');
+  const level = document.getElementById('alertPopupLevel');
+  const mapBtn = document.getElementById('alertPopupMapBtn');
+  const collectBtn = document.getElementById('alertPopupCollectBtn');
+
+  if (!modal || !bin) return;
+
+  const isFull = bin.status === 'Full' || bin.fillLevel >= 80;
+
+  if (isFull) {
+    card.className = 'alert-popup-card';
+    badge.innerHTML = '🚨 CRITICAL FULL BIN ALERT';
+    icon.textContent = '🚨';
+    title.textContent = `Bin ${bin.id} is FULL (${bin.fillLevel}%)!`;
+    level.innerHTML = `Fill Level: <strong>${bin.fillLevel}% (>80% Full Threshold)</strong>`;
+  } else {
+    card.className = 'alert-popup-card alert-card-warning';
+    badge.innerHTML = '⚠️ WARNING BIN ALERT';
+    icon.textContent = '⚠️';
+    title.textContent = `Bin ${bin.id} reached Warning level (${bin.fillLevel}%)`;
+    level.innerHTML = `Fill Level: <strong>${bin.fillLevel}% (Warning Threshold)</strong>`;
+  }
+
+  location.textContent = `Location: ${bin.location || 'Unknown'}`;
+
+  // Configure action buttons
+  mapBtn.onclick = () => {
+    viewOnMap(bin.latitude || null, bin.longitude || null, bin.location);
+  };
+
+  collectBtn.onclick = async () => {
+    dismissAlertPopup();
+    await markAsCollected(bin.id);
+  };
+
+  modal.hidden = false;
+}
+
+function dismissAlertPopup() {
+  if (currentPopupBin) {
+    dismissedAlertsSet.add(currentPopupBin.id);
+  }
+  const modal = document.getElementById('alertPopupModal');
+  if (modal) modal.hidden = true;
+  currentPopupBin = null;
+
+  // Check if there is another un-dismissed bin to notify
+  setTimeout(triggerNotificationAlerts, 400);
+}
+
+function toggleNotificationDropdown() {
+  const dropdown = document.getElementById('notifyDropdown');
+  if (dropdown) {
+    dropdown.hidden = !dropdown.hidden;
+  }
+}
+
+function closeNotificationDropdown() {
+  const dropdown = document.getElementById('notifyDropdown');
+  if (dropdown) {
+    dropdown.hidden = true;
+  }
+}
+
 function showToast(message, type = 'success') {
   // Remove existing toast
   const existingToast = document.querySelector('.toast');
@@ -487,3 +619,4 @@ function logout() {
   // Redirect to login
   window.location.href = '/collector-login.html';
 }
+

@@ -1,5 +1,9 @@
 import { Bin } from "../models/Bin.js";
-import { applyFailedSensorRead, applySuccessfulSensorRead, isSensorFresh } from "../utils/sensorMonitoring.js";
+import {
+  applyFailedSensorRead,
+  applySuccessfulSensorRead,
+  evaluateSensorUpdate,
+} from "../utils/sensorMonitoring.js";
 import { statusFromFillLevel } from "../utils/binStatus.js";
 import { processBinAlert } from "./alertService.js";
 
@@ -65,6 +69,7 @@ export async function syncAllBins() {
     const updatePromises = bins.map(async (bin) => {
       if (!bin.blynkPin) return bin;
 
+      // 1. Keep ultrasonic sensor reading interval at 5 seconds (called by setInterval in server.js)
       const distance = await fetchBlynkValue(bin.blynkPin);
       if (distance === null) {
         const wasConnected = bin.sensorConnected;
@@ -76,22 +81,37 @@ export async function syncAllBins() {
         return bin;
       }
 
-      const { fillLevel, status } = calculateBinMetrics(distance, bin);
+      // 2. Calculate current bin fill percentage and status
+      const { fillLevel: currentFill, status: currentStatus } = calculateBinMetrics(distance, bin);
       const now = new Date();
-      const fillChanged = bin.distance !== distance || bin.fillLevel !== fillLevel || bin.status !== status;
-      const heartbeatStale = !isSensorFresh(bin.lastSensorUpdate, now.getTime());
 
-      if (fillChanged || heartbeatStale || !bin.sensorConnected || bin.deviceStatus !== "Active") {
-        applySuccessfulSensorRead(bin, { distance, fillLevel, status, lastSensorUpdate: now });
-        await bin.save();
-      }
+      // 3 & 4 & 5 & 7. Evaluate update necessity:
+      // - 2% change threshold (abs(currentFill - previousFill) >= 2%)
+      // - Status transition (Normal / Warning / Full / etc.) forces immediate update
+      // - Heartbeat / last-seen update (every 2 minutes) if fill level is unchanged
+      const { shouldUpdate, isHeartbeatOnly } = evaluateSensorUpdate(bin, currentFill, currentStatus, now);
 
-      // Check alert thresholds (80% warning, 90% critical with TextBee SMS)
-      try {
-        await processBinAlert({ bin, fillLevel });
-      } catch (err) {
-        console.error(`Error processing alert for bin ${bin.id}:`, err);
+      if (shouldUpdate) {
+        if (!isHeartbeatOnly) {
+          // Send new fill level & status update to backend & dashboard
+          applySuccessfulSensorRead(bin, { distance, fillLevel: currentFill, status: currentStatus, lastSensorUpdate: now });
+          await bin.save();
+
+          // Process alert thresholds (80% warning, 90% critical with TextBee SMS)
+          try {
+            await processBinAlert({ bin, fillLevel: currentFill });
+          } catch (err) {
+            console.error(`Error processing alert for bin ${bin.id}:`, err);
+          }
+        } else {
+          // Heartbeat update: Update lastSensorUpdate and lastSensorAttempt to maintain active status
+          // without modifying fill level or triggering duplicate API/dashboard requests.
+          applySuccessfulSensorRead(bin, { lastSensorUpdate: now });
+          await bin.save();
+        }
       }
+      // If shouldUpdate is false: do NOT update database or dashboard.
+      // Dashboard maintains the last received value when no update is required.
 
       return bin;
     });
@@ -101,3 +121,4 @@ export async function syncAllBins() {
     // Ignored
   }
 }
+

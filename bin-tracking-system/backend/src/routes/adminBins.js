@@ -2,7 +2,7 @@ import express from "express";
 import { Bin } from "../models/Bin.js";
 import { Collector } from "../models/Collector.js";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { withMonitoring } from "../utils/sensorMonitoring.js";
+import { applySuccessfulSensorRead, evaluateSensorUpdate, withMonitoring } from "../utils/sensorMonitoring.js";
 import { parseBinPayload, statusFromFillLevel } from "../utils/binStatus.js";
 import { Collection } from "../models/Collection.js";
 import { processBinAlert } from "../services/alertService.js";
@@ -149,44 +149,72 @@ adminBinsRouter.post("/bins/:id/sensor", async (req, res) => {
     return res.status(400).json({ message: "Fill level must be a number between 0 and 100" });
   }
 
-  const existing = await Bin.findOne({ id }).select("warningThreshold fullThreshold").lean();
-  const status = statusFromFillLevel(fillLevel, existing || {});
-
-  const updateFields = {
-    fillLevel,
-    status,
-    lastSensorUpdate: new Date(),
-    lastSensorAttempt: new Date(),
-    sensorConnected: true,
-    deviceStatus: "Active",
-  };
-  if (fillLevel > 0) {
-    updateFields.lastCollected = null;
-    updateFields.assignedCollector = null;
-  }
-
   try {
-    const bin = await Bin.findOneAndUpdate(
-      { id },
-      { $set: updateFields },
-      { new: true }
-    );
-
+    const bin = await Bin.findOne({ id });
     if (!bin) return res.status(404).json({ message: "Bin not found" });
+
+    const currentFill = Math.round(fillLevel);
+    const currentStatus = statusFromFillLevel(currentFill, bin);
+    const now = new Date();
+
+    // 1. Reading interval: IoT sensor sends readings every 5 seconds
+    // 2, 3, 4, 5, 7. Change-detection & Heartbeat evaluation:
+    // - 2% change threshold (abs(currentFill - previousFill) < 2% -> no update)
+    // - Status change between Normal / Warning / Full forces immediate update
+    // - Heartbeat update (every 2 minutes) if fill level is static to maintain last-seen active status
+    const { shouldUpdate, isHeartbeatOnly, reason } = evaluateSensorUpdate(bin, currentFill, currentStatus, now);
+
+    if (!shouldUpdate) {
+      // Keep dashboard showing the last received value when no update is required.
+      // Avoid duplicate database/API updates.
+      return res.json({
+        message: "Fill level change below threshold (<2%), no dashboard update required",
+        updated: false,
+        bin: withMonitoring(bin.toObject()),
+      });
+    }
+
+    if (isHeartbeatOnly) {
+      // Periodic heartbeat update: Refresh lastSensorUpdate & deviceStatus without modifying fill level
+      applySuccessfulSensorRead(bin, { lastSensorUpdate: now });
+      await bin.save();
+
+      return res.json({
+        message: "Sensor heartbeat recorded successfully",
+        updated: true,
+        isHeartbeat: true,
+        bin: withMonitoring(bin.toObject()),
+      });
+    }
+
+    // Meaningful fill change (>= 2%) or status transition: Update fill level & status
+    bin.fillLevel = currentFill;
+    bin.status = currentStatus;
+    if (currentFill > 0) {
+      bin.lastCollected = null;
+      bin.assignedCollector = null;
+    }
+    applySuccessfulSensorRead(bin, { lastSensorUpdate: now });
+    await bin.save();
 
     // Process threshold alerts (80% warning, 90% critical with TextBee SMS)
     try {
-      await processBinAlert({ bin, fillLevel });
+      await processBinAlert({ bin, fillLevel: currentFill });
     } catch (err) {
       console.error(`Error processing alert for sensor update on bin ${id}:`, err);
     }
 
     // eslint-disable-next-line no-console
-    console.log(`📡 IoT Sensor Update - Bin: ${id} | Fill Level: ${fillLevel}% | Status: ${status}`);
+    console.log(`📡 IoT Sensor Update - Bin: ${id} | Fill Level: ${currentFill}% | Status: ${currentStatus} | Reason: ${reason}`);
 
-    return res.json({ message: "Bin level updated by sensor successfully", bin: withMonitoring(bin.toObject()) });
+    return res.json({
+      message: "Bin level updated by sensor successfully",
+      updated: true,
+      bin: withMonitoring(bin.toObject()),
+    });
   } catch (error) {
     console.error("Error updating bin via sensor:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
