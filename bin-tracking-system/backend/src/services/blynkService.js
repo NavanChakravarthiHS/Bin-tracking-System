@@ -5,11 +5,14 @@ import { processBinAlert } from "./alertService.js";
 
 const BLYNK_API_URL = process.env.BLYNK_API_URL || "https://blynk.cloud/external/api";
 
-const MAX_BIN_DEPTH_CM = 100;
+const EMPTY_BIN_DISTANCE_CM = 50;
+const FULL_BIN_DISTANCE_CM = 10;
 
 function calculateBinMetrics(distance, bin = {}) {
-  const validDistance = Math.max(0, Math.min(MAX_BIN_DEPTH_CM, distance));
-  const fillLevel = Math.round(((MAX_BIN_DEPTH_CM - validDistance) / MAX_BIN_DEPTH_CM) * 100);
+  const validDistance = Math.max(FULL_BIN_DISTANCE_CM, Math.min(EMPTY_BIN_DISTANCE_CM, distance));
+  const fillLevel = Math.round(
+    ((EMPTY_BIN_DISTANCE_CM - validDistance) / (EMPTY_BIN_DISTANCE_CM - FULL_BIN_DISTANCE_CM)) * 100
+  );
   return { fillLevel, status: statusFromFillLevel(fillLevel, bin) };
 }
 

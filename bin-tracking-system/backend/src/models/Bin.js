@@ -11,7 +11,7 @@ const binSchema = new mongoose.Schema(
       default: 'Normal' 
     },
     blynkPin: { type: String, default: null },
-    distance: { type: Number, default: 100 },
+    distance: { type: Number, default: 50 },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
     lastCollected: { type: Date, default: null },

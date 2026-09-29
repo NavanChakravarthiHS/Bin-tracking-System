@@ -13,7 +13,7 @@ export async function markBinCollected({ binId, collector }) {
     { id: binId },
     {
       fillLevel: 0,
-      distance: 100,
+      distance: 50,
       status: "Collected",
       lastCollected: collectedAt,
       assignedCollector: collectorLabel,
@@ -40,7 +40,7 @@ export async function markBinCollected({ binId, collector }) {
   });
 
   if (bin.blynkPin) {
-    await pushBlynkValue(bin.blynkPin, 100);
+    await pushBlynkValue(bin.blynkPin, 50);
   }
 
   return { bin, collection: record };

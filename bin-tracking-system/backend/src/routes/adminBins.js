@@ -66,7 +66,7 @@ adminBinsRouter.post("/bins", requireAuth, async (req, res) => {
       fullThreshold: parsed.fullThreshold,
       blynkPin: parsed.blynkPin,
       fillLevel,
-      distance: 100,
+      distance: 50,
       status: statusFromFillLevel(fillLevel, parsed),
       isActive: true,
     });

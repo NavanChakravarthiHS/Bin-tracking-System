@@ -2,7 +2,7 @@ export const getBinStatus = (fillLevel, status, bin = {}) => {
   const warningThreshold = Number(bin.warningThreshold ?? 50);
   const fullThreshold = Number(bin.fullThreshold ?? 80);
 
-  if (fillLevel === 0) {
+  if (bin.status === 'Collected' || status === 'Collected') {
     return {
       status: 'Collected',
       badgeColor: 'gray',

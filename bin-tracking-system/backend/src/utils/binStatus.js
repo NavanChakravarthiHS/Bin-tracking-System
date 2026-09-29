@@ -13,7 +13,7 @@ export function getThresholds(bin = {}) {
 export function statusFromFillLevel(fillLevel, bin = {}) {
   const level = Number(fillLevel) || 0;
   const { warningThreshold, fullThreshold } = getThresholds(bin);
-  if (level <= 0) return "Collected";
+  if (bin.status === "Collected" && level === 0) return "Collected";
   if (level >= fullThreshold) return "Full";
   if (level >= warningThreshold) return "Warning";
   return "Normal";
