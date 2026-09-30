@@ -102,6 +102,13 @@ adminBinsRouter.put("/bins/:id", requireAuth, async (req, res) => {
     bin.status = statusFromFillLevel(bin.fillLevel, parsed);
     await bin.save();
 
+    // Trigger alert evaluation for any threshold breaches after manual update
+    try {
+      await processBinAlert({ bin, fillLevel: bin.fillLevel });
+    } catch (err) {
+      console.error(`Error processing alert after admin bin update ${bin.id}:`, err);
+    }
+
     return res.json({ message: "Bin updated", bin: withMonitoring(bin.toObject()) });
   } catch (error) {
     console.error("Error updating bin:", error);

@@ -66,8 +66,8 @@ export async function processBinAlert({ bin, fillLevel }) {
     return null;
   }
 
-  // Warning level: warningThreshold <= currentLevel < fullThreshold (e.g., 50% to 80%)
-  if (currentLevel >= warningThreshold && currentLevel < fullThreshold && currentLevel <= 80) {
+  // Warning level: warningThreshold <= currentLevel < fullThreshold (e.g., 50% to 79%)
+  if (currentLevel >= warningThreshold && currentLevel < fullThreshold) {
     if (previousSeverity === "WARNING" || previousSeverity === "CRITICAL") {
       // Already alerted for this threshold, do not duplicate
       return null;
