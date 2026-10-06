@@ -2,12 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
-  ],
-  "crons": [
     {
-      "path": "/internal/sync-sensors",
-      "schedule": "*/5 * * * *"
+      "source": "/(.*)",
+      "destination": "/api/index"
     }
   ]
 }
