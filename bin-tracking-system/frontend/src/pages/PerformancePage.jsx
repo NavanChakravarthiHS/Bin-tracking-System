@@ -8,8 +8,9 @@ import {
 import { getToken } from '../auth/adminAuth';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import ExportReportPanel from '../components/Performance/ExportReportPanel';
+import { API_BASE_URL } from '../config/api';
 
-const API = 'http://localhost:5000';
+const API = API_BASE_URL;
 
 // ─── Score badge ─────────────────────────────────────────────────────────────
 function ScoreBadge({ score, band }) {

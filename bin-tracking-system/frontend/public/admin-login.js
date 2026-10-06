@@ -1,7 +1,7 @@
 (function () {
   const TOKEN_KEY = "admin_token";
   const DASHBOARD_URL = "/app.html";
-  const API_BASE = "http://localhost:5000"; // backend
+  const API_BASE = String(window.ECOTRACK_API_BASE_URL || "").replace(/\/+$/, "");
 
   const form = document.getElementById("loginForm");
   const mobileInput = document.getElementById("mobile");

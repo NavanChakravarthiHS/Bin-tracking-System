@@ -111,8 +111,9 @@
       </div>
     </div>
 
+    <script src="/api-config.js"></script>
     <script>
-      const API_URL = 'http://localhost:5000';
+      const API_URL = String(window.ECOTRACK_API_BASE_URL || '').replace(/\/+$/, '');
 
       // Toggle password visibility
       function togglePassword(inputId, btn) {

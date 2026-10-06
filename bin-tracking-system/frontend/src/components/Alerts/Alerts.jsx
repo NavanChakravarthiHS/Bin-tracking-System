@@ -16,8 +16,9 @@ import {
 } from 'lucide-react';
 import { getToken } from '../../auth/adminAuth';
 import LoadingSpinner from '../Common/LoadingSpinner';
+import { API_BASE_URL } from '../../config/api';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const Alerts = () => {
   const [alerts, setAlerts] = useState([]);

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../config/api";
+
 export const TOKEN_KEY = "admin_token";
 
 export function getToken() {
@@ -30,7 +32,7 @@ export function acceptTokenFromUrlHash() {
 }
 
 export async function fetchAdminMe(token) {
-  const res = await fetch("http://localhost:5000/admin/me", {
+  const res = await fetch(`${API_BASE_URL}/admin/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) return null;

@@ -5,8 +5,9 @@ import {
 } from 'lucide-react';
 import { getToken } from '../../auth/adminAuth';
 import { generatePDF, buildFilename } from '../../utils/pdfGenerator';
+import { API_BASE_URL } from '../../config/api';
 
-const API = 'http://localhost:5000';
+const API = API_BASE_URL;
 
 const REPORT_TYPES = [
   {

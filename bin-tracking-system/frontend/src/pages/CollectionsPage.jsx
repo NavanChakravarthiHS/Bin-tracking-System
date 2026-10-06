@@ -4,8 +4,9 @@ import LoadingSpinner from '../components/Common/LoadingSpinner';
 import StatusBadge from '../components/Common/StatusBadge';
 import { getToken } from '../auth/adminAuth';
 import { formatDate, getBinStatus } from '../utils/helpers';
+import { API_BASE_URL } from '../config/api';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const CollectionsPage = () => {
   const [pending, setPending] = useState([]);

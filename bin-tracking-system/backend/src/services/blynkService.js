@@ -1,3 +1,4 @@
+import { env } from "../config/env.js";
 import { Bin } from "../models/Bin.js";
 import {
   applyFailedSensorRead,
@@ -7,7 +8,7 @@ import {
 import { statusFromFillLevel } from "../utils/binStatus.js";
 import { processBinAlert } from "./alertService.js";
 
-const BLYNK_API_URL = process.env.BLYNK_API_URL || "https://blynk.cloud/external/api";
+const BLYNK_API_URL = env.blynkApiUrl;
 
 const EMPTY_BIN_DISTANCE_CM = 50;
 const FULL_BIN_DISTANCE_CM = 10;
@@ -20,7 +21,7 @@ function calculateBinMetrics(distance, bin = {}) {
   return { fillLevel, status: statusFromFillLevel(fillLevel, bin) };
 }
 
-export async function isBlynkHardwareConnected(token = process.env.BLYNK_AUTH_TOKEN) {
+export async function isBlynkHardwareConnected(token = env.blynkAuthToken) {
   if (!token) return false;
   try {
     const controller = new AbortController();
@@ -37,7 +38,7 @@ export async function isBlynkHardwareConnected(token = process.env.BLYNK_AUTH_TO
 }
 
 async function fetchBlynkValue(pin) {
-  const token = process.env.BLYNK_AUTH_TOKEN;
+  const token = env.blynkAuthToken;
   if (!token || !pin) return null;
 
   // Verify that the physical hardware device is online and connected to Blynk Cloud.
@@ -75,7 +76,7 @@ async function fetchBlynkValue(pin) {
 }
 
 export async function pushBlynkValue(pin, value) {
-  const token = process.env.BLYNK_AUTH_TOKEN;
+  const token = env.blynkAuthToken;
   if (!token || !pin) return;
   try {
     const url = `${BLYNK_API_URL}/update?token=${token}&${pin}=${value}`;

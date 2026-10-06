@@ -6,7 +6,7 @@ const MapView = ({ bins }) => {
   const [selectedBin, setSelectedBin] = useState(null);
 
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE',
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
   });
 
   const mapCenter = {

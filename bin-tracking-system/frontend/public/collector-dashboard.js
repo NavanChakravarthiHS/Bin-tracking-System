@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000';
+const API_URL = String(window.ECOTRACK_API_BASE_URL || '').replace(/\/+$/, '');
 
 // Global variable to store bins
 let assignedBins = [];

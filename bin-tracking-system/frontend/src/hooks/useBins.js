@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { mockBins } from '../data/mockData';
 import { getBinStatus } from '../utils/helpers';
+import { API_BASE_URL } from '../config/api';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 export const useBins = (searchTerm = '', activeFilter = 'All') => {
   const [bins, setBins] = useState([]);

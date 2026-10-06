@@ -186,8 +186,9 @@
       </div>
     </div>
 
+    <script src="/api-config.js"></script>
     <script>
-      const API_URL = 'http://localhost:5000';
+      const API_URL = String(window.ECOTRACK_API_BASE_URL || '').replace(/\/+$/, '');
       const TOKEN_KEY = 'admin_token';
       const nextUrl = new URLSearchParams(window.location.search).get('next') || '/app.html';
 

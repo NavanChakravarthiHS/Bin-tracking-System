@@ -2,10 +2,11 @@ import express from "express";
 import { Bin } from "../models/Bin.js";
 import { Collector } from "../models/Collector.js";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { applySuccessfulSensorRead, evaluateSensorUpdate, withMonitoring } from "../utils/sensorMonitoring.js";
+import { withMonitoring } from "../utils/sensorMonitoring.js";
 import { parseBinPayload, statusFromFillLevel } from "../utils/binStatus.js";
 import { Collection } from "../models/Collection.js";
 import { processBinAlert } from "../services/alertService.js";
+import { ingestSensorReading } from "../services/sensorIngest.js";
 
 export const adminBinsRouter = express.Router();
 
@@ -149,64 +150,12 @@ adminBinsRouter.delete("/bins/:id", requireAuth, async (req, res) => {
 
 // POST /admin/bins/:id/sensor - Public sensor update route for IoT hardware (NodeMCU / ESP8266 / ESP32)
 adminBinsRouter.post("/bins/:id/sensor", async (req, res) => {
-  const { id } = req.params;
-  const { fillLevel, distance, fillPercentage, deviceId } = req.body || {};
-  const targetId = (id && id !== "sensor") ? id : (deviceId || id);
-
-  let currentFill = null;
-  if (typeof fillPercentage === "number") {
-    currentFill = Math.round(fillPercentage);
-  } else if (typeof fillLevel === "number") {
-    currentFill = Math.round(fillLevel);
-  }
-
   try {
-    const bin = await Bin.findOne({ id: targetId });
-    if (!bin) return res.status(404).json({ message: `Bin '${targetId}' not found` });
-
-    if (typeof distance === "number") {
-      bin.distance = distance;
-      if (currentFill === null) {
-        // Calculate fill level from distance using standard range (50cm empty to 10cm full)
-        const validDist = Math.max(10, Math.min(50, distance));
-        currentFill = Math.round(((50 - validDist) / (50 - 10)) * 100);
-      }
-    }
-
-    if (currentFill === null) {
-      return res.status(400).json({ message: "Payload must contain distance, fillLevel, or fillPercentage" });
-    }
-
-    currentFill = Math.max(0, Math.min(100, currentFill));
-    const currentStatus = statusFromFillLevel(currentFill, bin);
-    const now = new Date();
-
-    // Whenever valid sensor data is received, update lastSensorUpdate and set status = ACTIVE
-    bin.fillLevel = currentFill;
-    bin.status = currentStatus;
-    if (currentFill > 0) {
-      bin.lastCollected = null;
-      bin.assignedCollector = null;
-    }
-
-    applySuccessfulSensorRead(bin, { distance: bin.distance, fillLevel: currentFill, status: currentStatus, lastSensorUpdate: now });
-    await bin.save();
-
-    // Process threshold alerts (80% warning, 90% critical with TextBee SMS)
-    try {
-      await processBinAlert({ bin, fillLevel: currentFill });
-    } catch (err) {
-      console.error(`Error processing alert for sensor update on bin ${targetId}:`, err);
-    }
-
-    // eslint-disable-next-line no-console
-    console.log(`📡 IoT Sensor Update - Bin: ${targetId} | Distance: ${bin.distance ?? 'N/A'} cm | Fill: ${currentFill}% | Status: ACTIVE`);
-
-    return res.json({
-      message: "Sensor data received successfully",
-      updated: true,
-      bin: withMonitoring(bin.toObject()),
+    const result = await ingestSensorReading({
+      binId: req.params.id,
+      body: req.body || {},
     });
+    return res.status(result.status).json(result.payload);
   } catch (error) {
     console.error("Error updating bin via sensor:", error);
     return res.status(500).json({ message: "Internal server error" });

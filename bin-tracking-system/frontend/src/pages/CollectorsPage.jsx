@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pencil, Plus, Trash2, Phone, MapPin, Package } from 'lucide-react';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import { getToken } from '../auth/adminAuth';
+import { API_BASE_URL } from '../config/api';
 
-const API_URL = 'http://localhost:5000';
+const API_URL = API_BASE_URL;
 
 const emptyForm = {
   name: '',
