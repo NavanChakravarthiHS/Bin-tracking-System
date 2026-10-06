@@ -200,37 +200,37 @@ function CollectorDetailModal({ collectorId, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-gray-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto animate-fade-in" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] my-auto overflow-y-auto border border-gray-200 animate-slide-up">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between rounded-t-2xl z-10">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-md flex-shrink-0">
               {(data.name || data.mobile || '?').charAt(0).toUpperCase()}
             </div>
-            <div>
-              <h3 className="text-xl font-bold text-heading">{data.name || 'Unnamed Collector'}</h3>
-              <p className="text-sm text-gray-500 flex items-center gap-1"><Phone size={12} /> {data.mobile}</p>
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-xl font-bold text-heading truncate">{data.name || 'Unnamed Collector'}</h3>
+              <p className="text-xs sm:text-sm text-gray-500 flex items-center gap-1"><Phone size={12} /> {data.mobile}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors min-h-[40px] min-w-[40px] flex items-center justify-center" aria-label="Close collector details">
             <X size={20} className="text-gray-600" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Score card */}
           <div className={`rounded-xl border p-4 flex items-center justify-between ${scoreColorMap[scoreColor] || 'text-gray-700 bg-gray-50 border-gray-200'}`}>
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Performance Score</p>
-              <p className="text-4xl font-bold mt-1">{data.score}%</p>
-              <p className="text-sm font-semibold mt-1">{scoreLabelText}</p>
+              <p className="text-3xl sm:text-4xl font-bold mt-0.5">{data.score}%</p>
+              <p className="text-xs sm:text-sm font-semibold mt-0.5">{scoreLabelText}</p>
             </div>
-            <Star size={48} className="opacity-20" />
+            <Star size={42} className="opacity-20 flex-shrink-0" />
           </div>
 
           {/* Stats grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
             {[
               { label: "Today's Collections", value: data.todayCount, color: 'text-green-700' },
               { label: "This Week", value: data.weekCount, color: 'text-blue-700' },
@@ -241,9 +241,9 @@ function CollectorDetailModal({ collectorId, onClose }) {
               { label: "Overflow Handled", value: data.overflowHandled, color: 'text-orange-700' },
               { label: "Delayed", value: data.delayed, color: 'text-yellow-700' },
             ].map((item) => (
-              <div key={item.label} className="stat-card py-3 px-4">
-                <p className="text-xs text-gray-500 mb-1">{item.label}</p>
-                <p className={`text-2xl font-bold ${item.color}`}>{item.value}</p>
+              <div key={item.label} className="stat-card py-2.5 px-3 sm:py-3 sm:px-4">
+                <p className="text-[11px] sm:text-xs text-gray-500 mb-0.5 leading-tight">{item.label}</p>
+                <p className={`text-xl sm:text-2xl font-bold ${item.color}`}>{item.value}</p>
               </div>
             ))}
           </div>
@@ -448,61 +448,61 @@ const PerformancePage = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-heading flex items-center gap-2">
-            <TruckIcon size={24} className="text-green-600" />
+          <h1 className="text-xl sm:text-2xl font-bold text-heading flex items-center gap-2 tracking-tight">
+            <TruckIcon size={22} className="text-green-600 flex-shrink-0" />
             Collector Performance
           </h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
             Real-time performance metrics for all waste collectors
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <button
             onClick={() => loadAll(true)}
             disabled={refreshing}
-            className="btn-secondary inline-flex items-center gap-2 text-xs py-2 px-3"
+            className="btn-secondary inline-flex items-center gap-1.5 text-xs py-2 px-2.5 sm:px-3 min-h-[38px]"
           >
-            <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={refreshing ? 'animate-spin' : ''} />
             {refreshing ? 'Refreshing...' : 'Refresh'}
           </button>
-          <button onClick={exportCSV} className="btn-secondary inline-flex items-center gap-2 text-xs py-2 px-3">
-            <Download size={14} /> Export CSV
+          <button onClick={exportCSV} className="btn-secondary inline-flex items-center gap-1.5 text-xs py-2 px-2.5 sm:px-3 min-h-[38px]">
+            <Download size={13} /> Export CSV
           </button>
           <button
             onClick={() => setShowExportModal(true)}
-            className="btn-primary inline-flex items-center gap-2 text-xs py-2 px-3 font-semibold shadow-sm"
+            className="btn-primary inline-flex items-center gap-1.5 text-xs py-2 px-2.5 sm:px-3 font-semibold shadow-xs min-h-[38px]"
           >
-            <FileText size={14} /> 🖨 Print Preview / PDF
+            <FileText size={13} /> PDF Report
           </button>
         </div>
       </div>
 
       {/* ── Summary Cards ── */}
       {summary && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5 sm:gap-4">
           {[
             { label: 'Total Collectors', value: summary.totalCollectors, icon: Users, color: 'from-blue-500 to-blue-600', text: 'text-blue-700' },
-            { label: 'Active Collectors', value: summary.activeCollectors, icon: Activity, color: 'from-green-500 to-green-600', text: 'text-green-700' },
-            { label: 'Collections Today', value: summary.collectionsToday, icon: CheckCircle2, color: 'from-emerald-500 to-emerald-600', text: 'text-emerald-700' },
-            { label: 'Avg. Time', value: `${summary.avgCollectionTime} min`, icon: Clock, color: 'from-cyan-500 to-cyan-600', text: 'text-cyan-700' },
+            { label: 'Active', value: summary.activeCollectors, icon: Activity, color: 'from-green-500 to-green-600', text: 'text-green-700' },
+            { label: 'Today', value: summary.collectionsToday, icon: CheckCircle2, color: 'from-emerald-500 to-emerald-600', text: 'text-emerald-700' },
+            { label: 'Avg. Time', value: `${summary.avgCollectionTime}m`, icon: Clock, color: 'from-cyan-500 to-cyan-600', text: 'text-cyan-700' },
             { label: 'Missed', value: summary.missedCollections, icon: AlertTriangle, color: 'from-orange-500 to-orange-600', text: 'text-orange-700' },
-            { label: 'Overflow Handled', value: summary.overflowHandled, icon: Flame, color: 'from-red-500 to-red-600', text: 'text-red-700' },
+            { label: 'Overflow', value: summary.overflowHandled, icon: Flame, color: 'from-red-500 to-red-600', text: 'text-red-700' },
             { label: 'Avg. Score', value: `${summary.avgPerformanceScore}%`, icon: Star, color: 'from-purple-500 to-purple-600', text: 'text-purple-700' },
           ].map((card) => {
             const Icon = card.icon;
             return (
-              <div key={card.label} className="stat-card flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-medium text-gray-500 leading-tight">{card.label}</p>
-                  <div className={`w-9 h-9 bg-gradient-to-br ${card.color} rounded-lg flex items-center justify-center shadow-md`}>
-                    <Icon size={16} className="text-white" />
+              <div key={card.label} className="stat-card p-3 sm:p-4 flex flex-col justify-between gap-1.5">
+                <div className="flex items-center justify-between gap-1">
+                  <p className="text-[11px] sm:text-xs font-medium text-gray-500 leading-tight truncate">{card.label}</p>
+                  <div className={`w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br ${card.color} rounded-lg flex items-center justify-center shadow-xs flex-shrink-0`}>
+                    <Icon size={14} className="text-white" />
                   </div>
                 </div>
-                <p className={`text-2xl font-bold ${card.text}`}>{card.value}</p>
+                <p className={`text-xl sm:text-2xl font-bold ${card.text}`}>{card.value}</p>
               </div>
             );
           })}
@@ -511,20 +511,20 @@ const PerformancePage = () => {
 
       {/* ── Tab Navigation ── */}
       <div className="border-b border-gray-200">
-        <nav className="flex gap-1 -mb-px overflow-x-auto">
+        <nav className="flex gap-1 -mb-px overflow-x-auto pb-0.5 scrollbar-none">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap min-h-[42px] ${
                   activeTab === tab.id
                     ? 'border-green-600 text-green-700'
                     : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
-                <Icon size={16} />
+                <Icon size={15} />
                 {tab.label}
               </button>
             );
@@ -534,9 +534,9 @@ const PerformancePage = () => {
 
       {/* ── Overview Tab ── */}
       {activeTab === 'overview' && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Score distribution */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
             {[
               { label: '🟢 Excellent (90–100%)', color: 'border-green-300 bg-green-50', textColor: 'text-green-800', filterVal: 'Excellent' },
               { label: '🟡 Good (75–89%)', color: 'border-yellow-300 bg-yellow-50', textColor: 'text-yellow-800', filterVal: 'Good' },
@@ -548,53 +548,57 @@ const PerformancePage = () => {
                 <button
                   key={band.filterVal}
                   onClick={() => { setFilterScore(band.filterVal); setActiveTab('table'); }}
-                  className={`modern-card p-4 border-2 ${band.color} text-left hover:shadow-md transition-all`}
+                  className={`modern-card p-3 sm:p-4 border-2 ${band.color} text-left hover:shadow-md active:scale-98 transition-all min-h-[90px] flex flex-col justify-between`}
                 >
-                  <p className={`text-xs font-semibold ${band.textColor} mb-1`}>{band.label}</p>
-                  <p className={`text-3xl font-bold ${band.textColor}`}>{count}</p>
-                  <p className={`text-xs ${band.textColor} opacity-70 mt-1`}>collectors</p>
+                  <p className={`text-[11px] sm:text-xs font-semibold ${band.textColor} mb-0.5 leading-tight`}>{band.label}</p>
+                  <div>
+                    <p className={`text-2xl sm:text-3xl font-bold ${band.textColor}`}>{count}</p>
+                    <p className={`text-[10px] sm:text-xs ${band.textColor} opacity-70 mt-0.5`}>collectors</p>
+                  </div>
                 </button>
               );
             })}
           </div>
 
           {/* Quick collector cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {collectors.slice(0, 6).map((c) => (
               <div
                 key={c._id}
-                className="modern-card p-5 cursor-pointer hover:shadow-lg transition-all"
+                className="modern-card p-4 sm:p-5 cursor-pointer hover:shadow-lg active:scale-99 transition-all"
                 onClick={() => setSelectedCollector(String(c._id))}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md flex-shrink-0">
                       {(c.name || c.mobile || '?').charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <p className="font-bold text-heading text-sm">{c.name || 'Unnamed'}</p>
-                      <p className="text-xs text-gray-500">{c.mobile}</p>
+                    <div className="min-w-0">
+                      <p className="font-bold text-heading text-xs sm:text-sm truncate">{c.name || 'Unnamed'}</p>
+                      <p className="text-[11px] sm:text-xs text-gray-500 truncate">{c.mobile}</p>
                     </div>
                   </div>
-                  <StatusBadge status={c.status} />
+                  <div className="flex-shrink-0">
+                    <StatusBadge status={c.status} />
+                  </div>
                 </div>
                 <ScoreBadge score={c.score} band={c.scoreBand} />
-                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center bg-gray-50/60 p-2 rounded-lg border border-gray-100">
                   <div>
-                    <p className="text-xs text-gray-500">Today</p>
-                    <p className="text-lg font-bold text-green-700">{c.binsCollectedToday}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">Today</p>
+                    <p className="text-base sm:text-lg font-bold text-green-700">{c.binsCollectedToday}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Total</p>
-                    <p className="text-lg font-bold text-blue-700">{c.binsCollectedAllTime}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">Total</p>
+                    <p className="text-base sm:text-lg font-bold text-blue-700">{c.binsCollectedAllTime}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500">Missed</p>
-                    <p className="text-lg font-bold text-red-700">{c.missed}</p>
+                    <p className="text-[10px] sm:text-xs text-gray-500">Missed</p>
+                    <p className="text-base sm:text-lg font-bold text-red-700">{c.missed}</p>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-1 text-xs text-gray-500">
-                  <MapPin size={11} />
+                <div className="mt-2.5 flex items-center gap-1 text-[11px] sm:text-xs text-gray-500">
+                  <MapPin size={11} className="flex-shrink-0" />
                   <span className="truncate">{c.assignedArea || '—'}</span>
                 </div>
               </div>
@@ -602,7 +606,7 @@ const PerformancePage = () => {
           </div>
           {collectors.length > 6 && (
             <button
-              className="btn-secondary text-sm py-2 px-4 w-full"
+              className="btn-secondary text-xs sm:text-sm py-2.5 px-4 w-full min-h-[42px]"
               onClick={() => setActiveTab('table')}
             >
               View all {collectors.length} collectors →
@@ -613,28 +617,28 @@ const PerformancePage = () => {
 
       {/* ── Table Tab ── */}
       {activeTab === 'table' && (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Filters */}
-          <div className="modern-card p-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="relative flex-1 min-w-48">
+          <div className="modern-card p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3">
+              <div className="relative flex-1 min-w-0 sm:min-w-48">
                 <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  className="input-field w-full pl-9 text-sm py-2"
+                  className="input-field w-full pl-9 text-xs sm:text-sm py-2 sm:py-2.5"
                   placeholder="Search collector, area..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="flex items-center gap-2">
-                <Filter size={14} className="text-gray-500" />
-                <select className="input-field text-sm py-2" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                <Filter size={14} className="text-gray-500 flex-shrink-0 hidden sm:block" />
+                <select className="input-field text-xs sm:text-sm py-2 sm:py-2.5 flex-1 sm:flex-none" value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
                   <option value="All">All Status</option>
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
                   <option value="Unassigned">Unassigned</option>
                 </select>
-                <select className="input-field text-sm py-2" value={filterScore} onChange={(e) => setFilterScore(e.target.value)}>
+                <select className="input-field text-xs sm:text-sm py-2 sm:py-2.5 flex-1 sm:flex-none" value={filterScore} onChange={(e) => setFilterScore(e.target.value)}>
                   <option value="All">All Scores</option>
                   <option value="Excellent">Excellent (90%+)</option>
                   <option value="Good">Good (75–89%)</option>
@@ -644,20 +648,20 @@ const PerformancePage = () => {
               </div>
               {(searchTerm || filterStatus !== 'All' || filterScore !== 'All') && (
                 <button
-                  className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                  className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors self-end sm:self-auto py-1"
                   onClick={() => { setSearchTerm(''); setFilterStatus('All'); setFilterScore('All'); }}
                 >
                   <X size={13} /> Clear
                 </button>
               )}
-              <span className="text-xs text-gray-500 ml-auto">{filteredCollectors.length} of {collectors.length}</span>
+              <span className="text-[11px] sm:text-xs text-gray-500 sm:ml-auto">{filteredCollectors.length} of {collectors.length}</span>
             </div>
           </div>
 
           {/* Table */}
           <div className="modern-card overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+              <table className="w-full text-xs sm:text-sm min-w-[700px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Collector</th>

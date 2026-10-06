@@ -35,13 +35,14 @@ const FilterBar = ({ activeFilter, onFilterChange }) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5 sm:gap-2">
       {filters.map((filter) => (
         <button
           key={filter}
+          type="button"
           onClick={() => onFilterChange(filter)}
-          className={`px-4 py-2 rounded-lg font-semibold transition-all duration-150 border ${getFilterColor(filter)} ${
-            activeFilter === filter ? 'scale-105' : 'hover:scale-105'
+          className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-150 border min-h-[36px] ${getFilterColor(filter)} ${
+            activeFilter === filter ? 'scale-102 shadow-sm' : 'hover:scale-102'
           }`}
         >
           {filter}

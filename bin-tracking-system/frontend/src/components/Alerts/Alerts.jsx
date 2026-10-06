@@ -187,71 +187,71 @@ const Alerts = () => {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Toast Feedback */}
       {successMsg && (
-        <div className="p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 text-sm font-semibold flex items-center justify-between">
+        <div className="p-3 sm:p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 text-xs sm:text-sm font-semibold flex items-center justify-between">
           <span>{successMsg}</span>
-          <button type="button" onClick={() => setSuccessMsg('')}><X size={16} /></button>
+          <button type="button" className="p-1" onClick={() => setSuccessMsg('')}><X size={16} /></button>
         </div>
       )}
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm font-semibold flex items-center justify-between">
+        <div className="p-3 sm:p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs sm:text-sm font-semibold flex items-center justify-between">
           <span>{errorMsg}</span>
-          <button type="button" onClick={() => setErrorMsg('')}><X size={16} /></button>
+          <button type="button" className="p-1" onClick={() => setErrorMsg('')}><X size={16} /></button>
         </div>
       )}
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="modern-card p-4 flex items-center justify-between">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Active Alerts</p>
-            <p className="text-2xl font-black text-heading mt-1">{stats.active}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Active Alerts</p>
+            <p className="text-xl sm:text-2xl font-black text-heading mt-0.5">{stats.active}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
-            <ShieldAlert size={24} />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+            <ShieldAlert size={20} />
           </div>
         </div>
 
-        <div className="modern-card p-4 flex items-center justify-between">
+        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Critical (90%+)</p>
-            <p className="text-2xl font-black text-red-600 mt-1">{stats.critical}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Critical (90%+)</p>
+            <p className="text-xl sm:text-2xl font-black text-red-600 mt-0.5">{stats.critical}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-600">
-            <AlertTriangle size={24} />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
+            <AlertTriangle size={20} />
           </div>
         </div>
 
-        <div className="modern-card p-4 flex items-center justify-between">
+        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Warning (80–89%)</p>
-            <p className="text-2xl font-black text-amber-600 mt-1">{stats.warning}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Warning (80–89%)</p>
+            <p className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5">{stats.warning}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
-            <AlertCircle size={24} />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
+            <AlertCircle size={20} />
           </div>
         </div>
 
-        <div className="modern-card p-4 flex items-center justify-between">
+        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Failed Dispatches</p>
-            <p className="text-2xl font-black text-purple-700 mt-1">{stats.failedNotifications}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Failed Dispatches</p>
+            <p className="text-xl sm:text-2xl font-black text-purple-700 mt-0.5">{stats.failedNotifications}</p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600">
-            <Smartphone size={24} />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0">
+            <Smartphone size={20} />
           </div>
         </div>
       </div>
 
       {/* Action & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-soft">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-white p-3.5 sm:p-4 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button
             type="button"
             onClick={() => setFilter('ALL')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               filter === 'ALL' ? 'bg-primary-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -260,7 +260,7 @@ const Alerts = () => {
           <button
             type="button"
             onClick={() => setFilter('CRITICAL')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               filter === 'CRITICAL' ? 'bg-red-600 text-white shadow-sm' : 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
             }`}
           >
@@ -269,7 +269,7 @@ const Alerts = () => {
           <button
             type="button"
             onClick={() => setFilter('WARNING')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               filter === 'WARNING' ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
             }`}
           >
@@ -278,7 +278,7 @@ const Alerts = () => {
           <button
             type="button"
             onClick={() => setFilter('FAILED')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
               filter === 'FAILED' ? 'bg-purple-600 text-white shadow-sm' : 'bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200'
             }`}
           >
@@ -286,11 +286,11 @@ const Alerts = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs font-semibold px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+            className="text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 flex-1 sm:flex-none"
           >
             <option value="ACTIVE">Active Alerts</option>
             <option value="ALL">All Statuses (History)</option>
@@ -301,7 +301,7 @@ const Alerts = () => {
             <button
               type="button"
               onClick={handleClearAll}
-              className="px-3 py-2 text-xs font-bold rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 transition-colors whitespace-nowrap"
+              className="px-2.5 sm:px-3 py-2 text-xs font-bold rounded-lg border border-gray-300 hover:bg-gray-100 text-gray-700 transition-colors whitespace-nowrap min-h-[36px]"
             >
               Clear All Active
             </button>
@@ -311,15 +311,15 @@ const Alerts = () => {
 
       {/* Alert Feed */}
       {filteredAlerts.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200 shadow-soft">
-          <div className="inline-block p-4 bg-green-50 rounded-full mb-3 text-green-600">
-            <CheckCircle size={36} />
+        <div className="text-center py-12 sm:py-16 bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
+          <div className="inline-block p-3.5 bg-green-50 rounded-full mb-2.5 text-green-600">
+            <CheckCircle size={32} />
           </div>
-          <h3 className="text-lg font-bold text-heading">All Clear!</h3>
-          <p className="text-sm text-gray-500 mt-1">No active alerts matching the selected filter.</p>
+          <h3 className="text-base sm:text-lg font-bold text-heading">All Clear!</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">No active alerts matching the selected filter.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filteredAlerts.map((alert, index) => {
             const isCritical = alert.severity === 'CRITICAL';
             const hasCollector = Boolean(alert.collectorName || alert.collectorMobile);
@@ -328,43 +328,43 @@ const Alerts = () => {
             return (
               <div
                 key={alert._id || index}
-                className={`modern-card p-5 border-l-4 transition-all duration-200 ${
+                className={`modern-card p-4 sm:p-5 border-l-4 transition-all duration-200 ${
                   isCritical ? 'border-l-red-600 bg-red-50/20' : 'border-l-amber-500 bg-amber-50/20'
                 }`}
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
                   {/* Left Column: Bin & Location Info */}
-                  <div className="space-y-2 flex-1">
-                    <div className="flex flex-wrap items-center gap-2.5">
-                      <span className="text-lg font-black text-heading">{alert.binId}</span>
+                  <div className="space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-base sm:text-lg font-black text-heading">{alert.binId}</span>
                       <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold uppercase tracking-wide ${
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold uppercase tracking-wide ${
                           isCritical
                             ? 'bg-red-600 text-white'
                             : 'bg-amber-500 text-white'
                         }`}
                       >
-                        {isCritical ? <AlertTriangle size={12} /> : <AlertCircle size={12} />}
+                        {isCritical ? <AlertTriangle size={11} /> : <AlertCircle size={11} />}
                         {alert.severity}
                       </span>
                       {alert.status === 'RESOLVED' && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 text-gray-700">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-gray-200 text-gray-700">
                           RESOLVED
                         </span>
                       )}
                       {alert.status === 'DISMISSED' && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-gray-100 text-gray-500">
                           DISMISSED
                         </span>
                       )}
-                      <span className="text-xs text-gray-500 flex items-center gap-1 ml-auto lg:ml-2">
-                        <Clock size={13} />
+                      <span className="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1 ml-auto lg:ml-2">
+                        <Clock size={12} />
                         {formatDate(alert.createdAt)}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <MapPin size={15} className="text-primary-600 flex-shrink-0" />
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-700 flex-wrap">
+                      <MapPin size={14} className="text-primary-600 flex-shrink-0" />
                       <span className="font-semibold">{alert.location}</span>
                       <span className="text-gray-400">•</span>
                       <span className="text-gray-600 font-medium">
@@ -373,8 +373,8 @@ const Alerts = () => {
                     </div>
 
                     {/* Collector Info */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <User size={15} className={hasCollector ? 'text-gray-600' : 'text-amber-600'} />
+                    <div className="flex items-center gap-1.5 text-xs sm:text-sm flex-wrap">
+                      <User size={14} className={hasCollector ? 'text-gray-600 flex-shrink-0' : 'text-amber-600 flex-shrink-0'} />
                       {hasCollector ? (
                         <span className="text-gray-800 font-medium">
                           Collector: <strong>{alert.collectorName || 'Assigned'}</strong> ({alert.collectorMobile})
@@ -388,31 +388,31 @@ const Alerts = () => {
 
                     {/* Admin Note if present */}
                     {alert.adminNote && (
-                      <p className="text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded inline-block">
+                      <p className="text-[11px] sm:text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded inline-block">
                         Note: {alert.adminNote}
                       </p>
                     )}
                   </div>
 
                   {/* Middle Column: Delivery Status Badges */}
-                  <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-[200px] border-t lg:border-t-0 lg:border-l border-gray-200 pt-3 lg:pt-0 lg:pl-4">
-                    <div className="flex items-center gap-2">
-                      <Smartphone size={16} className="text-primary-600 flex-shrink-0" />
+                  <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-0 sm:min-w-[180px] border-t lg:border-t-0 lg:border-l border-gray-200 pt-2.5 lg:pt-0 lg:pl-4">
+                    <div className="flex items-center gap-1.5">
+                      <Smartphone size={15} className="text-primary-600 flex-shrink-0" />
                       {getDeliveryBadge('TextBee SMS', alert.smsStatus, alert.smsError)}
                     </div>
                   </div>
 
                   {/* Right Column: Actions (Retry & Dismiss) */}
-                  <div className="flex items-center gap-2 self-end lg:self-center">
+                  <div className="flex items-center gap-2 self-start sm:self-end lg:self-center">
                     {(hasFailed || (isCritical && alert.smsStatus !== 'SENT')) && (
                       <button
                         type="button"
                         onClick={() => handleRetry(alert._id)}
                         disabled={retryingId === alert._id}
-                        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold transition-colors disabled:opacity-50 shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white text-xs font-bold transition-colors disabled:opacity-50 shadow-xs min-h-[36px]"
                         title="Retry sending SMS via TextBee"
                       >
-                        <RefreshCw size={14} className={retryingId === alert._id ? 'animate-spin' : ''} />
+                        <RefreshCw size={13} className={retryingId === alert._id ? 'animate-spin' : ''} />
                         {retryingId === alert._id ? 'Retrying...' : 'Retry SMS'}
                       </button>
                     )}
@@ -421,7 +421,7 @@ const Alerts = () => {
                       <button
                         type="button"
                         onClick={() => handleDismiss(alert._id)}
-                        className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                        className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors min-h-[36px] min-w-[36px] flex items-center justify-center"
                         title="Dismiss Alert"
                         aria-label="Dismiss alert"
                       >

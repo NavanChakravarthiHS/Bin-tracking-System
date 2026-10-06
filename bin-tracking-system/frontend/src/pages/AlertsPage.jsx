@@ -2,13 +2,13 @@ import Alerts from '../components/Alerts/Alerts';
 
 const AlertsPage = () => {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-black text-heading mb-1">
+      <div>
+        <h2 className="text-xl sm:text-2xl font-bold text-heading tracking-tight">
           Alerts & Notifications
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">
           Real-time smart bin threshold monitoring, collector dispatch, and TextBee SMS gateway delivery tracking
         </p>
       </div>

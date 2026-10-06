@@ -415,25 +415,26 @@ export default function ExportReportPanel({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-6"
       onClick={(e) => e.target === e.currentTarget && handleCloseModal()}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] my-auto flex flex-col border border-gray-200 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-green-950 to-slate-900 text-white px-6 py-4 flex items-center justify-between shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-600/30 border border-green-500/40 rounded-xl flex items-center justify-center text-green-400 font-bold">
-              <FileText size={22} />
+        <div className="bg-gradient-to-r from-slate-900 via-green-950 to-slate-900 text-white px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-600/30 border border-green-500/40 rounded-xl flex items-center justify-center text-green-400 font-bold flex-shrink-0">
+              <FileText size={18} />
             </div>
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h2 className="text-sm sm:text-lg font-bold tracking-tight text-white truncate">
                 Export & Print Performance Reports
               </h2>
-              <p className="text-xs text-green-300/80">
+              <p className="hidden sm:block text-xs text-green-300/80 truncate">
                 Official Smart Waste Bin Tracking System Administrative Reports
               </p>
             </div>
           </div>
           <button
             onClick={handleCloseModal}
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center transition-colors flex-shrink-0"
+            aria-label="Close export report panel"
           >
             <X size={18} />
           </button>
@@ -759,7 +760,7 @@ export default function ExportReportPanel({
               </div>
 
               {/* Embedded PDF iframe */}
-              <div className="w-full h-[620px] rounded-xl overflow-hidden border border-gray-300 shadow-inner bg-slate-800 flex items-center justify-center">
+              <div className="w-full h-[360px] sm:h-[480px] md:h-[580px] rounded-xl overflow-hidden border border-gray-300 shadow-inner bg-slate-800 flex items-center justify-center">
                 <iframe
                   ref={iframeRef}
                   src={previewPdfUrl}
@@ -772,21 +773,21 @@ export default function ExportReportPanel({
         </div>
 
         {/* Modal Footer */}
-        <div className="bg-gray-50 border-t border-gray-200 px-6 py-4 flex items-center justify-between rounded-b-2xl">
+        <div className="bg-gray-50 border-t border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 rounded-b-2xl">
           <button
             type="button"
             onClick={handleCloseModal}
-            className="btn-secondary text-xs py-2 px-4"
+            className="btn-secondary text-xs py-2 px-4 min-h-[38px] order-last sm:order-first"
           >
             Close
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             {previewPdfUrl && activeTab === 'config' && (
               <button
                 type="button"
                 onClick={() => setActiveTab('preview')}
-                className="btn-secondary text-xs py-2 px-4 flex items-center gap-1.5"
+                className="btn-secondary text-xs py-2 px-3 sm:px-4 flex items-center justify-center gap-1.5 min-h-[38px]"
               >
                 <Eye size={14} /> View Previous PDF
               </button>
@@ -796,9 +797,9 @@ export default function ExportReportPanel({
               type="button"
               onClick={handleExportCSV}
               disabled={generating}
-              className="btn-secondary text-xs py-2.5 px-4 font-semibold flex items-center gap-2"
+              className="btn-secondary text-xs py-2 px-3 sm:px-4 font-semibold flex items-center justify-center gap-2 min-h-[38px]"
             >
-              <Download size={16} />
+              <Download size={15} />
               Download CSV
             </button>
 
@@ -806,17 +807,17 @@ export default function ExportReportPanel({
               type="button"
               onClick={handleGeneratePDF}
               disabled={generating}
-              className="btn-primary text-xs py-2.5 px-5 font-bold shadow-md flex items-center gap-2"
+              className="btn-primary text-xs py-2 px-4 sm:px-5 font-bold shadow-sm flex items-center justify-center gap-2 min-h-[40px]"
             >
               {generating ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={15} className="animate-spin" />
                   Generating PDF...
                 </>
               ) : (
                 <>
-                  <Printer size={16} />
-                  🖨 Print Preview / PDF
+                  <Printer size={15} />
+                  Print / Save PDF
                 </>
               )}
             </button>

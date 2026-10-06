@@ -114,80 +114,82 @@ const CollectionsPage = () => {
   if (loading) return <LoadingSpinner size="large" />;
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <div>
-        <h2 className="text-2xl font-bold text-heading">Collection Management</h2>
-        <p className="text-sm text-gray-600 mt-1">Review Full and Warning bins, assign collectors, and mark collections</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-heading tracking-tight">Collection Management</h2>
+        <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Review Full and Warning bins, assign collectors, and mark collections</p>
       </div>
 
       {error && (
-        <div className="modern-card p-4 border-red-200 bg-red-50 text-red-700 text-sm font-medium">{error}</div>
+        <div className="modern-card p-3 sm:p-4 border-red-200 bg-red-50 text-red-700 text-xs sm:text-sm font-medium">{error}</div>
       )}
       {success && (
-        <div className="modern-card p-4 border-green-200 bg-green-50 text-green-700 text-sm font-medium">{success}</div>
+        <div className="modern-card p-3 sm:p-4 border-green-200 bg-green-50 text-green-700 text-xs sm:text-sm font-medium">{success}</div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="stat-card">
-          <p className="text-sm font-medium text-gray-600 mb-2">Full bins</p>
-          <p className="text-3xl font-bold text-red-700">{stats.full}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+        <div className="stat-card p-4 sm:p-5">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Full bins</p>
+          <p className="text-2xl sm:text-3xl font-bold text-red-700">{stats.full}</p>
         </div>
-        <div className="stat-card">
-          <p className="text-sm font-medium text-gray-600 mb-2">Warning bins</p>
-          <p className="text-3xl font-bold text-amber-700">{stats.warning}</p>
+        <div className="stat-card p-4 sm:p-5">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Warning bins</p>
+          <p className="text-2xl sm:text-3xl font-bold text-amber-700">{stats.warning}</p>
         </div>
-        <div className="stat-card">
-          <p className="text-sm font-medium text-gray-600 mb-2">Unassigned</p>
-          <p className="text-3xl font-bold text-heading">{stats.unassigned}</p>
+        <div className="stat-card p-4 sm:p-5">
+          <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">Unassigned</p>
+          <p className="text-2xl sm:text-3xl font-bold text-heading">{stats.unassigned}</p>
         </div>
       </div>
 
       {pending.length === 0 ? (
-        <div className="modern-card p-10 text-center">
-          <CheckCircle size={40} className="mx-auto text-green-600 mb-3" />
-          <p className="text-heading font-semibold">No bins need collection</p>
-          <p className="text-sm text-gray-500 mt-1">Full and Warning bins will appear here</p>
+        <div className="modern-card p-8 sm:p-10 text-center">
+          <CheckCircle size={36} className="mx-auto text-green-600 mb-2.5" />
+          <p className="text-heading font-bold text-sm sm:text-base">No bins need collection</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Full and Warning bins will automatically appear here</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {pending.map((bin, index) => (
             <div
               key={bin.id}
-              className={`modern-card p-5 ${bin.cardStyle || ''}`}
+              className={`modern-card p-4 sm:p-5 ${bin.cardStyle || ''}`}
               style={{ animationDelay: `${index * 40}ms` }}
             >
-              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                <div className="flex-1">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <h3 className="text-lg font-bold text-heading">{bin.id}</h3>
-                      <div className="flex items-center gap-1.5 text-sm text-gray-600 mt-1">
-                        <MapPin size={14} />
-                        <span>{bin.location}</span>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base sm:text-lg font-bold text-heading truncate">{bin.id}</h3>
+                      <div className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-600 mt-0.5">
+                        <MapPin size={13} className="text-primary-600 flex-shrink-0" />
+                        <span className="truncate">{bin.location}</span>
                       </div>
                     </div>
-                    <StatusBadge status={bin.status} />
+                    <div className="flex-shrink-0">
+                      <StatusBadge status={bin.status} />
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-700 mt-3">
-                    Fill level: <span className="font-bold">{bin.fillLevel}%</span>
+                  <p className="text-xs sm:text-sm text-gray-700 mt-2">
+                    Fill level: <span className="font-bold text-heading">{bin.fillLevel}%</span>
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-xs sm:text-sm text-gray-600 mt-0.5 truncate">
                     Assigned collector:{' '}
                     <span className="font-semibold text-heading">
                       {bin.assignedCollectorName || bin.assignedCollectorMobile || 'Unassigned'}
                     </span>
                     {bin.assignedCollectorMobile && (
                       <span className="inline-flex items-center gap-1 ml-2 text-gray-500">
-                        <Phone size={12} />
+                        <Phone size={11} />
                         {bin.assignedCollectorMobile}
                       </span>
                     )}
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 lg:w-96">
+                <div className="flex flex-col sm:flex-row gap-2.5 w-full lg:w-96 flex-shrink-0">
                   <select
-                    className="input-field flex-1"
+                    className="input-field flex-1 text-xs sm:text-sm py-2 sm:py-2.5"
                     value={bin.assignedCollectorId || ''}
                     disabled={savingId === bin.id}
                     onChange={(e) => assignCollector(bin.id, e.target.value)}
@@ -201,12 +203,12 @@ const CollectionsPage = () => {
                   </select>
                   <button
                     type="button"
-                    className="btn-primary inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                    className="btn-primary inline-flex items-center justify-center gap-1.5 whitespace-nowrap min-h-[40px] text-xs sm:text-sm"
                     disabled={savingId === bin.id}
                     onClick={() => markCollected(bin)}
                   >
-                    <CheckCircle size={16} />
-                    {savingId === bin.id ? 'Saving...' : 'Mark as Collected'}
+                    <CheckCircle size={15} />
+                    {savingId === bin.id ? 'Saving...' : 'Mark Collected'}
                   </button>
                 </div>
               </div>
@@ -215,33 +217,33 @@ const CollectionsPage = () => {
         </div>
       )}
 
-      <div className="modern-card p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Clock size={18} className="text-primary-600" />
-          <h3 className="text-sm font-semibold text-heading">Recent collections</h3>
+      <div className="modern-card p-4 sm:p-5">
+        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+          <Clock size={16} className="text-primary-600" />
+          <h3 className="text-xs sm:text-sm font-bold text-heading uppercase tracking-wider">Recent Collections Log</h3>
         </div>
         {history.length === 0 ? (
-          <p className="text-sm text-gray-500">No collections recorded yet</p>
+          <p className="text-xs sm:text-sm text-gray-500 py-4 text-center">No collections recorded yet</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <table className="w-full text-xs sm:text-sm min-w-[500px]">
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-200">
-                  <th className="py-2 pr-3 font-semibold">Bin</th>
-                  <th className="py-2 pr-3 font-semibold">Location</th>
-                  <th className="py-2 pr-3 font-semibold">Collector</th>
-                  <th className="py-2 font-semibold">Date & time</th>
+                  <th className="py-2.5 pr-3 font-semibold">Bin</th>
+                  <th className="py-2.5 pr-3 font-semibold">Location</th>
+                  <th className="py-2.5 pr-3 font-semibold">Collector</th>
+                  <th className="py-2.5 font-semibold">Date & Time</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((record) => (
-                  <tr key={record._id} className="border-b border-gray-100 last:border-0">
-                    <td className="py-2 pr-3 font-semibold text-heading">{record.binId}</td>
-                    <td className="py-2 pr-3 text-gray-700">{record.location}</td>
-                    <td className="py-2 pr-3 text-gray-700">
+                  <tr key={record._id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60 transition-colors">
+                    <td className="py-2.5 pr-3 font-semibold text-heading">{record.binId}</td>
+                    <td className="py-2.5 pr-3 text-gray-700 max-w-44 truncate">{record.location}</td>
+                    <td className="py-2.5 pr-3 text-gray-700">
                       {record.collectorName || record.collectorMobile || 'Unknown'}
                     </td>
-                    <td className="py-2 text-gray-700">{formatDate(record.collectedAt)}</td>
+                    <td className="py-2.5 text-gray-600 whitespace-nowrap">{formatDate(record.collectedAt)}</td>
                   </tr>
                 ))}
               </tbody>

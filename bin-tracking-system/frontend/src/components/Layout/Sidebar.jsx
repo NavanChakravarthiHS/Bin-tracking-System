@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Map, AlertTriangle, Leaf, Users, Truck, Trash2, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Map, AlertTriangle, Leaf, Users, Truck, Trash2, TrendingUp, X } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
   const location = useLocation();
 
   const navItems = [
@@ -19,53 +20,104 @@ const Sidebar = () => {
     return location.pathname.startsWith(path);
   };
 
+  // Close sidebar on Escape key press on mobile
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   return (
-    <aside className="w-64 bg-gray-800 border-r border-gray-700 shadow-lg h-screen sticky top-0 flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-700">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-2.5 rounded-lg shadow-lg">
-            <Leaf size={22} className="text-white" />
+    <>
+      {/* Mobile Backdrop */}
+      <div
+        className={`fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs transition-opacity duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Sidebar Container */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-gray-800 border-r border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out lg:static lg:w-64 lg:h-screen lg:sticky lg:top-0 lg:shadow-lg lg:translate-x-0 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        aria-label="Sidebar Navigation"
+      >
+        {/* Logo & Mobile Close Header */}
+        <div className="p-4 sm:p-6 border-b border-gray-700 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-2.5 rounded-lg shadow-lg">
+              <Leaf size={22} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white tracking-tight">EcoTrack</h1>
+              <p className="text-xs text-gray-300 font-medium">Smart Waste System</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-bold text-white">EcoTrack</h1>
-            <p className="text-xs text-gray-300 font-medium">Smart Waste Management</p>
+
+          {/* Close button for mobile drawer */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-700/60 rounded-lg transition-colors"
+            aria-label="Close navigation menu"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 p-3 sm:p-4 space-y-1.5 overflow-y-auto">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5 px-3">
+            Navigation
+          </p>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.path);
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={onClose}
+                className={`sidebar-link ${active ? 'active' : ''}`}
+              >
+                <Icon size={20} className="flex-shrink-0" />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-700">
+          <div className="bg-gray-700/80 rounded-lg p-3 border border-gray-600">
+            <p className="text-xs font-semibold text-gray-200 mb-1">System Status</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse flex-shrink-0"></div>
+              <span className="text-xs text-gray-200 font-medium truncate">All systems operational</span>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
-          Navigation
-        </p>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`sidebar-link ${active ? 'active' : ''}`}
-            >
-              <Icon size={20} />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-700">
-        <div className="bg-gray-700 rounded-lg p-3 border border-gray-600">
-          <p className="text-sm font-semibold text-gray-200 mb-1">System Status</p>
-          <div className="flex items-center gap-2 mt-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-xs text-gray-200 font-medium">All systems operational</span>
-          </div>
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

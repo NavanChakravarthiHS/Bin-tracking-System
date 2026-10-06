@@ -50,7 +50,7 @@ const BinMap = ({ bins }) => {
   }, [bins.length]);
 
   return (
-    <div className="rounded-2xl overflow-hidden shadow-card border border-gray-200/80 h-[550px] relative">
+    <div className="rounded-2xl overflow-hidden shadow-card border border-gray-200/80 h-[380px] sm:h-[460px] md:h-[540px] lg:h-[600px] relative w-full">
       {/* Custom CSS for marker icons */}
       <style>{`
         .bin-marker-icon { background: none !important; border: none !important; }
@@ -58,6 +58,7 @@ const BinMap = ({ bins }) => {
           border-radius: 12px !important;
           box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important;
           padding: 0 !important;
+          max-width: calc(100vw - 32px) !important;
         }
         .leaflet-popup-content { margin: 0 !important; }
         .leaflet-popup-tip { display: none !important; }
@@ -90,7 +91,7 @@ const BinMap = ({ bins }) => {
               }}
             >
               <Popup>
-                <div style={{ padding: '14px', minWidth: '240px', maxWidth: '280px', fontFamily: 'Inter, system-ui, sans-serif' }}>
+                <div style={{ padding: '12px 14px', width: '260px', maxWidth: 'calc(100vw - 48px)', fontFamily: 'Inter, system-ui, sans-serif' }}>
                   {/* Header */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', paddingBottom: '8px', borderBottom: '1px solid #f3f4f6' }}>
                     <div>

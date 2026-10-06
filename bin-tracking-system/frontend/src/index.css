@@ -3,6 +3,14 @@
 /* Base styles - High contrast, accessible design */
 * {
   border-color: #e5e7eb;
+  box-sizing: border-box;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 body {
