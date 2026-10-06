@@ -46,8 +46,8 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
-        '/admin': backendTarget,
-        '/collector': backendTarget,
+        '^/admin/': backendTarget,
+        '^/collector/': backendTarget,
         '/health': backendTarget,
         '/iot': backendTarget,
         '/internal': backendTarget,
@@ -55,8 +55,8 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       proxy: {
-        '/admin': backendTarget,
-        '/collector': backendTarget,
+        '^/admin/': backendTarget,
+        '^/collector/': backendTarget,
         '/health': backendTarget,
         '/iot': backendTarget,
         '/internal': backendTarget,

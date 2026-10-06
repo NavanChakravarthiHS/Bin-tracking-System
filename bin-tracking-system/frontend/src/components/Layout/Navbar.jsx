@@ -20,7 +20,7 @@ const Navbar = ({
             <button
               type="button"
               onClick={onToggleMobileMenu}
-              className="lg:hidden p-2.5 -ml-1 text-gray-700 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
+              className="xl:hidden p-2.5 -ml-1 text-gray-700 hover:bg-gray-100 active:bg-gray-200 rounded-lg transition-colors flex items-center justify-center min-h-[44px] min-w-[44px]"
               aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             >
               {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}

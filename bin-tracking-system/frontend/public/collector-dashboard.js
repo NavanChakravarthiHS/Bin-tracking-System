@@ -149,12 +149,38 @@ function onBinSearch(value) {
   renderBins();
 }
 
+function openSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const hamburger = document.getElementById('hamburgerBtn');
+  if (sidebar) sidebar.classList.add('is-open');
+  if (backdrop) backdrop.classList.add('is-open');
+  if (hamburger) hamburger.setAttribute('aria-expanded', 'true');
+  document.body.classList.add('sidebar-locked');
+}
+
+function closeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const hamburger = document.getElementById('hamburgerBtn');
+  if (sidebar) sidebar.classList.remove('is-open');
+  if (backdrop) backdrop.classList.remove('is-open');
+  if (hamburger) hamburger.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('sidebar-locked');
+}
+
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('is-open');
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar && sidebar.classList.contains('is-open')) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
 }
 
 function navigateCollector(section, event) {
   if (event) event.preventDefault();
+  closeSidebar();
   document.querySelectorAll('.sidebar-link').forEach((link) => {
     link.classList.toggle('active', link.getAttribute('data-nav') === section);
   });
@@ -660,4 +686,18 @@ function logout() {
   // Redirect to login
   window.location.href = '/collector-login.html';
 }
+
+// Global listeners for responsive sidebar drawer behavior
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeSidebar();
+    closeNotificationDropdown();
+  }
+});
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth >= 1280) {
+    closeSidebar();
+  }
+});
 

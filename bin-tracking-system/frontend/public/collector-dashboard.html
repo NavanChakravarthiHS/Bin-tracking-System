@@ -9,18 +9,29 @@
   </head>
   <body>
     <div class="app-shell">
-      <aside class="sidebar" id="sidebar">
+      <!-- Backdrop for mobile/tablet drawer (< 1280px) -->
+      <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()" aria-hidden="true"></div>
+
+      <aside class="sidebar" id="sidebar" aria-label="Collector navigation">
         <div class="sidebar-brand">
-          <div class="sidebar-logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path>
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+          <div class="sidebar-brand-main">
+            <div class="sidebar-logo" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"></path>
+                <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path>
+              </svg>
+            </div>
+            <div>
+              <h1>EcoTrack</h1>
+              <p>Smart Waste Management</p>
+            </div>
+          </div>
+          <button type="button" class="sidebar-close-btn lg-hidden" onclick="closeSidebar()" aria-label="Close navigation menu">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
-          </div>
-          <div>
-            <h1>EcoTrack</h1>
-            <p>Smart Waste Management</p>
-          </div>
+          </button>
         </div>
 
         <nav class="sidebar-nav" aria-label="Collector">
@@ -53,7 +64,7 @@
       <div class="app-main">
         <header class="navbar">
           <div class="navbar-left">
-            <button type="button" class="icon-btn lg-hidden" onclick="toggleSidebar()" aria-label="Open menu">
+            <button type="button" class="icon-btn lg-hidden hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Toggle navigation menu" aria-expanded="false">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <div>

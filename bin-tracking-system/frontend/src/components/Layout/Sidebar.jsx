@@ -47,7 +47,7 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
     <>
       {/* Mobile Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-xs transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/60 z-40 xl:hidden backdrop-blur-xs transition-opacity duration-300 ${
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -56,7 +56,7 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-gray-800 border-r border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out lg:static lg:w-64 lg:h-screen lg:sticky lg:top-0 lg:shadow-lg lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-gray-800 border-r border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out xl:static xl:w-64 xl:h-screen xl:sticky xl:top-0 xl:shadow-lg xl:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Sidebar Navigation"
@@ -77,7 +77,7 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-700/60 rounded-lg transition-colors"
+            className="xl:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-700/60 rounded-lg transition-colors"
             aria-label="Close navigation menu"
           >
             <X size={20} />
