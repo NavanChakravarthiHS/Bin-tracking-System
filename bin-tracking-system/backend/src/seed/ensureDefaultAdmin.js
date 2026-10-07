@@ -4,7 +4,7 @@ import { Collector } from "../models/Collector.js";
 
 const DEFAULT_ADMIN = {
   name: "Admin User",
-  mobile: "9876543210",
+  mobile: "7019311747",
   password: "admin123",
 };
 
@@ -19,6 +19,7 @@ export async function ensureDefaultAdmin() {
   if (!existingAdmin) {
     const passwordHash = await bcrypt.hash(DEFAULT_ADMIN.password, 10);
     await Admin.create({ name: DEFAULT_ADMIN.name, mobile: DEFAULT_ADMIN.mobile, passwordHash });
+    console.log(`✅ Default Admin user created: ${DEFAULT_ADMIN.mobile}`);
   }
 
   const existingCollector = await Collector.findOne({ mobile: DEFAULT_COLLECTOR.mobile }).lean();

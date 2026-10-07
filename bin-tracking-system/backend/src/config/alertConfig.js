@@ -20,7 +20,7 @@ export const alertConfig = {
   consecutiveReadingsRequired: Number(process.env.CONSECUTIVE_READINGS_REQUIRED || 3),
 
   // Admin Mobile override (if set in .env)
-  adminMobile: process.env.ADMIN_MOBILE || "",
+  adminMobile: process.env.ADMIN_MOBILE || "7019311747",
 };
 
 export function getEscalationTimeoutMs() {
