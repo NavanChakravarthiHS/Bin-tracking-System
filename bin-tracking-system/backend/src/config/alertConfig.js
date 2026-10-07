@@ -21,6 +21,7 @@ export const alertConfig = {
 
   // Admin Mobile override (if set in .env)
   adminMobile: process.env.ADMIN_MOBILE || "7019311747",
+  disableAllAlerts: true,
 };
 
 export function getEscalationTimeoutMs() {

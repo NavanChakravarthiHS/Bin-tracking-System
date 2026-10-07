@@ -34,6 +34,11 @@ export function determineAlertState(fillLevel) {
  * Main Role-Based Sensor Alert Processor
  */
 export async function processBinAlert({ bin, fillLevel }) {
+  // Global disable switch – stop all alerts
+  if (alertConfig.disableAllAlerts) {
+    console.log('🔕 All alerts are disabled via configuration.');
+    return null;
+  }
   if (!bin || typeof fillLevel !== "number") return null;
 
   const currentLevel = Math.max(0, Math.min(100, Math.round(fillLevel)));
