@@ -7,6 +7,7 @@ import {
 } from "../utils/sensorMonitoring.js";
 import { statusFromFillLevel } from "../utils/binStatus.js";
 import { processBinAlert } from "./alertService.js";
+import { checkPendingCollectionVerification } from "./collectionService.js";
 
 const BLYNK_API_URL = env.blynkApiUrl;
 
@@ -121,8 +122,9 @@ export async function syncAllBins() {
           applySuccessfulSensorRead(bin, { distance, fillLevel: currentFill, status: currentStatus, lastSensorUpdate: now });
           await bin.save();
 
-          // Process alert thresholds (80% warning, 90% critical with TextBee SMS)
+          // Process alert thresholds and pending collection verification
           try {
+            await checkPendingCollectionVerification({ bin, currentFill });
             await processBinAlert({ bin, fillLevel: currentFill });
           } catch (err) {
             console.error(`Error processing alert for bin ${bin.id}:`, err);

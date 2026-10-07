@@ -2,13 +2,16 @@ import express from "express";
 import { Alert } from "../models/Alert.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { retryAlertNotification } from "../services/alertService.js";
+import { runAlertMonitorCycleIfNeeded } from "../services/alertMonitorService.js";
 
 export const adminAlertsRouter = express.Router();
 
 // GET /admin/alerts - Get all alerts with statistics
 adminAlertsRouter.get("/alerts", requireAuth, async (req, res) => {
   try {
-    const { status, severity } = req.query;
+    await runAlertMonitorCycleIfNeeded();
+
+    const { status, severity, alertType } = req.query;
     const query = {};
 
     if (status && status !== "ALL") {
@@ -16,6 +19,9 @@ adminAlertsRouter.get("/alerts", requireAuth, async (req, res) => {
     }
     if (severity && severity !== "ALL") {
       query.severity = severity.toUpperCase();
+    }
+    if (alertType && alertType !== "ALL") {
+      query.alertType = alertType.toUpperCase();
     }
 
     const alerts = await Alert.find(query)
@@ -28,9 +34,16 @@ adminAlertsRouter.get("/alerts", requireAuth, async (req, res) => {
       total: allAlerts.length,
       active: allAlerts.filter((a) => a.status === "ACTIVE").length,
       critical: allAlerts.filter((a) => a.status === "ACTIVE" && a.severity === "CRITICAL").length,
+      priority: allAlerts.filter((a) => a.status === "ACTIVE" && a.severity === "PRIORITY").length,
       warning: allAlerts.filter((a) => a.status === "ACTIVE" && a.severity === "WARNING").length,
+      deviceOffline: allAlerts.filter((a) => a.status === "ACTIVE" && a.alertType === "DEVICE_OFFLINE").length,
+      escalated: allAlerts.filter((a) => a.status === "ACTIVE" && a.alertType === "ESCALATION").length,
       failedNotifications: allAlerts.filter(
-        (a) => a.status === "ACTIVE" && a.smsStatus === "FAILED"
+        (a) =>
+          a.status === "ACTIVE" &&
+          (a.collectorNotified?.status === "FAILED" ||
+            a.adminNotified?.status === "FAILED" ||
+            a.smsStatus === "FAILED")
       ).length,
     };
 

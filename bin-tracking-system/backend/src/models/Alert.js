@@ -4,9 +4,15 @@ const alertSchema = new mongoose.Schema(
   {
     binId: { type: String, required: true, index: true },
     fillLevel: { type: Number, required: true },
+    alertType: {
+      type: String,
+      enum: ["WARNING", "PRIORITY", "COLLECTION_REQUIRED", "FULL", "ESCALATION", "DEVICE_OFFLINE"],
+      default: "WARNING",
+      index: true,
+    },
     severity: {
       type: String,
-      enum: ["WARNING", "CRITICAL"],
+      enum: ["WARNING", "PRIORITY", "CRITICAL", "DEVICE_OFFLINE"],
       required: true,
       index: true,
     },
@@ -26,6 +32,28 @@ const alertSchema = new mongoose.Schema(
     },
     collectorName: { type: String, default: "" },
     collectorMobile: { type: String, default: "" },
+    collectorNotified: {
+      sent: { type: Boolean, default: false },
+      mobile: { type: String, default: "" },
+      status: {
+        type: String,
+        enum: ["PENDING", "SENT", "FAILED", "SKIPPED", "NOT_SENT"],
+        default: "NOT_SENT",
+      },
+      sentAt: { type: Date, default: null },
+      error: { type: String, default: "" },
+    },
+    adminNotified: {
+      sent: { type: Boolean, default: false },
+      mobile: { type: String, default: "" },
+      status: {
+        type: String,
+        enum: ["PENDING", "SENT", "FAILED", "SKIPPED", "NOT_SENT"],
+        default: "NOT_SENT",
+      },
+      sentAt: { type: Date, default: null },
+      error: { type: String, default: "" },
+    },
     smsStatus: {
       type: String,
       enum: ["PENDING", "SENT", "FAILED", "SKIPPED", "NOT_SENT"],

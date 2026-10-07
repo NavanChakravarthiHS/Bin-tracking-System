@@ -203,7 +203,7 @@ const Alerts = () => {
       )}
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
         <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
             <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Active Alerts</p>
@@ -216,18 +216,8 @@ const Alerts = () => {
 
         <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Critical (90%+)</p>
-            <p className="text-xl sm:text-2xl font-black text-red-600 mt-0.5">{stats.critical}</p>
-          </div>
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
-            <AlertTriangle size={20} />
-          </div>
-        </div>
-
-        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
-          <div>
-            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Warning (80–89%)</p>
-            <p className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5">{stats.warning}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Priority (80-94%)</p>
+            <p className="text-xl sm:text-2xl font-black text-amber-600 mt-0.5">{stats.priority || 0}</p>
           </div>
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 flex-shrink-0">
             <AlertCircle size={20} />
@@ -236,11 +226,31 @@ const Alerts = () => {
 
         <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Failed Dispatches</p>
-            <p className="text-xl sm:text-2xl font-black text-purple-700 mt-0.5">{stats.failedNotifications}</p>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Critical / Full</p>
+            <p className="text-xl sm:text-2xl font-black text-red-600 mt-0.5">{stats.critical || 0}</p>
+          </div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-red-50 flex items-center justify-center text-red-600 flex-shrink-0">
+            <AlertTriangle size={20} />
+          </div>
+        </div>
+
+        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Device Offline</p>
+            <p className="text-xl sm:text-2xl font-black text-gray-700 mt-0.5">{stats.deviceOffline || 0}</p>
+          </div>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 flex-shrink-0">
+            <Smartphone size={20} />
+          </div>
+        </div>
+
+        <div className="modern-card p-3.5 sm:p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">Escalated (30m+)</p>
+            <p className="text-xl sm:text-2xl font-black text-purple-700 mt-0.5">{stats.escalated || 0}</p>
           </div>
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 flex-shrink-0">
-            <Smartphone size={20} />
+            <Clock size={20} />
           </div>
         </div>
       </div>
@@ -264,7 +274,7 @@ const Alerts = () => {
               filter === 'CRITICAL' ? 'bg-red-600 text-white shadow-sm' : 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
             }`}
           >
-            Critical Only
+            Critical / Full
           </button>
           <button
             type="button"
@@ -273,7 +283,7 @@ const Alerts = () => {
               filter === 'WARNING' ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
             }`}
           >
-            Warning Only
+            Warning / Priority
           </button>
           <button
             type="button"
@@ -322,14 +332,25 @@ const Alerts = () => {
         <div className="space-y-3 sm:space-y-4">
           {filteredAlerts.map((alert, index) => {
             const isCritical = alert.severity === 'CRITICAL';
+            const isOffline = alert.severity === 'DEVICE_OFFLINE' || alert.alertType === 'DEVICE_OFFLINE';
+            const isEscalation = alert.alertType === 'ESCALATION';
             const hasCollector = Boolean(alert.collectorName || alert.collectorMobile);
-            const hasFailed = alert.smsStatus === 'FAILED';
+
+            const collectorStatus = alert.collectorNotified?.status || (alert.severity === 'WARNING' ? 'NOT_SENT' : alert.smsStatus);
+            const adminStatus = alert.adminNotified?.status || (isCritical || isEscalation || isOffline ? alert.smsStatus : 'NOT_SENT');
+            const hasFailed = collectorStatus === 'FAILED' || adminStatus === 'FAILED';
 
             return (
               <div
                 key={alert._id || index}
                 className={`modern-card p-4 sm:p-5 border-l-4 transition-all duration-200 ${
-                  isCritical ? 'border-l-red-600 bg-red-50/20' : 'border-l-amber-500 bg-amber-50/20'
+                  isEscalation
+                    ? 'border-l-purple-600 bg-purple-50/20'
+                    : isOffline
+                    ? 'border-l-gray-600 bg-gray-50/30'
+                    : isCritical
+                    ? 'border-l-red-600 bg-red-50/20'
+                    : 'border-l-amber-500 bg-amber-50/20'
                 }`}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
@@ -339,13 +360,17 @@ const Alerts = () => {
                       <span className="text-base sm:text-lg font-black text-heading">{alert.binId}</span>
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-extrabold uppercase tracking-wide ${
-                          isCritical
+                          isEscalation
+                            ? 'bg-purple-700 text-white'
+                            : isOffline
+                            ? 'bg-gray-700 text-white'
+                            : isCritical
                             ? 'bg-red-600 text-white'
                             : 'bg-amber-500 text-white'
                         }`}
                       >
-                        {isCritical ? <AlertTriangle size={11} /> : <AlertCircle size={11} />}
-                        {alert.severity}
+                        {isCritical || isEscalation ? <AlertTriangle size={11} /> : <AlertCircle size={11} />}
+                        {alert.alertType || alert.severity}
                       </span>
                       {alert.status === 'RESOLVED' && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-gray-200 text-gray-700">
@@ -386,31 +411,36 @@ const Alerts = () => {
                       )}
                     </div>
 
-                    {/* Admin Note if present */}
-                    {alert.adminNote && (
-                      <p className="text-[11px] sm:text-xs text-gray-600 bg-gray-100 px-2.5 py-1 rounded inline-block">
-                        Note: {alert.adminNote}
+                    {/* Alert Message */}
+                    {alert.message && (
+                      <p className="text-[11px] sm:text-xs text-gray-700 bg-gray-100 px-2.5 py-1 rounded inline-block font-medium">
+                        {alert.message}
                       </p>
                     )}
                   </div>
 
-                  {/* Middle Column: Delivery Status Badges */}
-                  <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-0 sm:min-w-[180px] border-t lg:border-t-0 lg:border-l border-gray-200 pt-2.5 lg:pt-0 lg:pl-4">
-                    <div className="flex items-center gap-1.5">
-                      <Smartphone size={15} className="text-primary-600 flex-shrink-0" />
-                      {getDeliveryBadge('TextBee SMS', alert.smsStatus, alert.smsError)}
+                  {/* Middle Column: Role Notification Delivery Badges */}
+                  <div className="flex flex-col sm:flex-row lg:flex-col gap-2 min-w-0 sm:min-w-[200px] border-t lg:border-t-0 lg:border-l border-gray-200 pt-2.5 lg:pt-0 lg:pl-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Collector SMS</span>
+                      {getDeliveryBadge('Collector', collectorStatus, alert.collectorNotified?.error || alert.smsError)}
+                    </div>
+
+                    <div className="flex flex-col gap-1 mt-1">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Admin SMS</span>
+                      {getDeliveryBadge('Admin', adminStatus, alert.adminNotified?.error)}
                     </div>
                   </div>
 
                   {/* Right Column: Actions (Retry & Dismiss) */}
                   <div className="flex items-center gap-2 self-start sm:self-end lg:self-center">
-                    {(hasFailed || (isCritical && alert.smsStatus !== 'SENT')) && (
+                    {hasFailed && (
                       <button
                         type="button"
                         onClick={() => handleRetry(alert._id)}
                         disabled={retryingId === alert._id}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white text-xs font-bold transition-colors disabled:opacity-50 shadow-xs min-h-[36px]"
-                        title="Retry sending SMS via TextBee"
+                        title="Retry sending failed SMS via TextBee"
                       >
                         <RefreshCw size={13} className={retryingId === alert._id ? 'animate-spin' : ''} />
                         {retryingId === alert._id ? 'Retrying...' : 'Retry SMS'}

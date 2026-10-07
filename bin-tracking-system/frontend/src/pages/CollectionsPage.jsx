@@ -220,32 +220,77 @@ const CollectionsPage = () => {
       <div className="modern-card p-4 sm:p-5">
         <div className="flex items-center gap-2 mb-3 sm:mb-4">
           <Clock size={16} className="text-primary-600" />
-          <h3 className="text-xs sm:text-sm font-bold text-heading uppercase tracking-wider">Recent Collections Log</h3>
+          <h3 className="text-xs sm:text-sm font-bold text-heading uppercase tracking-wider">Smart Collection Verification History</h3>
         </div>
         {history.length === 0 ? (
           <p className="text-xs sm:text-sm text-gray-500 py-4 text-center">No collections recorded yet</p>
         ) : (
           <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-            <table className="w-full text-xs sm:text-sm min-w-[500px]">
+            <table className="w-full text-xs sm:text-sm min-w-[650px]">
               <thead>
                 <tr className="text-left text-gray-500 border-b border-gray-200">
-                  <th className="py-2.5 pr-3 font-semibold">Bin</th>
+                  <th className="py-2.5 pr-3 font-semibold">Bin ID</th>
                   <th className="py-2.5 pr-3 font-semibold">Location</th>
                   <th className="py-2.5 pr-3 font-semibold">Collector</th>
-                  <th className="py-2.5 font-semibold">Date & Time</th>
+                  <th className="py-2.5 pr-3 font-semibold">Fill Drop (Before ➔ After)</th>
+                  <th className="py-2.5 pr-3 font-semibold">Verification Status</th>
+                  <th className="py-2.5 pr-3 font-semibold">Duration</th>
+                  <th className="py-2.5 font-semibold">Time</th>
                 </tr>
               </thead>
               <tbody>
-                {history.map((record) => (
-                  <tr key={record._id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60 transition-colors">
-                    <td className="py-2.5 pr-3 font-semibold text-heading">{record.binId}</td>
-                    <td className="py-2.5 pr-3 text-gray-700 max-w-44 truncate">{record.location}</td>
-                    <td className="py-2.5 pr-3 text-gray-700">
-                      {record.collectorName || record.collectorMobile || 'Unknown'}
-                    </td>
-                    <td className="py-2.5 text-gray-600 whitespace-nowrap">{formatDate(record.collectedAt)}</td>
-                  </tr>
-                ))}
+                {history.map((record) => {
+                  const status = record.verificationStatus || 'VERIFIED';
+                  const isVerified = status === 'VERIFIED';
+                  const isPending = status === 'PENDING';
+                  const isFailed = status === 'FAILED';
+
+                  return (
+                    <tr key={record._id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/60 transition-colors">
+                      <td className="py-2.5 pr-3 font-bold text-heading">{record.binId}</td>
+                      <td className="py-2.5 pr-3 text-gray-700 max-w-44 truncate">{record.location}</td>
+                      <td className="py-2.5 pr-3 text-gray-700">
+                        {record.collectorName || record.collectorMobile || 'Unknown'}
+                      </td>
+                      <td className="py-2.5 pr-3 font-semibold text-gray-800">
+                        {record.fillLevelBefore != null ? `${record.fillLevelBefore}%` : '—'} ➔{' '}
+                        <span className={isVerified ? 'text-green-700 font-bold' : isFailed ? 'text-red-700 font-bold' : 'text-amber-700'}>
+                          {record.fillLevelAfter != null ? `${record.fillLevelAfter}%` : isPending ? 'Verifying...' : '—'}
+                        </span>
+                      </td>
+                      <td className="py-2.5 pr-3 whitespace-nowrap">
+                        {isVerified && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-green-100 text-green-800 border border-green-300">
+                            <CheckCircle size={12} className="text-green-600" />
+                            VERIFIED ✅
+                          </span>
+                        )}
+                        {isPending && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 border border-amber-300">
+                            <Clock size={12} className="text-amber-600 animate-spin" />
+                            PENDING ⏳
+                          </span>
+                        )}
+                        {isFailed && (
+                          <div className="flex flex-col">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-red-100 text-red-800 border border-red-300">
+                              FAILED ❌
+                            </span>
+                            {record.failureReason && (
+                              <span className="text-[10px] text-red-600 font-medium mt-0.5 max-w-[200px] truncate" title={record.failureReason}>
+                                {record.failureReason}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-2.5 pr-3 text-gray-600 font-medium whitespace-nowrap">
+                        {record.collectionDurationSeconds ? `${record.collectionDurationSeconds}s` : '—'}
+                      </td>
+                      <td className="py-2.5 text-gray-600 whitespace-nowrap">{formatDate(record.verifiedAt || record.collectedAt || record.createdAt)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

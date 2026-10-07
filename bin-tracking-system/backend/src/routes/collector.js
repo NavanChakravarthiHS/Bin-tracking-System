@@ -101,9 +101,9 @@ collectorRouter.get("/bins", requireCollectorAuth, async (req, res) => {
   }
 });
 
-// POST /collector/update-status (protected route)
+// POST /collector/update-status (Initiate Collection Process)
 collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) => {
-  const { binId, status, fillLevel } = req.body || {};
+  const { binId, qrCode } = req.body || {};
 
   if (!binId) {
     return res.status(400).json({ message: "Bin ID is required" });
@@ -115,18 +115,41 @@ collectorRouter.post("/update-status", requireCollectorAuth, async (req, res) =>
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const result = await markBinCollected({ binId, collector });
-    if (!result) {
-      return res.status(404).json({ message: "Bin not found" });
+    const result = await markBinCollected({ binId, collector, qrCode });
+    if (result.error) {
+      return res.status(400).json({ message: result.error });
     }
 
     return res.json({
-      message: "Bin status updated successfully",
+      message: result.message || "Collection process initiated. Verification pending sensor confirmation.",
       bin: result.bin,
       collection: result.collection,
     });
   } catch (error) {
-    console.error('Error updating bin:', error);
-    return res.status(500).json({ message: "Failed to update bin status" });
+    console.error('Error updating bin status:', error);
+    return res.status(500).json({ message: "Failed to initiate bin collection" });
+  }
+});
+
+// Alias POST /collector/start-collection
+collectorRouter.post("/start-collection", requireCollectorAuth, async (req, res) => {
+  const { binId, qrCode } = req.body || {};
+  if (!binId) return res.status(400).json({ message: "Bin ID is required" });
+
+  try {
+    const collector = await Collector.findById(req.collector.collectorId);
+    if (!collector) return res.status(401).json({ message: "Unauthorized" });
+
+    const result = await markBinCollected({ binId, collector, qrCode });
+    if (result.error) return res.status(400).json({ message: result.error });
+
+    return res.json({
+      message: "Collection started. Verification pending sensor confirmation.",
+      bin: result.bin,
+      collection: result.collection,
+    });
+  } catch (error) {
+    console.error('Error starting collection:', error);
+    return res.status(500).json({ message: "Failed to start collection" });
   }
 });

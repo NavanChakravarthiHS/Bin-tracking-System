@@ -11,7 +11,20 @@ const collectionSchema = new mongoose.Schema(
     },
     collectorName: { type: String, default: "" },
     collectorMobile: { type: String, default: "" },
-    collectedAt: { type: Date, required: true, default: Date.now },
+    fillLevelBefore: { type: Number, required: true },
+    fillLevelAfter: { type: Number, default: null },
+    collectionStartedAt: { type: Date, required: true, default: Date.now },
+    verifiedAt: { type: Date, default: null },
+    verificationStatus: {
+      type: String,
+      enum: ["PENDING", "VERIFIED", "FAILED"],
+      default: "PENDING",
+      index: true,
+    },
+    failureReason: { type: String, default: "" },
+    collectionDurationSeconds: { type: Number, default: null },
+    qrScanned: { type: Boolean, default: false },
+    collectedAt: { type: Date, default: Date.now }, // Backward compatibility
   },
   { timestamps: true }
 );

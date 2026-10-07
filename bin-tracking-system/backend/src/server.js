@@ -4,6 +4,7 @@ import { createExpressApp } from "./app.js";
 import { ensureDefaultAdmin } from "./seed/ensureDefaultAdmin.js";
 import { seedBins } from "./seed/seedBins.js";
 import { syncAllBins } from "./services/blynkService.js";
+import { runAlertMonitorCycle } from "./services/alertMonitorService.js";
 
 let bootPromise;
 
@@ -26,6 +27,7 @@ if (!env.isVercel) {
     .then(() => {
       setInterval(async () => {
         await syncAllBins();
+        await runAlertMonitorCycle();
       }, 5000);
 
       app.listen(env.port, () => {

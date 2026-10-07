@@ -2,6 +2,7 @@ import { Bin } from "../models/Bin.js";
 import { applySuccessfulSensorRead, withMonitoring } from "../utils/sensorMonitoring.js";
 import { statusFromFillLevel } from "../utils/binStatus.js";
 import { processBinAlert } from "./alertService.js";
+import { checkPendingCollectionVerification } from "./collectionService.js";
 
 const EMPTY_BIN_DISTANCE_CM = 50;
 const FULL_BIN_DISTANCE_CM = 10;
@@ -67,6 +68,8 @@ export async function ingestSensorReading({ binId, body = {} }) {
   await bin.save();
 
   try {
+    // Check if bin is in collection verification pending state
+    await checkPendingCollectionVerification({ bin, currentFill });
     await processBinAlert({ bin, fillLevel: currentFill });
   } catch (err) {
     console.error(`Error processing alert for sensor update on bin ${targetId}:`, err);

@@ -34,10 +34,29 @@ const binSchema = new mongoose.Schema(
     fullThreshold: { type: Number, default: 80, min: 2, max: 100 },
     lastAlertSeverity: {
       type: String,
-      enum: ["NONE", "WARNING", "CRITICAL"],
+      enum: ["NONE", "WARNING", "PRIORITY", "CRITICAL", "FULL", "DEVICE_OFFLINE"],
       default: "NONE",
     },
+    lastAlertState: {
+      type: String,
+      enum: ["NORMAL", "WARNING", "PRIORITY", "CRITICAL", "FULL"],
+      default: "NORMAL",
+    },
+    consecutiveCriticalReadings: { type: Number, default: 0 },
     lastAlertAt: { type: Date, default: null },
+    isEscalated: { type: Boolean, default: false },
+    escalatedAt: { type: Date, default: null },
+    isDeviceOffline: { type: Boolean, default: false },
+    offlineAlertSentAt: { type: Date, default: null },
+    isVerificationPending: { type: Boolean, default: false },
+    activeCollectionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Collection",
+      default: null,
+    },
+    consecutiveLowReadings: { type: Number, default: 0 },
+    verificationStartedAt: { type: Date, default: null },
+    qrCode: { type: String, default: null },
   },
   { timestamps: true }
 );
