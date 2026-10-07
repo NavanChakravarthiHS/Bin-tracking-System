@@ -7,12 +7,14 @@ import { parseBinPayload, statusFromFillLevel } from "../utils/binStatus.js";
 import { Collection } from "../models/Collection.js";
 import { processBinAlert } from "../services/alertService.js";
 import { ingestSensorReading } from "../services/sensorIngest.js";
+import { syncAllBinsIfNeeded } from "../services/blynkService.js";
 
 export const adminBinsRouter = express.Router();
 
 // GET /admin/bins - Get all bins
 adminBinsRouter.get("/bins", requireAuth, async (req, res) => {
   try {
+    await syncAllBinsIfNeeded();
     const filter = req.query.includeInactive === "true" ? {} : { isActive: { $ne: false } };
     const bins = await Bin.find(filter).sort({ status: 1, id: 1 }).lean();
     const collectorIds = [...new Set(bins.map((bin) => bin.assignedCollectorId).filter(Boolean))];

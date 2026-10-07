@@ -5,7 +5,9 @@ export const mockBins = [
     status: "Normal",
     latitude: 12.884826192901519,
     longitude: 76.16705545090305,
-    location: "College Library"
+    location: "College Library",
+    sensorConnected: true,
+    deviceStatus: "Active",
   },
   {
     id: "BIN002",
@@ -13,7 +15,9 @@ export const mockBins = [
     status: "Full",
     latitude: 12.88434509283807,
     longitude: 76.16648145829812,
-    location: "Principal's Office"
+    location: "Principal's Office",
+    sensorConnected: true,
+    deviceStatus: "Active",
   },
   {
     id: "BIN003",
@@ -21,7 +25,9 @@ export const mockBins = [
     status: "Normal",
     latitude: 12.88399547624362,
     longitude: 76.16687634296892,
-    location: "Government College of Engineering, Mosalehosahalli"
+    location: "Government College of Engineering, Mosalehosahalli",
+    sensorConnected: true,
+    deviceStatus: "Active",
   },
   {
     id: "BIN004",
@@ -29,6 +35,8 @@ export const mockBins = [
     status: "Warning",
     latitude: 12.883773704898823,
     longitude: 76.16671399141555,
-    location: "Seminar Hall"
+    location: "Seminar Hall",
+    sensorConnected: true,
+    deviceStatus: "Active",
   }
 ];

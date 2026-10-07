@@ -6,6 +6,7 @@ import { signCollectorJwt } from "../utils/jwt.js";
 import { requireCollectorAuth } from "../middleware/requireCollectorAuth.js";
 import { markBinCollected } from "../services/collectionService.js";
 import { withMonitoring } from "../utils/sensorMonitoring.js";
+import { syncAllBinsIfNeeded } from "../services/blynkService.js";
 
 export const collectorRouter = express.Router();
 
@@ -86,6 +87,7 @@ collectorRouter.get("/me", requireCollectorAuth, async (req, res) => {
 // GET /collector/bins - Get all bins (protected route)
 collectorRouter.get("/bins", requireCollectorAuth, async (req, res) => {
   try {
+    await syncAllBinsIfNeeded();
     const bins = await Bin.find({
       assignedCollectorId: req.collector.collectorId,
       isActive: { $ne: false },

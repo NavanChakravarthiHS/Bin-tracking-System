@@ -146,3 +146,17 @@ export async function syncAllBins() {
   }
 }
 
+let lastSyncTimestamp = 0;
+const SYNC_THROTTLE_MS = 10000; // 10 seconds
+
+export async function syncAllBinsIfNeeded() {
+  const now = Date.now();
+  if (now - lastSyncTimestamp < SYNC_THROTTLE_MS) {
+    return;
+  }
+  lastSyncTimestamp = now;
+  await syncAllBins();
+}
+
+
+
