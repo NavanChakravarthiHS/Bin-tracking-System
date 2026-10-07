@@ -96,6 +96,12 @@ export async function processBinAlert({ bin, fillLevel }) {
 
   const collectorName = collector?.name || bin.assignedCollector || "Assigned Collector";
 
+  // Determine if SMS can be sent (only for integrated bins with live sensor data)
+  const canSendSMS = bin.integrationStatus === "INTEGRATED" && bin.sensorConnected;
+  if (!canSendSMS) {
+    console.log(`🔕 SMS disabled for Bin ${bin.id} (integrationStatus=${bin.integrationStatus}, sensorConnected=${bin.sensorConnected})`);
+  }
+
   let collectorNotified = { sent: false, mobile: "", status: "NOT_SENT", error: "", sentAt: null };
   let adminNotified = { sent: false, mobile: "", status: "NOT_SENT", error: "", sentAt: null };
 
@@ -108,18 +114,18 @@ export async function processBinAlert({ bin, fillLevel }) {
 
   // 2. PRIORITY (80-94%): SMS to assigned collector ONLY.
   if (targetState === "PRIORITY") {
-    if (collector) {
+    if (canSendSMS && collector) {
       const res = await sendCollectorAlert({ bin, fillLevel: currentLevel, alertType: "PRIORITY", collector });
       collectorNotified = { ...res };
     } else {
       collectorNotified.status = "SKIPPED";
-      collectorNotified.error = "No collector assigned to this bin";
+      collectorNotified.error = collector ? "SMS disabled for non-integrated bin" : "No collector assigned to this bin";
     }
   }
 
   // 3. CRITICAL / COLLECTION REQUIRED (95-99%): SMS to assigned collector ONLY. Alert on dashboard.
   if (targetState === "CRITICAL") {
-    if (collector) {
+    if (canSendSMS && collector) {
       const res = await sendCollectorAlert({
         bin,
         fillLevel: currentLevel,
@@ -129,22 +135,27 @@ export async function processBinAlert({ bin, fillLevel }) {
       collectorNotified = { ...res };
     } else {
       collectorNotified.status = "SKIPPED";
-      collectorNotified.error = "No collector assigned to this bin";
+      collectorNotified.error = collector ? "SMS disabled for non-integrated bin" : "No collector assigned to this bin";
     }
   }
 
   // 4. FULL / OVERFLOW (100%): SMS to BOTH assigned collector and admin.
   if (targetState === "FULL") {
-    if (collector) {
+    if (canSendSMS && collector) {
       const resCol = await sendCollectorAlert({ bin, fillLevel: currentLevel, alertType: "FULL", collector });
       collectorNotified = { ...resCol };
     } else {
       collectorNotified.status = "SKIPPED";
-      collectorNotified.error = "No collector assigned to this bin";
+      collectorNotified.error = collector ? "SMS disabled for non-integrated bin" : "No collector assigned to this bin";
     }
 
-    const resAdmin = await sendAdminCriticalAlert({ bin, fillLevel: currentLevel, collectorName });
-    adminNotified = { ...resAdmin };
+    if (canSendSMS) {
+      const resAdmin = await sendAdminCriticalAlert({ bin, fillLevel: currentLevel, collectorName });
+      adminNotified = { ...resAdmin };
+    } else {
+      adminNotified.status = "SKIPPED";
+      adminNotified.error = "Admin SMS disabled for non-integrated bin";
+    }
   }
 
   // Format message summary for dashboard record

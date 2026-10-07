@@ -10,6 +10,7 @@ const binsData = [
     status: "Normal",
     latitude: 12.884826192901519,
     longitude: 76.16705545090305,
+    integrationStatus: "INTEGRATED",
   },
   {
     id: "BIN002",

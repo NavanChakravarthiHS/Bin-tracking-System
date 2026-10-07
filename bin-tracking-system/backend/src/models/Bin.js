@@ -30,6 +30,7 @@ const binSchema = new mongoose.Schema(
       default: "Inactive",
     },
     isActive: { type: Boolean, default: true },
+    integrationStatus: { type: String, enum: ['INTEGRATED', 'NOT_INTEGRATED'], default: 'NOT_INTEGRATED' },
     warningThreshold: { type: Number, default: 50, min: 1, max: 99 },
     fullThreshold: { type: Number, default: 80, min: 2, max: 100 },
     lastAlertSeverity: {
