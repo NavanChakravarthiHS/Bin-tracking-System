@@ -11,7 +11,15 @@ const binSchema = new mongoose.Schema(
       default: 'Normal' 
     },
     blynkPin: { type: String, default: null },
+    blynkAuthToken: { type: String, default: null },
     distance: { type: Number, default: 50 },
+    // Per-bin HC-SR04 calibration distances (cm).
+    // emptyDistance: sensor reading when the bin is completely empty.
+    // fullDistance:  sensor reading when the bin is completely full.
+    emptyDistance: { type: Number, default: 50 },
+    fullDistance: { type: Number, default: 10 },
+    // Per-bin notification toggle. Set to false to suppress SMS/alerts during testing.
+    notificationsEnabled: { type: Boolean, default: true },
     latitude: { type: Number, required: true },
     longitude: { type: Number, required: true },
     lastCollected: { type: Date, default: null },

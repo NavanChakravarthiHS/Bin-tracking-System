@@ -416,46 +416,228 @@ function viewOnMap(latitude, longitude, location) {
   }
 }
 
-// Mark bin as collected
-async function markAsCollected(binId) {
-  const token = localStorage.getItem('collectorToken');
-  
-  // Find the bin
-  const bin = assignedBins.find(b => b.id === binId);
-  if (!bin) return;
-  
-  // Update fill level locally so the UI responds instantly
-  bin.fillLevel = 0;
-  bin.distance = 100;
-  bin.status = 'Normal';// Call backend API
+// Global state for Collection Verification Popup
+let currentVerifyingBin = null;
+let isVerificationInProgress = false;
+
+// Open the Collection Verification Popup
+function openVerificationModal(binId) {
+  const normalizedId = String(binId || "").trim().toUpperCase();
+  const bin = assignedBins.find(
+    (b) => String(b.id || b.binId || "").trim().toUpperCase() === normalizedId
+  );
+  if (!bin) {
+    console.warn("Bin not found in assignedBins for verification:", binId, assignedBins);
+    showToast(`Bin ${binId} details not found. Please refresh.`, "warning");
+    return;
+  }
+
+  currentVerifyingBin = bin;
+  isVerificationInProgress = false;
+
+  const modal = document.getElementById("collectionVerifyModal");
+  const binIdEl = document.getElementById("verifyBinId");
+  const locationEl = document.getElementById("verifyBinLocation");
+  const collectorEl = document.getElementById("verifyCollectorName");
+  const fillBeforeEl = document.getElementById("verifyFillBefore");
+  const fillBarEl = document.getElementById("verifyFillBar");
+
+  const collectorName =
+    localStorage.getItem("collectorName") ||
+    document.getElementById("userName")?.textContent ||
+    "Collector";
+
+  if (binIdEl) binIdEl.textContent = bin.id;
+  if (locationEl) locationEl.textContent = bin.location || "Unknown Location";
+  if (collectorEl) collectorEl.textContent = collectorName;
+
+  const currentFill = Number(bin.fillLevel) || 0;
+  if (fillBeforeEl) {
+    fillBeforeEl.textContent = `${currentFill}%`;
+    fillBeforeEl.className = "verify-fill-badge " + (
+      currentFill >= 80 ? "" : currentFill >= 50 ? "badge-amber" : "badge-green"
+    );
+  }
+
+  if (fillBarEl) {
+    fillBarEl.style.width = `${Math.max(5, Math.min(100, currentFill))}%`;
+    fillBarEl.className = "verify-progress-bar " + (
+      currentFill >= 80 ? "" : currentFill >= 50 ? "bar-amber" : "bar-green"
+    );
+  }
+
+  // Show Step 1 (Confirm), Hide others
+  showVerificationStep("confirm");
+
+  if (modal) modal.hidden = false;
+}
+
+// Close the Collection Verification Popup
+function closeVerificationModal() {
+  if (isVerificationInProgress) return; // Prevent closing mid-verification
+  const modal = document.getElementById("collectionVerifyModal");
+  if (modal) modal.hidden = true;
+  currentVerifyingBin = null;
+}
+
+// Switch between modal steps (confirm, loading, success, failed)
+function showVerificationStep(step) {
+  const stepConfirm = document.getElementById("verifyStepConfirm");
+  const stepLoading = document.getElementById("verifyStepLoading");
+  const stepSuccess = document.getElementById("verifyStepSuccess");
+  const stepFailed = document.getElementById("verifyStepFailed");
+
+  if (stepConfirm) stepConfirm.style.display = step === "confirm" ? "block" : "none";
+  if (stepLoading) stepLoading.style.display = step === "loading" ? "block" : "none";
+  if (stepSuccess) stepSuccess.style.display = step === "success" ? "block" : "none";
+  if (stepFailed) stepFailed.style.display = step === "failed" ? "block" : "none";
+}
+
+// Mark bin as collected (Triggers the Professional Verification Popup)
+function markAsCollected(binId) {
+  openVerificationModal(binId);
+}
+
+// Execute live collection verification on backend
+async function executeCollectionVerification() {
+  if (!currentVerifyingBin || isVerificationInProgress) return;
+
+  const token = localStorage.getItem("collectorToken");
+  const binId = currentVerifyingBin.id;
+  isVerificationInProgress = true;
+
+  // Show live verifying state (radar scanner animation)
+  showVerificationStep("loading");
+  const loadingText = document.getElementById("verifyLoadingText");
+  if (loadingText) {
+    loadingText.textContent = `Querying live sensor for ${binId}...`;
+  }
+
   try {
-    const response = await fetch(`${API_URL}/collector/update-status`, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}/collector/verify-collection`, {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ binId, status: 'Collected', fillLevel: 0 }),
+      body: JSON.stringify({ binId }),
     });
-    
-    if (response.ok) {
-      // Show success message
-      showToast(`${binId} marked as collected!`, 'success');
-      
-      // Re-render to update priority list
-      setTimeout(() => {
-        renderBins();
-      }, 500);
+
+    const result = await response.json().catch(() => ({}));
+
+    if (result && result.verified) {
+      // ✅ COLLECTION VERIFIED SUCCESSFULLY!
+      const collectorName =
+        localStorage.getItem("collectorName") ||
+        document.getElementById("userName")?.textContent ||
+        "Collector";
+
+      const successMsg = document.getElementById("verifySuccessMessage");
+      const successBefore = document.getElementById("verifySuccessBefore");
+      const successAfter = document.getElementById("verifySuccessAfter");
+      const successTime = document.getElementById("verifySuccessTime");
+
+      if (successMsg) {
+        successMsg.textContent =
+          result.message ||
+          `Collection Verified Successfully! Bin ${binId} was collected by ${collectorName}.`;
+      }
+      if (successBefore) {
+        successBefore.textContent = `${result.fillBefore != null ? result.fillBefore : currentVerifyingBin.fillLevel}%`;
+      }
+      if (successAfter) {
+        successAfter.textContent = `${result.fillAfter != null ? result.fillAfter : 0}%`;
+      }
+      if (successTime) {
+        successTime.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      }
+
+      // Update local bin in assignedBins array
+      currentVerifyingBin.fillLevel = result.fillAfter != null ? result.fillAfter : 0;
+      currentVerifyingBin.status = "Collected";
+      currentVerifyingBin.lastCollected = new Date().toISOString();
+      currentVerifyingBin.isVerificationPending = false;
+
+      showVerificationStep("success");
+      showToast(`✓ Bin ${binId} collection verified!`, "success");
     } else {
-      throw new Error('Failed to update');
+      // ❌ VERIFICATION FAILED OR AWAITING FRESH SENSOR READING
+      const failedTitle = document.getElementById("verifyFailedTitle");
+      const failedMsg = document.getElementById("verifyFailedMessage");
+      const failedComparison = document.getElementById("verifyFailedComparison");
+      const failedBefore = document.getElementById("verifyFailedBefore");
+      const failedAfter = document.getElementById("verifyFailedAfter");
+      const failedIcon = document.getElementById("verifyFailedIcon");
+
+      const isStaleOrUnavailable =
+        result.status === "UNAVAILABLE" ||
+        result.status === "STALE" ||
+        (result.message && result.message.includes("fresh sensor reading"));
+
+      if (failedTitle) {
+        failedTitle.textContent = isStaleOrUnavailable
+          ? "Waiting for Sensor Reading"
+          : "Collection Verification Failed";
+        failedTitle.className = "verify-result-title " + (isStaleOrUnavailable ? "text-amber" : "text-error");
+      }
+
+      if (failedMsg) {
+        failedMsg.textContent =
+          result.message ||
+          (isStaleOrUnavailable
+            ? "Unable to verify collection. Waiting for a fresh sensor reading."
+            : "Collection Verification Failed: No sufficient drop in fill level detected. Please check the bin and try again.");
+      }
+
+      if (failedIcon) {
+        failedIcon.className = "verify-result-icon " + (isStaleOrUnavailable ? "verify-result--warning" : "verify-result--error");
+        failedIcon.innerHTML = isStaleOrUnavailable
+          ? `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+          : `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+      }
+
+      if (failedComparison && result.fillAfter != null) {
+        failedComparison.style.display = "flex";
+        if (failedBefore) failedBefore.textContent = `${result.fillBefore}%`;
+        if (failedAfter) failedAfter.textContent = `${result.fillAfter}%`;
+      } else if (failedComparison) {
+        failedComparison.style.display = "none";
+      }
+
+      showVerificationStep("failed");
     }
   } catch (error) {
-    console.error('Error updating bin status:', error);
-    showToast('Failed to update status. Please try again.', 'error');
-    // Revert UI changes on error
-    bin.fillLevel = 100; // Force it to re-evaluate from backend
-    showToast('Failed to update status. Please try again.', 'error');
+    console.error("Error verifying collection:", error);
+    const failedTitle = document.getElementById("verifyFailedTitle");
+    const failedMsg = document.getElementById("verifyFailedMessage");
+    const failedComparison = document.getElementById("verifyFailedComparison");
+
+    if (failedTitle) failedTitle.textContent = "Connection Error";
+    if (failedMsg) failedMsg.textContent = "Unable to contact verification service. Please check network connection and try again.";
+    if (failedComparison) failedComparison.style.display = "none";
+
+    showVerificationStep("failed");
+  } finally {
+    isVerificationInProgress = false;
   }
+}
+
+// Retry collection verification
+function retryVerification() {
+  executeCollectionVerification();
+}
+
+// Leave task pending (collector leaves the bin pending sensor update)
+function leaveVerificationPending() {
+  closeVerificationModal();
+  showToast("Collection task left pending sensor confirmation.", "warning");
+}
+
+// Finish successful verification and refresh dashboard
+function finishVerificationSuccess() {
+  closeVerificationModal();
+  renderBins();
+  loadBins(); // Pull updated data from server
 }
 
 // Render bins to the DOM

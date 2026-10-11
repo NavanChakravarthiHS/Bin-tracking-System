@@ -13,7 +13,7 @@ export function getThresholds(bin = {}) {
 export function statusFromFillLevel(fillLevel, bin = {}) {
   const level = Number(fillLevel) || 0;
   const { warningThreshold, fullThreshold } = getThresholds(bin);
-  if (bin.status === "Collected" && level === 0) return "Collected";
+  if (bin.status === "Collected" && level < warningThreshold) return "Collected";
   if (level >= fullThreshold) return "Full";
   if (level >= warningThreshold) return "Warning";
   return "Normal";
@@ -29,6 +29,9 @@ export function parseBinPayload(body = {}, { requireId = true } = {}) {
   const blynkPin = body.blynkPin == null || String(body.blynkPin).trim() === ""
     ? null
     : String(body.blynkPin).trim();
+  const blynkAuthToken = body.blynkAuthToken == null || String(body.blynkAuthToken).trim() === ""
+    ? null
+    : String(body.blynkAuthToken).trim();
 
   if (requireId && !/^[A-Z0-9_-]{3,20}$/.test(id)) {
     return { error: "Bin ID must be 3-20 characters (letters, numbers, _ or -)" };
@@ -60,5 +63,6 @@ export function parseBinPayload(body = {}, { requireId = true } = {}) {
     warningThreshold,
     fullThreshold,
     blynkPin,
+    blynkAuthToken,
   };
 }

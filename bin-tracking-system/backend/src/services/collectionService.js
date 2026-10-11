@@ -3,8 +3,8 @@ import { Collector } from "../models/Collector.js";
 import { Collection } from "../models/Collection.js";
 import { Alert } from "../models/Alert.js";
 import { alertConfig, getVerificationTimeoutMs } from "../config/alertConfig.js";
-import { pushBlynkValue } from "./blynkService.js";
-import { withMonitoring } from "../utils/sensorMonitoring.js";
+import { pushBlynkValue, fetchLiveBinReading } from "./blynkService.js";
+import { withMonitoring, isSensorFresh, applySuccessfulSensorRead } from "../utils/sensorMonitoring.js";
 import { sendAdminCriticalAlert, getAdminMobileNumber } from "./smsNotificationService.js";
 import { sendSMS } from "./textbeeService.js";
 
@@ -134,7 +134,9 @@ export async function checkPendingCollectionVerification({ bin, currentFill }) {
 
       // Update Blynk if pin configured
       if (bin.blynkPin) {
-        await pushBlynkValue(bin.blynkPin, 50);
+        const pin = String(bin.blynkPin).split(',')[0].trim();
+        const emptyVal = Number(bin.emptyDistance) > 0 ? Number(bin.emptyDistance) : 50;
+        await pushBlynkValue(pin, emptyVal, bin.blynkAuthToken || undefined);
       }
 
       console.log(
@@ -223,10 +225,250 @@ export async function checkVerificationTimeouts() {
 }
 
 /**
+ * Core Collection Verification Engine.
+ * Verifies that waste was physically removed by obtaining a fresh post-collection sensor reading
+ * and comparing the before and after fill percentages against configurable thresholds.
+ */
+export async function verifyBinCollection({ binId, collector, qrCode = null }) {
+  const bin = await Bin.findOne({ id: binId });
+  if (!bin) {
+    return { error: "Bin not found" };
+  }
+
+  // QR Code Verification (Optional / Recommended)
+  if (qrCode) {
+    const scannedCode = String(qrCode).trim().toUpperCase();
+    const expectedCode = String(bin.qrCode || bin.id).trim().toUpperCase();
+    if (scannedCode !== expectedCode) {
+      return { error: `QR Code mismatch. Scanned '${scannedCode}' does not match Bin '${bin.id}'.` };
+    }
+  }
+
+  const collectorLabel = collector.name || collector.mobile || "Collector";
+  const maxAllowed = alertConfig.verificationMaxFillPercentage || 30;
+  const minDrop = alertConfig.verificationMinDropPercentage || 15;
+
+  // 1. Prevent duplicate collection records if the bin is already verified and empty
+  if (bin.status === "Collected" && bin.fillLevel <= maxAllowed) {
+    const recentVerified = await Collection.findOne({
+      binId: bin.id,
+      verificationStatus: "VERIFIED",
+    }).sort({ createdAt: -1 });
+
+    if (recentVerified && (Date.now() - new Date(recentVerified.verifiedAt || recentVerified.collectedAt).getTime() < 300000)) {
+      return {
+        success: true,
+        verified: true,
+        duplicate: true,
+        message: `Collection Verified Successfully! Bin ${bin.id} was collected by ${recentVerified.collectorName || collectorLabel}.`,
+        fillBefore: recentVerified.fillLevelBefore,
+        fillAfter: recentVerified.fillLevelAfter,
+        bin: withMonitoring(bin.toObject()),
+        collection: recentVerified,
+      };
+    }
+  }
+
+  // 2. Retrieve or create the active PENDING collection record
+  let collectionRecord = null;
+  let fillBefore = bin.fillLevel ?? 0;
+
+  if (bin.isVerificationPending && bin.activeCollectionId) {
+    collectionRecord = await Collection.findById(bin.activeCollectionId);
+    if (collectionRecord) {
+      fillBefore = collectionRecord.fillLevelBefore ?? fillBefore;
+    }
+  }
+
+  if (!collectionRecord) {
+    const startedAt = new Date();
+    collectionRecord = await Collection.create({
+      binId: bin.id,
+      location: bin.location,
+      collectorId: collector._id,
+      collectorName: collector.name || "",
+      collectorMobile: collector.mobile,
+      fillLevelBefore: fillBefore,
+      fillLevelAfter: null,
+      collectionStartedAt: startedAt,
+      verificationStatus: "PENDING",
+      qrScanned: Boolean(qrCode),
+      collectedAt: startedAt,
+    });
+
+    bin.isVerificationPending = true;
+    bin.activeCollectionId = collectionRecord._id;
+    bin.consecutiveLowReadings = 0;
+    bin.verificationStartedAt = startedAt;
+    await bin.save();
+  }
+
+  // 3. Obtain a fresh sensor reading
+  let postReading = null;
+  let postDistance = null;
+  let readingSource = null;
+
+  // Try live hardware poll via Blynk Cloud
+  try {
+    const live = await fetchLiveBinReading(bin);
+    if (live && live.connected && typeof live.fillLevel === "number") {
+      postReading = live.fillLevel;
+      postDistance = live.distance;
+      readingSource = "BLYNK_LIVE";
+
+      // Update bin with this fresh reading
+      applySuccessfulSensorRead(bin, {
+        distance: postDistance,
+        fillLevel: postReading,
+        lastSensorUpdate: live.readAt,
+      });
+      await bin.save();
+    }
+  } catch (err) {
+    console.warn(`[Verification] Blynk live read error for bin ${bin.id}:`, err.message);
+  }
+
+  // If live Blynk read was not available, check recently ingested sensor reading
+  if (postReading === null) {
+    const isFresh = isSensorFresh(bin.lastSensorUpdate);
+    if (!isFresh || !bin.sensorConnected || bin.lastSensorUpdate === null) {
+      return {
+        success: false,
+        verified: false,
+        status: "UNAVAILABLE",
+        message: "Unable to verify collection. Waiting for a fresh sensor reading.",
+        fillBefore,
+        fillAfter: null,
+      };
+    }
+
+    const lastUpdateMs = new Date(bin.lastSensorUpdate).getTime();
+    const collectionStartedMs = new Date(collectionRecord.collectionStartedAt).getTime();
+
+    // Check if the sensor reading was taken before collection was started
+    if (lastUpdateMs < (collectionStartedMs - 5000)) {
+      return {
+        success: false,
+        verified: false,
+        status: "STALE",
+        message: "Unable to verify collection. Waiting for a fresh sensor reading.",
+        fillBefore,
+        fillAfter: bin.fillLevel,
+      };
+    }
+
+    postReading = bin.fillLevel;
+    postDistance = bin.distance;
+    readingSource = "SENSOR_STREAM";
+  }
+
+  // 4. Reject identical high readings (no physical emptying detected)
+  if (postReading === fillBefore && postReading > maxAllowed) {
+    collectionRecord.fillLevelAfter = postReading;
+    collectionRecord.failureReason = `No drop in fill level detected (Remained at ${postReading}%).`;
+    await collectionRecord.save();
+
+    return {
+      success: false,
+      verified: false,
+      status: "FAILED",
+      message: "Collection Verification Failed: No sufficient drop in fill level detected. Please check the bin and try again.",
+      fillBefore,
+      fillAfter: postReading,
+      fillDrop: 0,
+    };
+  }
+
+  // 5. Compare fill percentage before and after collection
+  const fillDrop = fillBefore - postReading;
+  // A collection is verified if:
+  // - Fill level after collection dropped below or equal to maxAllowed (<= 30%)
+  // - AND the drop is at least minDrop (>= 15%), OR if bin started low (<= 30%), it dropped by at least 5%
+  const sufficientDrop =
+    postReading <= maxAllowed &&
+    (fillDrop >= minDrop || (fillBefore <= maxAllowed && fillDrop >= 5));
+
+  if (!sufficientDrop) {
+    collectionRecord.fillLevelAfter = postReading;
+    collectionRecord.failureReason = `Insufficient fill-level decrease (Before: ${fillBefore}%, After: ${postReading}%, Drop: ${fillDrop}%). Required: level <= ${maxAllowed}% with >= ${minDrop}% drop.`;
+    await collectionRecord.save();
+
+    return {
+      success: false,
+      verified: false,
+      status: "FAILED",
+      message: "Collection Verification Failed: No sufficient drop in fill level detected. Please check the bin and try again.",
+      fillBefore,
+      fillAfter: postReading,
+      fillDrop,
+    };
+  }
+
+  // 6. ✅ SUCCESSFUL VERIFICATION!
+  const verifiedAt = new Date();
+  const durationSeconds = Math.max(
+    1,
+    Math.round((verifiedAt.getTime() - new Date(collectionRecord.collectionStartedAt).getTime()) / 1000)
+  );
+
+  collectionRecord.verificationStatus = "VERIFIED";
+  collectionRecord.fillLevelAfter = postReading;
+  collectionRecord.verifiedAt = verifiedAt;
+  collectionRecord.collectedAt = verifiedAt;
+  collectionRecord.collectionDurationSeconds = durationSeconds;
+  await collectionRecord.save();
+
+  // Update Bin in database
+  bin.fillLevel = postReading;
+  bin.status = "Collected";
+  bin.lastCollected = verifiedAt;
+  bin.isVerificationPending = false;
+  bin.activeCollectionId = null;
+  bin.consecutiveLowReadings = 0;
+  bin.verificationStartedAt = null;
+  bin.lastAlertState = "NORMAL";
+  bin.lastAlertSeverity = "NONE";
+  bin.consecutiveCriticalReadings = 0;
+  bin.isEscalated = false;
+  bin.escalatedAt = null;
+  await bin.save();
+
+  // Resolve active alerts
+  await Alert.updateMany(
+    { binId: bin.id, status: "ACTIVE" },
+    { $set: { status: "RESOLVED", resolvedAt: verifiedAt } }
+  );
+
+  // Update Blynk virtual pin with empty distance
+  if (bin.blynkPin) {
+    const pin = String(bin.blynkPin).split(",")[0].trim();
+    const emptyVal = Number(bin.emptyDistance) > 0 ? Number(bin.emptyDistance) : 50;
+    await pushBlynkValue(pin, emptyVal, bin.blynkAuthToken || undefined);
+  }
+
+  console.log(
+    `✅ [Collection VERIFIED via Popup] Bin: ${bin.id} | Collector: ${collectorLabel} | ${fillBefore}% ➔ ${postReading}% (Drop: ${fillDrop}%) | Source: ${readingSource}`
+  );
+
+  return {
+    success: true,
+    verified: true,
+    status: "VERIFIED",
+    message: `Collection Verified Successfully! Bin ${bin.id} was collected by ${collectorLabel}.`,
+    fillBefore,
+    fillAfter: postReading,
+    fillDrop,
+    verifiedAt,
+    bin: withMonitoring(bin.toObject()),
+    collection: collectionRecord,
+  };
+}
+
+/**
  * Backward compatibility wrapper for markBinCollected
  */
 export async function markBinCollected({ binId, collector, qrCode = null }) {
-  return await initiateCollectionVerification({ binId, collector, qrCode });
+  return await verifyBinCollection({ binId, collector, qrCode });
 }
 
 export function needsCollection(bin) {

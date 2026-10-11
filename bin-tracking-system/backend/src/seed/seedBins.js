@@ -15,8 +15,20 @@ const binsData = [
   {
     id: "BIN002",
     location: "Principal's Office",
-    fillLevel: 85,
-    status: "Full",
+    fillLevel: 0,
+    distance: 60,
+    status: "Normal",
+    // BIN002 uses its own Blynk device — token stored here (not in env)
+    blynkPin: "V0",
+    blynkAuthToken: "WSb0GD_9dtS8jY6qOYzuNQmgZyPp81K0",
+    integrationStatus: "INTEGRATED",
+    // HC-SR04 calibration for BIN002 hardware
+    // emptyDistance: ~60 cm when bin is completely empty
+    // fullDistance:  ~10 cm when bin is completely full
+    emptyDistance: 60,
+    fullDistance: 10,
+    // Notifications disabled during initial testing — enable after end-to-end verification
+    notificationsEnabled: false,
     latitude: 12.88434509283807,
     longitude: 76.16648145829812,
   },

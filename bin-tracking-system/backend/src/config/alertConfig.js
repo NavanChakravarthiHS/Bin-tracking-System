@@ -14,6 +14,7 @@ export const alertConfig = {
 
   // Verification Rules
   verificationMaxFillPercentage: Number(process.env.VERIFICATION_MAX_FILL_PERCENTAGE || 30), // Must drop <= 30%
+  verificationMinDropPercentage: Number(process.env.VERIFICATION_MIN_DROP_PERCENTAGE || 15), // Minimum drop in fill percentage required
   verificationReadingsRequired: Number(process.env.VERIFICATION_READINGS_REQUIRED || 2), // 2 consistent low readings required
 
   // False Alert Prevention: Number of consecutive readings required for critical threshold confirmation

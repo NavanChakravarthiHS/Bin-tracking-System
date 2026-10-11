@@ -11,13 +11,31 @@ import { checkPendingCollectionVerification } from "./collectionService.js";
 
 const BLYNK_API_URL = env.blynkApiUrl;
 
-const EMPTY_BIN_DISTANCE_CM = 50;
-const FULL_BIN_DISTANCE_CM = 10;
+// Default calibration constants (used when a bin does not have per-bin values set).
+const DEFAULT_EMPTY_DISTANCE_CM = 50;
+const DEFAULT_FULL_DISTANCE_CM = 10;
+
+/**
+ * Resolve the Blynk distance virtual pin for a bin.
+ * The blynkPin field may be stored as "V0" or as a comma-separated list like "V0,V1".
+ * For distance polling we always use the FIRST pin only.
+ */
+function resolveDistancePin(blynkPin) {
+  if (!blynkPin) return null;
+  return String(blynkPin).split(',')[0].trim() || null;
+}
 
 function calculateBinMetrics(distance, bin = {}) {
-  const validDistance = Math.max(FULL_BIN_DISTANCE_CM, Math.min(EMPTY_BIN_DISTANCE_CM, distance));
+  const emptyDist = Number(bin.emptyDistance) > 0 ? Number(bin.emptyDistance) : DEFAULT_EMPTY_DISTANCE_CM;
+  const fullDist  = Number(bin.fullDistance)  > 0 ? Number(bin.fullDistance)  : DEFAULT_FULL_DISTANCE_CM;
+  // Guard against misconfiguration (emptyDist must be strictly greater than fullDist)
+  if (emptyDist <= fullDist) {
+    console.warn(`[BIN ${bin.id}] Invalid calibration: emptyDistance (${emptyDist}) <= fullDistance (${fullDist}). Using defaults.`);
+    return calculateBinMetrics(distance, { ...bin, emptyDistance: DEFAULT_EMPTY_DISTANCE_CM, fullDistance: DEFAULT_FULL_DISTANCE_CM });
+  }
+  const validDistance = Math.max(fullDist, Math.min(emptyDist, distance));
   const fillLevel = Math.round(
-    ((EMPTY_BIN_DISTANCE_CM - validDistance) / (EMPTY_BIN_DISTANCE_CM - FULL_BIN_DISTANCE_CM)) * 100
+    ((emptyDist - validDistance) / (emptyDist - fullDist)) * 100
   );
   return { fillLevel, status: statusFromFillLevel(fillLevel, bin) };
 }
@@ -38,8 +56,8 @@ export async function isBlynkHardwareConnected(token = env.blynkAuthToken) {
   }
 }
 
-async function fetchBlynkValue(pin) {
-  const token = env.blynkAuthToken;
+async function fetchBlynkValue(pin, binToken) {
+  const token = binToken || env.blynkAuthToken;
   if (!token || !pin) return null;
 
   // Verify that the physical hardware device is online and connected to Blynk Cloud.
@@ -76,8 +94,8 @@ async function fetchBlynkValue(pin) {
   }
 }
 
-export async function pushBlynkValue(pin, value) {
-  const token = env.blynkAuthToken;
+export async function pushBlynkValue(pin, value, binToken) {
+  const token = binToken || env.blynkAuthToken;
   if (!token || !pin) return;
   try {
     const url = `${BLYNK_API_URL}/update?token=${token}&${pin}=${value}`;
@@ -85,6 +103,36 @@ export async function pushBlynkValue(pin, value) {
   } catch (error) {
     // Ignored
   }
+}
+
+/**
+ * Live hardware reading on demand for collection verification
+ */
+export async function fetchLiveBinReading(bin) {
+  if (!bin) return null;
+  const distancePin = resolveDistancePin(bin.blynkPin);
+  if (!distancePin) return null;
+  const token = bin.blynkAuthToken || env.blynkAuthToken;
+  if (!token) return null;
+
+  const isConnected = await isBlynkHardwareConnected(token);
+  if (!isConnected) {
+    return { connected: false, distance: null, fillLevel: null, reason: "Hardware device offline in Blynk Cloud" };
+  }
+
+  const distance = await fetchBlynkValue(distancePin, token);
+  if (distance === null) {
+    return { connected: false, distance: null, fillLevel: null, reason: "Unable to read distance from Blynk pin" };
+  }
+
+  const { fillLevel, status } = calculateBinMetrics(distance, bin);
+  return {
+    connected: true,
+    distance,
+    fillLevel,
+    status,
+    readAt: new Date(),
+  };
 }
 
 export async function syncAllBins() {
@@ -95,7 +143,8 @@ export async function syncAllBins() {
       if (!bin.blynkPin) return bin;
 
       // 1. Keep ultrasonic sensor reading interval at 5 seconds (called by setInterval in server.js)
-      const distance = await fetchBlynkValue(bin.blynkPin);
+      const distancePin = resolveDistancePin(bin.blynkPin);
+      const distance = await fetchBlynkValue(distancePin, bin.blynkAuthToken || undefined);
       if (distance === null) {
         const wasConnected = bin.sensorConnected;
         const wasActive = bin.deviceStatus;
@@ -125,7 +174,12 @@ export async function syncAllBins() {
           // Process alert thresholds and pending collection verification
           try {
             await checkPendingCollectionVerification({ bin, currentFill });
-            await processBinAlert({ bin, fillLevel: currentFill });
+            // Respect per-bin notification toggle (disabled for BIN002 during testing)
+            if (bin.notificationsEnabled !== false) {
+              await processBinAlert({ bin, fillLevel: currentFill });
+            } else {
+              console.log(`🔕 Notifications disabled for bin ${bin.id} — skipping alert.`);
+            }
           } catch (err) {
             console.error(`Error processing alert for bin ${bin.id}:`, err);
           }
@@ -134,6 +188,13 @@ export async function syncAllBins() {
           // without modifying fill level or triggering duplicate API/dashboard requests.
           applySuccessfulSensorRead(bin, { lastSensorUpdate: now });
           await bin.save();
+        }
+      } else if (bin.isVerificationPending && bin.activeCollectionId) {
+        // Fallback safety guard: always check pending collection verification
+        try {
+          await checkPendingCollectionVerification({ bin, currentFill });
+        } catch (err) {
+          console.error(`Error checking pending verification for bin ${bin.id}:`, err);
         }
       }
       // If shouldUpdate is false: do NOT update database or dashboard.

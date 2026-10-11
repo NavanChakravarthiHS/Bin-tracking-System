@@ -34,16 +34,22 @@ export function evaluateSensorUpdate(bin, currentFill, currentStatus, now = new 
   // Immediate update if device was previously offline or disconnected
   const isDeviceReconnected = !bin.sensorConnected || bin.deviceStatus !== "Active";
 
+  // CRITICAL: When bin collection verification is pending, every reading must be processed
+  // until required consecutive low readings are confirmed or timeout occurs!
+  const isVerificationPending = Boolean(bin.isVerificationPending && bin.activeCollectionId);
+
   const lastUpdateMs = bin.lastSensorUpdate ? new Date(bin.lastSensorUpdate).getTime() : 0;
   const timeSinceLastUpdate = now.getTime() - lastUpdateMs;
   // Requirement 7: Heartbeat update every 2 minutes to keep last-seen active status
   const isHeartbeatDue = timeSinceLastUpdate >= SENSOR_HEARTBEAT_INTERVAL_MS;
 
-  if (hasMeaningfulFillChange || hasStatusChanged || isDeviceReconnected) {
+  if (hasMeaningfulFillChange || hasStatusChanged || isDeviceReconnected || isVerificationPending) {
     return {
       shouldUpdate: true,
       isHeartbeatOnly: false,
-      reason: hasMeaningfulFillChange
+      reason: isVerificationPending
+        ? "VERIFICATION_PENDING"
+        : hasMeaningfulFillChange
         ? `FILL_CHANGE (${fillDiff}%)`
         : hasStatusChanged
         ? `STATUS_CHANGED (${previousStatus} -> ${currentStatus})`

@@ -68,6 +68,7 @@ adminBinsRouter.post("/bins", requireAuth, async (req, res) => {
       warningThreshold: parsed.warningThreshold,
       fullThreshold: parsed.fullThreshold,
       blynkPin: parsed.blynkPin,
+      blynkAuthToken: parsed.blynkAuthToken,
       fillLevel,
       distance: 50,
       status: statusFromFillLevel(fillLevel, parsed),
@@ -102,6 +103,7 @@ adminBinsRouter.put("/bins/:id", requireAuth, async (req, res) => {
     bin.warningThreshold = parsed.warningThreshold;
     bin.fullThreshold = parsed.fullThreshold;
     bin.blynkPin = parsed.blynkPin;
+    bin.blynkAuthToken = parsed.blynkAuthToken;
     bin.status = statusFromFillLevel(bin.fillLevel, parsed);
     await bin.save();
 

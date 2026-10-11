@@ -4,13 +4,16 @@ import { statusFromFillLevel } from "../utils/binStatus.js";
 import { processBinAlert } from "./alertService.js";
 import { checkPendingCollectionVerification } from "./collectionService.js";
 
-const EMPTY_BIN_DISTANCE_CM = 50;
-const FULL_BIN_DISTANCE_CM = 10;
+const DEFAULT_EMPTY_DISTANCE_CM = 50;
+const DEFAULT_FULL_DISTANCE_CM = 10;
 
-function fillFromDistance(distance) {
-  const validDist = Math.max(FULL_BIN_DISTANCE_CM, Math.min(EMPTY_BIN_DISTANCE_CM, distance));
+function fillFromDistance(distance, bin = {}) {
+  const emptyDist = Number(bin.emptyDistance) > 0 ? Number(bin.emptyDistance) : DEFAULT_EMPTY_DISTANCE_CM;
+  const fullDist  = Number(bin.fullDistance)  > 0 ? Number(bin.fullDistance)  : DEFAULT_FULL_DISTANCE_CM;
+  if (emptyDist <= fullDist) return 0; // misconfigured — treat as empty
+  const validDist = Math.max(fullDist, Math.min(emptyDist, distance));
   return Math.round(
-    ((EMPTY_BIN_DISTANCE_CM - validDist) / (EMPTY_BIN_DISTANCE_CM - FULL_BIN_DISTANCE_CM)) * 100
+    ((emptyDist - validDist) / (emptyDist - fullDist)) * 100
   );
 }
 
@@ -37,7 +40,7 @@ export async function ingestSensorReading({ binId, body = {} }) {
   if (typeof distance === "number") {
     bin.distance = distance;
     if (currentFill === null) {
-      currentFill = fillFromDistance(distance);
+      currentFill = fillFromDistance(distance, bin);
     }
   }
 
@@ -54,10 +57,6 @@ export async function ingestSensorReading({ binId, body = {} }) {
 
   bin.fillLevel = currentFill;
   bin.status = currentStatus;
-  if (currentFill > 0) {
-    bin.lastCollected = null;
-    bin.assignedCollector = null;
-  }
 
   applySuccessfulSensorRead(bin, {
     distance: bin.distance,
@@ -70,7 +69,12 @@ export async function ingestSensorReading({ binId, body = {} }) {
   try {
     // Check if bin is in collection verification pending state
     await checkPendingCollectionVerification({ bin, currentFill });
-    await processBinAlert({ bin, fillLevel: currentFill });
+    // Respect per-bin notification toggle (disabled for BIN002 during testing)
+    if (bin.notificationsEnabled !== false) {
+      await processBinAlert({ bin, fillLevel: currentFill });
+    } else {
+      console.log(`🔕 Notifications disabled for bin ${targetId} — skipping alert processing.`);
+    }
   } catch (err) {
     console.error(`Error processing alert for sensor update on bin ${targetId}:`, err);
   }
