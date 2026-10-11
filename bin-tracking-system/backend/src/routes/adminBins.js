@@ -42,6 +42,7 @@ adminBinsRouter.get("/bins", requireAuth, async (req, res) => {
 // GET /admin/bins/:id - Get single bin
 adminBinsRouter.get("/bins/:id", requireAuth, async (req, res) => {
   try {
+    await syncAllBinsIfNeeded();
     const bin = await Bin.findOne({ id: req.params.id }).lean();
     if (!bin) return res.status(404).json({ message: "Bin not found" });
     return res.json({ bin: withMonitoring(bin) });
@@ -103,7 +104,11 @@ adminBinsRouter.put("/bins/:id", requireAuth, async (req, res) => {
     bin.warningThreshold = parsed.warningThreshold;
     bin.fullThreshold = parsed.fullThreshold;
     bin.blynkPin = parsed.blynkPin;
-    bin.blynkAuthToken = parsed.blynkAuthToken;
+    if (parsed.blynkAuthToken) {
+      bin.blynkAuthToken = parsed.blynkAuthToken;
+    } else if (!bin.blynkAuthToken && parsed.id === "BIN002") {
+      bin.blynkAuthToken = "WSb0GD_9dtS8jY6qOYzuNQmgZyPp81K0";
+    }
     bin.status = statusFromFillLevel(bin.fillLevel, parsed);
     await bin.save();
 

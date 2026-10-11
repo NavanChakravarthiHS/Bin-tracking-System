@@ -17,6 +17,7 @@ const emptyForm = {
   warningThreshold: 50,
   fullThreshold: 80,
   blynkPin: '',
+  blynkAuthToken: '',
 };
 
 const BinsPage = () => {
@@ -116,6 +117,7 @@ const BinsPage = () => {
       warningThreshold: bin.warningThreshold ?? 50,
       fullThreshold: bin.fullThreshold ?? 80,
       blynkPin: bin.blynkPin || '',
+      blynkAuthToken: bin.blynkAuthToken || '',
     });
     setFormError('');
     setModalOpen(true);
@@ -136,6 +138,7 @@ const BinsPage = () => {
     warningThreshold: Number(form.warningThreshold),
     fullThreshold: Number(form.fullThreshold),
     blynkPin: form.blynkPin ? form.blynkPin.trim() : null,
+    blynkAuthToken: form.blynkAuthToken ? form.blynkAuthToken.trim() : undefined,
   });
 
   const handleSave = async (event) => {
@@ -532,18 +535,32 @@ const BinsPage = () => {
                 </div>
               </div>
 
-              {/* Blynk IoT Virtual Pin */}
-              <div>
-                <label className="block text-xs sm:text-sm font-semibold text-heading mb-1">
-                  Blynk Virtual Pin (Optional)
-                </label>
-                <input
-                  className="input-field w-full text-sm py-2 sm:py-2.5"
-                  value={form.blynkPin}
-                  onChange={(e) => setForm({ ...form, blynkPin: e.target.value })}
-                  placeholder="e.g. V0, V1"
-                />
-                <p className="text-[11px] text-gray-500 mt-1">Attach to hardware sensor pin for live IoT telemetry updates</p>
+              {/* Blynk IoT Virtual Pin & Device Auth Token */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-heading mb-1">
+                    Blynk Virtual Pin (Optional)
+                  </label>
+                  <input
+                    className="input-field w-full text-sm py-2 sm:py-2.5"
+                    value={form.blynkPin}
+                    onChange={(e) => setForm({ ...form, blynkPin: e.target.value })}
+                    placeholder="e.g. V0, V1"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">Telemetry pin (e.g. V0 for ultrasonic)</p>
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-heading mb-1">
+                    Blynk Auth Token (Optional)
+                  </label>
+                  <input
+                    className="input-field w-full text-sm py-2 sm:py-2.5 font-mono"
+                    value={form.blynkAuthToken}
+                    onChange={(e) => setForm({ ...form, blynkAuthToken: e.target.value })}
+                    placeholder="Leave blank to use default"
+                  />
+                  <p className="text-[11px] text-gray-500 mt-1">Per-device Blynk Cloud auth token</p>
+                </div>
               </div>
 
               {/* Action Buttons */}

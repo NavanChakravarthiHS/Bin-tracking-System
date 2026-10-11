@@ -21,6 +21,11 @@ export const env = {
   frontendOrigins: parseOriginList(process.env.FRONTEND_ORIGIN),
   cronSecret: process.env.CRON_SECRET || "",
   blynkAuthToken: process.env.BLYNK_AUTH_TOKEN || "",
+  blynkAuthTokenBin2:
+    process.env.BLYNK_AUTH_TOKEN_BIN2 ||
+    process.env.BLYNK_AUTH_TOKEN_BIN002 ||
+    process.env.BLYNK_BIN002_AUTH_TOKEN ||
+    "WSb0GD_9dtS8jY6qOYzuNQmgZyPp81K0",
   blynkApiUrl: process.env.BLYNK_API_URL || "https://blynk.cloud/external/api",
   isVercel: process.env.VERCEL === "1",
 };

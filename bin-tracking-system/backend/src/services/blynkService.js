@@ -25,6 +25,19 @@ function resolveDistancePin(blynkPin) {
   return String(blynkPin).split(',')[0].trim() || null;
 }
 
+export function resolveBinAuthToken(bin) {
+  if (!bin) return env.blynkAuthToken;
+  if (typeof bin === "string") return bin.trim();
+  if (bin.blynkAuthToken && String(bin.blynkAuthToken).trim()) {
+    return String(bin.blynkAuthToken).trim();
+  }
+  const id = String(bin.id || "").trim().toUpperCase();
+  if (id === "BIN002") {
+    return env.blynkAuthTokenBin2 || "WSb0GD_9dtS8jY6qOYzuNQmgZyPp81K0";
+  }
+  return env.blynkAuthToken;
+}
+
 function calculateBinMetrics(distance, bin = {}) {
   const emptyDist = Number(bin.emptyDistance) > 0 ? Number(bin.emptyDistance) : DEFAULT_EMPTY_DISTANCE_CM;
   const fullDist  = Number(bin.fullDistance)  > 0 ? Number(bin.fullDistance)  : DEFAULT_FULL_DISTANCE_CM;
@@ -110,9 +123,8 @@ export async function pushBlynkValue(pin, value, binToken) {
  */
 export async function fetchLiveBinReading(bin) {
   if (!bin) return null;
-  const distancePin = resolveDistancePin(bin.blynkPin);
-  if (!distancePin) return null;
-  const token = bin.blynkAuthToken || env.blynkAuthToken;
+  const distancePin = resolveDistancePin(bin.blynkPin) || "V0";
+  const token = resolveBinAuthToken(bin);
   if (!token) return null;
 
   const isConnected = await isBlynkHardwareConnected(token);
@@ -140,16 +152,31 @@ export async function syncAllBins() {
     const bins = await Bin.find({ isActive: { $ne: false } });
     
     const updatePromises = bins.map(async (bin) => {
+      // Auto-assign blynkPin for BIN002 if missing
+      if (!bin.blynkPin && String(bin.id).toUpperCase() === "BIN002") {
+        bin.blynkPin = "V0";
+      }
       if (!bin.blynkPin) return bin;
+
+      const token = resolveBinAuthToken(bin);
+      let configUpdated = false;
+      if (!bin.blynkAuthToken && token) {
+        bin.blynkAuthToken = token;
+        configUpdated = true;
+      }
+      if (bin.isActive === false && String(bin.id).toUpperCase() === "BIN002") {
+        bin.isActive = true;
+        configUpdated = true;
+      }
 
       // 1. Keep ultrasonic sensor reading interval at 5 seconds (called by setInterval in server.js)
       const distancePin = resolveDistancePin(bin.blynkPin);
-      const distance = await fetchBlynkValue(distancePin, bin.blynkAuthToken || undefined);
+      const distance = await fetchBlynkValue(distancePin, token);
       if (distance === null) {
         const wasConnected = bin.sensorConnected;
         const wasActive = bin.deviceStatus;
         applyFailedSensorRead(bin);
-        if (wasConnected !== bin.sensorConnected || wasActive !== bin.deviceStatus) {
+        if (configUpdated || wasConnected !== bin.sensorConnected || wasActive !== bin.deviceStatus) {
           await bin.save();
         }
         return bin;

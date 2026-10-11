@@ -51,9 +51,42 @@ const binsData = [
 ];
 
 export async function seedBins() {
-  const count = await Bin.countDocuments();
-  if (count === 0) {
-    await Bin.insertMany(binsData);
-    console.log("Bins seeded successfully");
+  for (const binDef of binsData) {
+    const existing = await Bin.findOne({ id: binDef.id });
+    if (!existing) {
+      await Bin.create(binDef);
+      console.log(`[Seed] Created bin ${binDef.id}`);
+    } else {
+      let modified = false;
+      // Sync Blynk Auth Token and Pin if defined in seed and missing or different
+      if (binDef.blynkAuthToken && existing.blynkAuthToken !== binDef.blynkAuthToken) {
+        existing.blynkAuthToken = binDef.blynkAuthToken;
+        modified = true;
+      }
+      if (binDef.blynkPin && existing.blynkPin !== binDef.blynkPin) {
+        existing.blynkPin = binDef.blynkPin;
+        modified = true;
+      }
+      if (binDef.integrationStatus && existing.integrationStatus !== binDef.integrationStatus) {
+        existing.integrationStatus = binDef.integrationStatus;
+        modified = true;
+      }
+      if (binDef.emptyDistance && !existing.emptyDistance) {
+        existing.emptyDistance = binDef.emptyDistance;
+        modified = true;
+      }
+      if (binDef.fullDistance && !existing.fullDistance) {
+        existing.fullDistance = binDef.fullDistance;
+        modified = true;
+      }
+      if (existing.isActive === false) {
+        existing.isActive = true;
+        modified = true;
+      }
+      if (modified) {
+        await existing.save();
+        console.log(`[Seed] Synchronized configuration for bin ${binDef.id}`);
+      }
+    }
   }
 }
