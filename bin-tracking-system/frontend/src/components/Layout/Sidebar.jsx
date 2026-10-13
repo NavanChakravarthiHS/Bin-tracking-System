@@ -56,13 +56,13 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-gray-800 border-r border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out xl:static xl:w-64 xl:h-screen xl:sticky xl:top-0 xl:shadow-lg xl:translate-x-0 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 h-screen w-72 max-w-[85vw] bg-gray-800 border-r border-gray-700 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out xl:w-64 xl:translate-x-0 xl:shadow-lg xl:z-40 ${
+          isOpen ? 'translate-x-0 z-50' : '-translate-x-full z-50'
         }`}
         aria-label="Sidebar Navigation"
       >
         {/* Logo & Mobile Close Header */}
-        <div className="p-4 sm:p-6 border-b border-gray-700 flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-gray-700 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-2.5 rounded-lg shadow-lg">
               <Leaf size={22} className="text-white" />
@@ -85,7 +85,7 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 sm:p-4 space-y-1.5 overflow-y-auto">
+        <nav className="flex-1 p-3 sm:p-4 space-y-1.5 overflow-y-auto min-h-0">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2.5 px-3">
             Navigation
           </p>
@@ -107,7 +107,7 @@ const Sidebar = ({ isOpen = false, onClose = () => {} }) => {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4 border-t border-gray-700 flex-shrink-0">
           <div className="bg-gray-700/80 rounded-lg p-3 border border-gray-600">
             <p className="text-xs font-semibold text-gray-200 mb-1">System Status</p>
             <div className="flex items-center gap-2 mt-1.5">

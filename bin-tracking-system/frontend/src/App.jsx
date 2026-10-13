@@ -17,22 +17,22 @@ function App() {
 
   return (
     <Router basename="/app.html">
-      <div className="flex bg-gray-50 min-h-screen relative overflow-x-hidden">
-        {/* Sidebar (Responsive desktop sticky + mobile drawer) */}
+      <div className="flex bg-gray-50 min-h-screen xl:h-screen xl:overflow-hidden">
+        {/* Sidebar (Responsive desktop fixed + mobile drawer) */}
         <Sidebar
           isOpen={mobileSidebarOpen}
           onClose={() => setMobileSidebarOpen(false)}
         />
         
         {/* Main Content */}
-        <div className="flex-1 flex flex-col min-w-0 w-full overflow-x-hidden">
+        <div className="flex-1 flex flex-col min-w-0 w-full xl:ml-64 min-h-screen xl:h-screen xl:overflow-y-auto overflow-x-hidden">
           <Navbar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             onToggleMobileMenu={() => setMobileSidebarOpen((prev) => !prev)}
             isMobileMenuOpen={mobileSidebarOpen}
           />
-          <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-y-auto overflow-x-hidden">
+          <main className="flex-1 p-3 sm:p-4 md:p-6 overflow-x-hidden">
             <div className="max-w-7xl mx-auto w-full">
               <Routes>
                 <Route element={<RequireAdmin />}>
