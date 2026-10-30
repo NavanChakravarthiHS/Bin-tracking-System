@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { getToken } from '../../auth/adminAuth';
 import LoadingSpinner from '../Common/LoadingSpinner';
+import SmsControlModal from '../Common/SmsControlModal';
 import { API_BASE_URL } from '../../config/api';
 
 const API_URL = API_BASE_URL;
@@ -29,6 +30,7 @@ const Alerts = () => {
   const [statusFilter, setStatusFilter] = useState('ACTIVE'); // ACTIVE, ALL, RESOLVED
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [isSmsModalOpen, setIsSmsModalOpen] = useState(false);
 
   const token = getToken();
 
@@ -297,10 +299,20 @@ const Alerts = () => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+          <button
+            type="button"
+            onClick={() => setIsSmsModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white transition-colors shadow-xs whitespace-nowrap min-h-[36px]"
+            title="Open SMS Gateway Test & Control Modal"
+          >
+            <Smartphone size={14} />
+            <span>SMS Dispatch</span>
+          </button>
+
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 flex-1 sm:flex-none"
+            className="text-xs font-semibold px-2.5 sm:px-3 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 flex-1 sm:flex-none min-h-[36px]"
           >
             <option value="ACTIVE">Active Alerts</option>
             <option value="ALL">All Statuses (History)</option>
@@ -465,6 +477,13 @@ const Alerts = () => {
           })}
         </div>
       )}
+
+      {/* SMS Gateway Control Modal */}
+      <SmsControlModal
+        isOpen={isSmsModalOpen}
+        onClose={() => setIsSmsModalOpen(false)}
+        onSent={() => fetchAlerts(true)}
+      />
     </div>
   );
 };

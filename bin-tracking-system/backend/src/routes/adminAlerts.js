@@ -3,6 +3,8 @@ import { Alert } from "../models/Alert.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { retryAlertNotification } from "../services/alertService.js";
 import { runAlertMonitorCycleIfNeeded } from "../services/alertMonitorService.js";
+import { sendSMS } from "../services/textbeeService.js";
+import { getAdminMobileNumber } from "../services/smsNotificationService.js";
 
 export const adminAlertsRouter = express.Router();
 
@@ -51,6 +53,45 @@ adminAlertsRouter.get("/alerts", requireAuth, async (req, res) => {
   } catch (error) {
     console.error("Error fetching alerts:", error);
     return res.status(500).json({ message: "Failed to fetch alerts" });
+  }
+});
+
+// POST /admin/alerts/test-sms - Trigger a test SMS message
+adminAlertsRouter.post("/alerts/test-sms", requireAuth, async (req, res) => {
+  try {
+    const { recipient, message } = req.body || {};
+    const adminMobile = await getAdminMobileNumber();
+    const targetMobile = (recipient || adminMobile || "").trim();
+
+    if (!targetMobile) {
+      return res.status(400).json({
+        success: false,
+        message: "No recipient mobile number provided and no admin mobile configured",
+      });
+    }
+
+    const testMessage =
+      message ||
+      `EcoTrack Test SMS: System alert notification gateway is active and operational at ${new Date().toLocaleTimeString()}.`;
+
+    const result = await sendSMS(targetMobile, testMessage);
+
+    if (result.success) {
+      return res.json({
+        success: true,
+        message: `Test SMS dispatched successfully to ${targetMobile}`,
+        messageId: result.messageId,
+      });
+    } else {
+      return res.status(502).json({
+        success: false,
+        message: `Failed to dispatch SMS: ${result.error || "Gateway error"}`,
+        error: result.error,
+      });
+    }
+  } catch (error) {
+    console.error("Error sending test SMS:", error);
+    return res.status(500).json({ success: false, message: error.message || "Failed to send test SMS" });
   }
 });
 

@@ -11,6 +11,7 @@ const binsData = [
     latitude: 12.884826192901519,
     longitude: 76.16705545090305,
     integrationStatus: "INTEGRATED",
+    notificationsEnabled: true,
   },
   {
     id: "BIN002",
@@ -27,8 +28,7 @@ const binsData = [
     // fullDistance:  ~10 cm when bin is completely full
     emptyDistance: 60,
     fullDistance: 10,
-    // Notifications disabled during initial testing — enable after end-to-end verification
-    notificationsEnabled: false,
+    notificationsEnabled: true,
     latitude: 12.88434509283807,
     longitude: 76.16648145829812,
   },
@@ -69,6 +69,10 @@ export async function seedBins() {
       }
       if (binDef.integrationStatus && existing.integrationStatus !== binDef.integrationStatus) {
         existing.integrationStatus = binDef.integrationStatus;
+        modified = true;
+      }
+      if (binDef.notificationsEnabled !== undefined && existing.notificationsEnabled !== binDef.notificationsEnabled) {
+        existing.notificationsEnabled = binDef.notificationsEnabled;
         modified = true;
       }
       if (binDef.emptyDistance && !existing.emptyDistance) {
